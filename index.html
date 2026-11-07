@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>臨場 浜風珈琲</title>
+<meta name="description" content="喫茶店に調査に入り、社長の説明の不審な点を証拠で崩す、3Dの税務調査体験ゲーム（すべて架空）。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&family=Zen+Old+Mincho:wght@600&display=swap">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+<div id="stage" aria-label="調査現場の3D画面"></div>
+<div id="vignette"></div>
+<div id="loading">調査の準備中…</div>
+
+<!-- タイトル -->
+<section id="title" hidden>
+  <div class="t-wrap">
+    <div class="t-kicker">税務調査 体験ゲーム</div>
+    <h1 class="t-name">臨場</h1>
+    <p class="t-case">CASE：喫茶店「浜風珈琲」</p>
+    <p class="t-sub">あなたは税務署の調査官。お店に入り、社長の説明に<b>不審な点</b>がないか調べます。見つけた証拠を社長にぶつけて、ごまかしを明らかにしましょう。</p>
+    <div class="t-row">
+      <button class="btn btn-main" id="as-leader">代表として始める<small>グループに1人</small></button>
+      <button class="btn btn-ghost" id="as-member">メンバー<small>代表以外の人</small></button>
+    </div>
+    <button class="btn btn-ghost t-resume" id="resume" hidden>続きから再開する</button>
+    <div class="t-foot">
+      <span>全員が調べられます。社長に証拠を示せるのは代表だけ。会社・人物・資料はすべて架空です。</span>
+      <button class="icon-btn" id="t-sound" aria-label="音のオンとオフ"></button>
+    </div>
+  </div>
+</section>
+
+<!-- プレイ中 -->
+<div id="hud" hidden>
+  <div class="hud-top">
+    <div class="place"><small id="role-label">代表</small><span id="place-label">店内</span></div>
+    <div class="hud-tools">
+      <button class="icon-btn" id="b-book" aria-label="手帳を開く">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M4 17a3 3 0 0 1 3-3h11"/></svg>手帳<span class="badge" id="book-count">0</span></button>
+      <button class="icon-btn" id="b-hint" aria-label="ヒントを聞く">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>ヒント</button>
+      <button class="icon-btn" id="b-sound" aria-label="音のオンとオフ"></button>
+    </div>
+  </div>
+  <div class="hud-mid"><div id="coach" hidden><div class="hand"></div><p>指でなぞって見回す・光る印をタップ</p></div></div>
+  <div class="hud-bottom">
+    <div class="claims" id="claims"></div>
+    <div class="row2" id="row2">
+      <button class="btn btn-ghost" id="b-move" hidden></button>
+      <button class="btn btn-main" id="b-council">相談タイム</button>
+    </div>
+  </div>
+</div>
+
+<div id="talk" hidden>
+  <div class="talk-box" id="talk-box" role="button" tabindex="0" aria-label="タップで次へ">
+    <canvas id="talk-face" width="160" height="160"></canvas>
+    <div><div class="talk-who" id="talk-who"></div><div class="talk-say" id="talk-say" aria-live="polite"></div></div>
+    <div class="talk-next"><span>▼ タップで次へ</span></div>
+  </div>
+</div>
+<button class="icon-btn" id="skip" hidden>スキップ ▶▶</button>
+
+<div id="toast" hidden></div>
+<section class="sheet" id="evidence" hidden><div class="paper" id="paper"></div></section>
+<section class="sheet" id="notebook" hidden><div class="book" id="book"></div></section>
+<section class="sheet" id="dial" hidden>
+  <div class="lockbox" id="lockbox">
+    <h2>金庫</h2>
+    <p>4けたの番号で開きます。<br>番号のヒントは、どこかにあるはず。</p>
+    <div class="wheels" id="wheels"></div>
+    <div class="btns"><button class="btn btn-ghost" id="dial-cancel">やめる</button><button class="btn btn-main" id="dial-ok">開ける</button></div>
+  </div>
+</section>
+<section class="sheet" id="council" hidden><div class="council-in" id="council-in"></div></section>
+
+<div id="speedlines"></div>
+<div id="thrust" hidden></div>
+<div id="flash"></div>
+<div id="banner" hidden></div>
+<div id="fade"></div>
+<section id="result" hidden><div class="r-wrap" id="result-in"></div></section>
+
+<script src="js/vendor/three.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/world.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
