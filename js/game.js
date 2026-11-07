@@ -85,6 +85,7 @@
 
   function setPhase(p) {
     S.phase = p;
+    document.body.classList.toggle("cinema", p === "intro" || p === "confront");
     const exploring = p === "explore";
     $("hud").hidden = !(p === "explore");
     W.showMarkers(S.room, exploring);
@@ -192,6 +193,11 @@
     if (isNew) { S.got.add(ev); bumpBadge(); toast(`手帳に「${C.evidence[ev].name}」を追加`); if (id === "plant") W.keyMesh.visible = false; }
     save();
     if (isNew && COMMENTS[ev]) await lines(COMMENTS[ev]);
+    const shopSeen = [...S.seen].filter((k) => C.spots[k].room === "shop").length;
+    if (S.room === "shop" && !S.visited.has("office") && shopSeen >= 3 && !S.toldDoor) {
+      S.toldDoor = true;
+      await talk("mori", "カウンターの奥に<b>「事務室」のドア</b>があるね。青い矢印の印をタップすると入れるよ。", "smile");
+    }
     await W.restore(back, 750);
     S.busy = false; setPhase("explore");
   }
@@ -310,7 +316,7 @@
     await wait(700);
     if (ok) {
       const f = $("flash"); f.style.transition = "none"; f.style.opacity = ".9"; requestAnimationFrame(() => { f.style.transition = "opacity .6s"; f.style.opacity = "0"; });
-      W.react("boss", "shock");
+      W.react("boss", "shock"); th.hidden = true;
       const bn = $("banner"); bn.innerHTML = `立証！<small>「${c.label}」の主張を崩した</small>`; bn.hidden = false; bn.classList.remove("show"); void bn.offsetWidth; bn.classList.add("show");
       SND.play("win");
       await wait(1500); bn.hidden = true; th.hidden = true;

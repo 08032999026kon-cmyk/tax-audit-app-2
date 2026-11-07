@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>臨場 進行画面</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&family=Zen+Old+Mincho:wght@600&display=swap">
+<style>
+/* 投影用。暗い1テーマに固定し、遠くからでも読める大きさにする */
+:root{
+  --night:#0b1020;--panel:#151b2b;--ink:#f3ead8;--dim:#aaa392;--amber:#f2a53a;--red:#e2553f;--paper:#f7f1e3;--paper-ink:#2b2620;--line:rgba(243,234,216,.16);
+  --f-display:"Dela Gothic One","Hiragino Kaku Gothic StdN","Noto Sans JP",sans-serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  --f-paper:"Zen Old Mincho","Hiragino Mincho ProN","Noto Serif JP",serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--night);color:var(--ink);font-family:var(--f-body);display:flex;flex-direction:column;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+.slide{display:none;flex:1;min-height:0;padding:5vh max(5vw,16px) 3vh;overflow:auto;flex-direction:column;gap:3vh}
+.slide.on{display:flex}
+.kicker{font-size:clamp(12px,1.4vw,20px);letter-spacing:.28em;color:var(--amber);font-weight:700;margin:0}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(64px,13vw,200px);line-height:.95;margin:0;letter-spacing:.02em;text-shadow:0 8px 60px rgba(242,165,58,.25)}
+h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px);line-height:1.15;margin:0;letter-spacing:.02em}
+.lead{font-size:clamp(18px,2.4vw,38px);line-height:1.6;margin:0}
+.lead b,.big b{color:var(--amber)}
+.center{justify-content:center}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:2.4vw}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:2.4vw;display:flex;flex-direction:column;gap:1vw;min-width:0}
+.card h3{margin:0;font-size:clamp(20px,2.6vw,40px)}
+.tag{align-self:flex-start;padding:.25em .8em;border-radius:999px;font-size:clamp(14px,1.6vw,24px);font-weight:700;background:var(--ink);color:var(--night)}
+.tag.red{background:var(--red);color:#fff}
+.big{font-size:clamp(18px,2.3vw,36px);line-height:1.6;margin:0;padding-left:1.2em}
+.note{font-size:clamp(14px,1.5vw,22px);color:var(--dim);margin:0}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1.6vh;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:auto 1fr;gap:1.4vw;align-items:center;font-size:clamp(18px,2.4vw,38px);line-height:1.5;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.6vh 1.6vw}
+.steps li::before{content:counter(s);font-family:var(--f-display);display:grid;place-items:center;width:1.8em;height:1.8em;border-radius:50%;background:var(--amber);color:#1b1206}
+.steps li.must{border-color:var(--red)}
+.steps b{color:var(--amber)}
+.qrwrap{display:grid;grid-template-columns:auto 1fr;gap:4vw;align-items:center;flex:1;min-height:0}
+.qr{background:#fff;padding:1.4vw;border-radius:18px;width:min(46vh,40vw);aspect-ratio:1;max-width:100%}
+.qr svg{width:100%;height:100%;display:block}
+.url{font-family:ui-monospace,Menlo,monospace;font-size:clamp(12px,1.4vw,22px);color:var(--dim);word-break:break-all}
+.timer-wrap{display:grid;grid-template-columns:1.3fr 1fr;gap:3vw;align-items:center;flex:1}
+.timer{font-family:var(--f-display);font-size:clamp(80px,17vw,280px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.timer.low{color:var(--red)}
+.tbtns{display:flex;flex-wrap:wrap;gap:10px;margin-top:2vh}
+.tbtns button{padding:.6em 1.2em;border-radius:12px;background:var(--panel);border:1px solid var(--line);font-size:clamp(14px,1.5vw,22px);font-weight:700}
+.tbtns button.primary{background:var(--amber);color:#1b1206;border-color:var(--amber)}
+.answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:2vw}
+.ans{background:var(--paper);color:var(--paper-ink);border-radius:16px;padding:2vw;display:flex;flex-direction:column;gap:1vh}
+.ans small{font-size:clamp(12px,1.3vw,20px);font-weight:700;letter-spacing:.12em;color:#7a6e5c}
+.ans .claim{font-family:var(--f-paper);font-size:clamp(16px,1.9vw,30px);line-height:1.5}
+.ans .ev{font-size:clamp(18px,2.2vw,34px);font-weight:700;color:#b2321f}
+.ans p{margin:0;font-size:clamp(14px,1.5vw,22px);line-height:1.6}
+.reveal{align-self:flex-start;padding:.7em 1.4em;border-radius:14px;background:var(--red);color:#fff;font-size:clamp(16px,1.8vw,28px);font-weight:700}
+.fraud{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:2vw}
+.fraud .card strong{font-family:var(--f-display);font-weight:400;font-size:clamp(24px,3.2vw,52px);color:var(--amber)}
+.bar{display:flex;align-items:center;gap:10px;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);background:#080c18}
+.bar button{padding:8px 16px;border-radius:10px;background:var(--panel);border:1px solid var(--line);font-weight:700}
+.bar .count{flex:1;text-align:center;color:var(--dim);font-size:14px;font-variant-numeric:tabular-nums}
+#cfg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:grid;place-items:center;padding:16px}
+#cfg div{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(36rem,100%);display:flex;flex-direction:column;gap:10px}
+#cfg input{font:inherit;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0b1020;color:var(--ink);width:100%}
+@media (max-width:760px){.qrwrap,.timer-wrap{grid-template-columns:1fr}.qr{width:min(70vw,320px)}}
+</style>
+</head>
+<body>
+<section class="slide on center" data-title="タイトル">
+  <p class="kicker">税務調査 体験ゲーム</p>
+  <h1>臨場</h1>
+  <p class="lead">喫茶店「浜風珈琲」に調査に入り、社長の説明の<b>不審な点</b>を、<b>証拠</b>で崩そう。</p>
+</section>
+
+<section class="slide" data-title="今日やること">
+  <p class="kicker">MISSION</p>
+  <h2>あなたは税務署の調査官です</h2>
+  <p class="lead">お店のもうけ（<b>所得</b>）は「売上 − 経費」。もうけが大きいほど、税金も多くなります。<br>だから、こんなごまかしが起きることがあります。</p>
+  <div class="fraud">
+    <div class="card"><strong>売上除外</strong><p class="lead">売上を帳簿に書かずに隠す</p></div>
+    <div class="card"><strong>架空経費</strong><p class="lead">ありもしない経費を足す</p></div>
+  </div>
+  <p class="note">これから出てくる会社・人物・資料は、すべて架空です。</p>
+</section>
+
+<section class="slide" data-title="役割">
+  <p class="kicker">ROLE</p>
+  <h2>グループで役割を決めよう</h2>
+  <div class="grid2">
+    <div class="card"><span class="tag red">代表　1人</span><ul class="big"><li>「代表として始める」を押す</li><li>相談して決めた証拠を<b>社長にぶつける</b></li></ul></div>
+    <div class="card"><span class="tag">メンバー　ほかの人</span><ul class="big"><li>「メンバー」を押す</li><li>店を調べて、見つけた証拠を<b>代表に伝える</b></li></ul></div>
+  </div>
+  <p class="note">全員が自分のスマホで店を調べられます。社長に示せるのは代表だけです。間違えても減点はありません。</p>
+</section>
+
+<section class="slide" data-title="QRを読み取る">
+  <p class="kicker">JOIN</p>
+  <h2>スマホでQRを読み取ってください</h2>
+  <div class="qrwrap">
+    <div class="qr" id="qr"></div>
+    <div style="display:flex;flex-direction:column;gap:2vh;min-width:0">
+      <p class="lead">開いたら、<b>代表</b>か<b>メンバー</b>を選んで始めます。</p>
+      <p class="lead">音が出ます。周りがうるさいときは、画面右上の「音」で消せます。</p>
+      <div class="url" id="url"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="進め方">
+  <p class="kicker">HOW TO PLAY</p>
+  <h2>この順で進めよう</h2>
+  <ol class="steps">
+    <li>指でなぞって見回し、<b>光る印</b>をタップして店や事務室を調べる</li>
+    <li>社長の主張と<b>食い違う証拠</b>を探す（迷ったら「ヒント」）</li>
+    <li class="must"><b>相談タイム</b>：どの主張に、どの証拠をぶつけるか、みんなで決める</li>
+    <li>代表が社長にぶつける。<b>3つの主張</b>をすべて崩したらクリア</li>
+  </ol>
+</section>
+
+<section class="slide" data-title="調査タイム">
+  <p class="kicker">INVESTIGATION</p>
+  <h2>調査開始</h2>
+  <div class="timer-wrap">
+    <div>
+      <div class="timer" id="timer">18:00</div>
+      <div class="tbtns"><button class="primary" id="t-start">スタート</button><button id="t-pause">一時停止</button><button id="t-plus">＋1分</button><button id="t-minus">−1分</button><button id="t-reset">リセット</button></div>
+    </div>
+    <div class="card"><h3>迷ったら</h3><ul class="big"><li>画面右上の<b>ヒント</b>を押す</li><li>社長の主張を読み直す</li><li>日付・金額を見比べる</li><li>手を挙げてスタッフへ</li></ul></div>
+  </div>
+</section>
+
+<section class="slide" data-title="ふりかえり">
+  <p class="kicker">REVIEW</p>
+  <h2>ふりかえり</h2>
+  <ol class="steps">
+    <li>最初に「あれ？」と感じた<b>不審な点</b>は？（端緒）</li>
+    <li>そこから、どこを調べようと<b>当たりをつけた</b>？</li>
+    <li>社長が言い逃れできない<b>決め手の証拠</b>は、どれだった？（立証）</li>
+  </ol>
+</section>
+
+<section class="slide" data-title="答え合わせ">
+  <p class="kicker">ANSWER</p>
+  <h2>答え合わせ</h2>
+  <button class="reveal" id="reveal">答えを表示する</button>
+  <div class="answers" id="answers" hidden></div>
+</section>
+
+<section class="slide center" data-title="おわり">
+  <p class="kicker">OUR WORK</p>
+  <h2 style="font-size:clamp(36px,7vw,110px)">端緒 → 当たり → 立証</h2>
+  <p class="lead">不審な点に気づき、どこを調べるか当たりをつけ、<br>社長にぶつける証拠で立証する。それが、今日体験した仕事です。</p>
+  <p class="lead" style="margin-top:3vh">ありがとうございました</p>
+</section>
+
+<div class="bar">
+  <button id="prev">← 前へ</button>
+  <div class="count" id="count"></div>
+  <button id="cfg-open">設定</button>
+  <button id="full">全画面</button>
+  <button id="next">次へ →</button>
+</div>
+<div id="cfg" hidden><div>
+  <b>参加者が開くURL</b>
+  <input id="cfg-url" type="url" inputmode="url">
+  <p class="note">QRに使うURLです。ふつうは変える必要はありません。</p>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="tb" id="cfg-cancel">やめる</button><button class="tb" id="cfg-save" style="color:var(--amber)">保存</button></div>
+</div></div>
+
+<script src="js/vendor/qrcode.js"></script>
+<script src="js/data.js"></script>
+<script>
+(function(){
+  "use strict";
+  const $=id=>document.getElementById(id);
+  const DEFAULT_URL="https://08032999026kon-cmyk.github.io/tax-audit-app-2/";
+  function gameUrl(){
+    try{const s=localStorage.getItem("rinjo-host:url");if(s)return s;}catch(e){}
+    if(/^https?:/.test(location.protocol)&&!/claude/.test(location.host)) return new URL("index.html",location.href).href.replace(/index\.html$/,"");
+    return DEFAULT_URL;
+  }
+  function drawQr(){
+    const u=gameUrl();$("url").textContent=u;const el=$("qr");
+    if(typeof qrcode!=="function"){el.textContent=u;return;}
+    const q=qrcode(0,"M");q.addData(u);q.make();el.innerHTML=q.createSvgTag({cellSize:4,margin:2,scalable:true});
+  }
+  drawQr();
+
+  const slides=[...document.querySelectorAll(".slide")];let at=0;
+  try{at=Math.min(slides.length-1,Math.max(0,+sessionStorage.getItem("rinjo-host:at")||0));}catch(e){}
+  function show(n){at=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,i)=>s.classList.toggle("on",i===at));
+    $("count").textContent=`${at+1} / ${slides.length}　${slides[at].dataset.title}`;try{sessionStorage.setItem("rinjo-host:at",at);}catch(e){}}
+  show(at);
+  $("prev").onclick=()=>show(at-1);$("next").onclick=()=>show(at+1);
+  addEventListener("keydown",e=>{if(e.target.tagName==="INPUT")return;if(["ArrowRight","PageDown"].includes(e.key)){show(at+1);e.preventDefault();}if(["ArrowLeft","PageUp"].includes(e.key)){show(at-1);e.preventDefault();}});
+  $("full").onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}catch(e){}};
+
+  /* タイマー */
+  let total=18*60,left=total,tid=null;
+  const fmt=s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+  function paint(){$("timer").textContent=fmt(left);$("timer").classList.toggle("low",left<=60);}
+  $("t-start").onclick=()=>{if(tid)return;tid=setInterval(()=>{left=Math.max(0,left-1);paint();if(!left){clearInterval(tid);tid=null;}},1000);};
+  $("t-pause").onclick=()=>{clearInterval(tid);tid=null;};
+  $("t-plus").onclick=()=>{left+=60;paint();};
+  $("t-minus").onclick=()=>{left=Math.max(0,left-60);paint();};
+  $("t-reset").onclick=()=>{clearInterval(tid);tid=null;left=total;paint();};
+  paint();
+
+  /* 答え */
+  $("reveal").onclick=()=>{
+    const C=window.CASE;
+    $("answers").innerHTML=C.claims.map(c=>`<div class="ans"><small>社長の主張（${c.label}）</small><div class="claim">「${c.text}」</div><small>決め手の証拠</small><div class="ev">${C.evidence[c.answer].name}</div><p>${c.solved}</p></div>`).join("");
+    $("answers").hidden=false;$("reveal").hidden=true;
+  };
+
+  /* 設定 */
+  $("cfg-open").onclick=()=>{$("cfg-url").value=gameUrl();$("cfg").hidden=false;};
+  $("cfg-cancel").onclick=()=>{$("cfg").hidden=true;};
+  $("cfg-save").onclick=()=>{try{localStorage.setItem("rinjo-host:url",$("cfg-url").value.trim());}catch(e){}$("cfg").hidden=true;drawQr();};
+})();
+</script>
+</body>
+</html>

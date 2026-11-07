@@ -276,3 +276,9 @@ tr.hl td{background:rgba(242,165,58,.18)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* 映画のような上下の黒帯（オープニングと対決のとき） */
+.cine{position:fixed;left:0;right:0;height:9vh;background:#000;z-index:25;pointer-events:none;transition:transform .6s ease}
+#cine-t{top:0;transform:translateY(-100%)}
+#cine-b{bottom:0;transform:translateY(100%)}
+body.cinema #cine-t,body.cinema #cine-b{transform:none}

@@ -182,8 +182,10 @@
     const hair = mesh(new T.SphereGeometry(0.212, 24, 12, 0, Math.PI * 2, 0, Math.PI / (opt.bald ? 3.2 : 2.1)), STD({ color: opt.hair || 0x1d1d1d }), 0, 0.01, -0.01, head);
     hair.rotation.x = opt.bald ? -0.2 : -0.35;
     if (opt.mustache) box(0.1, 0.025, 0.03, STD({ color: 0x2a2a2a }), 0, -0.07, 0.19, head);
+    [-1, 1].forEach(sd => sph(0.05, skin, sd * 0.2, -0.01, 0, head, 10, 8));
+    if (opt.bald) [-1, 1].forEach(sd => { const h = sph(0.07, STD({ color: opt.hair || 0x1d1d1d }), sd * 0.17, 0.06, -0.06, head, 10, 8); h.scale.set(0.7, 1, 1.2); });
     const fc = canvas(256, 256, () => {}); const ft = tex(fc);
-    const face = mesh(new T.PlaneGeometry(0.3, 0.3), new T.MeshBasicMaterial({ map: ft, transparent: true, depthWrite: false }), 0, 0.0, 0.201, head);
+    const face = mesh(new T.PlaneGeometry(0.34, 0.34), new T.MeshBasicMaterial({ map: ft, transparent: true, depthWrite: false }), 0, 0.0, 0.201, head);
     face.castShadow = false;
     const p = { group: g, torso, head, arms, body, face, expr: "", who: opt.who, base: 0 };
     p.setFace = (e) => { if (p.expr === e) return; p.expr = e; drawFace(fc.getContext("2d"), 256, 256, e, opt.who); ft.needsUpdate = true; };
