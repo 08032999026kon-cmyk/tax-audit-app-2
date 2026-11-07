@@ -80,9 +80,10 @@ b{font-weight:700}
 #hud > .hud-mid{pointer-events:none}
 .hud-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .place{display:flex;flex-direction:column;gap:2px;padding:6px 12px;border-radius:12px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.place small{font-size:10px;letter-spacing:.16em;color:var(--amber)}
-.place span{font-size:14px;font-weight:700}
-.hud-tools{display:flex;gap:6px}
+.place small{font-size:10px;letter-spacing:.06em;color:var(--amber);white-space:nowrap;font-variant-numeric:tabular-nums}
+.place span{font-size:14px;font-weight:700;white-space:nowrap}
+.hud-tools{display:flex;gap:6px;flex:none}
+@media (max-width:380px){.icon-btn{padding:0 9px}.icon-btn svg{display:none}}
 .hud-mid{flex:1;pointer-events:none;position:relative}
 .hud-bottom{display:flex;flex-direction:column;gap:8px;max-width:34rem;width:100%;margin:0 auto}
 .claims{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
@@ -282,3 +283,12 @@ tr.hl td{background:rgba(242,165,58,.18)}
 #cine-t{top:0;transform:translateY(-100%)}
 #cine-b{bottom:0;transform:translateY(100%)}
 body.cinema #cine-t,body.cinema #cine-b{transform:none}
+
+/* 社長の登場の札 */
+#namecard{position:fixed;left:0;top:22%;z-index:32;pointer-events:none;padding:14px 28px 14px max(20px,env(safe-area-inset-left,0px));
+  background:linear-gradient(90deg,rgba(90,20,34,.96),rgba(90,20,34,.85) 70%,rgba(90,20,34,0));border-top:3px solid #e8b94a;border-bottom:3px solid #e8b94a;
+  min-width:min(22rem,86vw);animation:cardIn .7s cubic-bezier(.2,1.2,.4,1) both}
+#namecard small{display:block;font-size:12px;letter-spacing:.2em;color:#e8b94a;font-weight:700}
+#namecard strong{display:block;font-family:var(--f-display);font-weight:400;font-size:clamp(40px,12vw,64px);line-height:1.1;letter-spacing:.06em;color:#fff;text-shadow:0 3px 0 #000}
+#namecard span{display:block;font-size:13px;color:#f3d9a8;margin-top:2px}
+@keyframes cardIn{from{transform:translateX(-110%)}}

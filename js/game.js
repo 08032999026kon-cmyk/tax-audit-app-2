@@ -59,7 +59,7 @@
       const el = $("talk-say"); const plain = text.replace(/<[^>]+>/g, ""); let i = 0; el.textContent = "";
       clearInterval(typing);
       if (who === "boss") W.react("boss", "talk");
-      typing = setInterval(() => { i++; el.textContent = plain.slice(0, i); if (i % 3 === 0) SND.play("tick"); if (i >= plain.length) { clearInterval(typing); typing = null; el.innerHTML = text; } }, 30);
+      typing = setInterval(() => { i++; el.textContent = plain.slice(0, i); if (i % 3 === 0) SND.play(who === "boss" ? "bossTick" : "tick"); if (i >= plain.length) { clearInterval(typing); typing = null; el.innerHTML = text; } }, 30);
       talkDone = () => {
         if (typing) { clearInterval(typing); typing = null; el.innerHTML = text; return; }
         talkDone = null; $("talk").hidden = true; res();
@@ -72,8 +72,8 @@
 
   /* HUD */
   function renderHud() {
-    $("role-label").textContent = S.role === "leader" ? "代表" : "メンバー";
-    $("place-label").textContent = `${ROOMS[S.room].name}　${S.seen.size}/${Object.keys(C.spots).length}`;
+    $("role-label").textContent = `${S.role === "leader" ? "代表" : "メンバー"}・調査 ${S.seen.size}/${Object.keys(C.spots).length}`;
+    $("place-label").textContent = ROOMS[S.room].name;
     $("book-count").textContent = S.got.size;
     $("claims").innerHTML = C.claims.map((c) => `<button class="claim-chip ${S.solved.has(c.id) ? "solved" : ""}" data-id="${c.id}"><i></i><span>${c.label}<br><small>${S.solved.has(c.id) ? "立証" : "主張"}</small></span></button>`).join("");
     const mv = $("b-move");
@@ -317,7 +317,7 @@
     await wait(700);
     if (ok) {
       const f = $("flash"); f.style.transition = "none"; f.style.opacity = ".9"; requestAnimationFrame(() => { f.style.transition = "opacity .6s"; f.style.opacity = "0"; });
-      W.react("boss", "shock"); th.hidden = true;
+      W.react("boss", "shock"); th.hidden = true; SND.play("shock");
       const bn = $("banner"); bn.innerHTML = `立証！<small>「${c.label}」の主張を崩した</small>`; bn.hidden = false; bn.classList.remove("show"); void bn.offsetWidth; bn.classList.add("show");
       SND.play("win");
       await wait(1500); bn.hidden = true; th.hidden = true;
@@ -329,7 +329,7 @@
       await talk("mori", `やった！ 「${c.label}」の主張を崩したよ。残りの主張はあと<b>${left}つ</b>。続けて調べよう。`, "smile");
     } else {
       SND.play("wrong"); th.hidden = true;
-      await W.react("boss", "smug");
+      SND.play("laugh"); await W.react("boss", "smug");
       await talk("boss", (c.near && c.near[ev]) || c.wrong, "smug");
       const near = c.near && c.near[ev];
       await talk("mori", near ? "惜しい！ 方向は合っているよ。社長が言い逃れできない、<b>もっと決定的な証拠</b>がないか探そう。" : "その証拠では崩せないみたいだ。<b>間違えても減点はない</b>よ。主張と食い違う証拠を、もう一度考えよう。", "think");
@@ -391,7 +391,12 @@
     SND.play("door"); await W.openFront();
     await W.flyTo(ROOMS.shop.pos, V(-1.45, 1.7, -3.2), 1800);
     await W.turnTo("boss", ROOMS.shop.pos, 500);
-    await talk("boss", "いらっしゃい。社長の白洲です。うちは小さな店ですが、きちんとやってますよ。", "smile");
+    SND.bgm("tense"); SND.play("slam");
+    const cam0 = W.snapshot();
+    await W.flyTo(V(-1.0, 1.75, -1.35), V(-1.45, 1.78, -3.2), 700);
+    if (!W.fast) { $("namecard").hidden = false; await wait(2300); $("namecard").hidden = true; }
+    await talk("boss", "いらっしゃい。社長の白洲です。うちは小さな店ですが、税金のことは<b>きちんと</b>やってますよ。ククク……。", "smug");
+    SND.bgm("calm"); await W.restore(cam0, 900);
     await talk("mori", "社長、まずはお店のお金のことを教えてください。", "normal");
     for (const c of C.claims) {
       await talk("boss", c.text, "smile");
@@ -441,6 +446,7 @@
   $("as-member").addEventListener("click", () => begin("member"));
   $("resume").addEventListener("click", () => { const d = load(); if (d) begin(d.role || "leader", d); });
 
+  document.addEventListener("pointerdown", () => SND.unlock(), { capture: true });
   /* ---------- 起動 ---------- */
   try { W.init($("stage")); } catch (e) { $("loading").textContent = "この端末では3Dを表示できませんでした。別のブラウザーで開いてください。"; return; }
   W.place(V(5, 1.5, 14), V(0, 1.6, 4)); W.showMarkers("shop", false);
