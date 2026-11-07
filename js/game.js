@@ -73,9 +73,9 @@
   /* HUD */
   function renderHud() {
     $("role-label").textContent = S.role === "leader" ? "代表" : "メンバー";
-    $("place-label").textContent = ROOMS[S.room].name;
+    $("place-label").textContent = `${ROOMS[S.room].name}　${S.seen.size}/${Object.keys(C.spots).length}`;
     $("book-count").textContent = S.got.size;
-    $("claims").innerHTML = C.claims.map((c) => `<div class="claim-chip ${S.solved.has(c.id) ? "solved" : ""}" data-id="${c.id}"><i></i><span>${c.label}<br><small>${S.solved.has(c.id) ? "立証" : "主張"}</small></span></div>`).join("");
+    $("claims").innerHTML = C.claims.map((c) => `<button class="claim-chip ${S.solved.has(c.id) ? "solved" : ""}" data-id="${c.id}"><i></i><span>${c.label}<br><small>${S.solved.has(c.id) ? "立証" : "主張"}</small></span></button>`).join("");
     const mv = $("b-move");
     if (S.room === "office") { mv.hidden = false; mv.textContent = "← 店内へ"; }
     else if (S.visited.has("office")) { mv.hidden = false; mv.textContent = "事務室へ →"; }
@@ -247,6 +247,7 @@
     $("book-close").addEventListener("click", () => { SND.play("tap"); $("notebook").hidden = true; });
   }
   $("b-book").addEventListener("click", () => { if (!S.busy) openBook(); });
+  $("claims").addEventListener("click", (e) => { if (e.target.closest(".claim-chip") && !S.busy) openBook(); });
 
   /* ---------- ヒント ---------- */
   $("b-hint").addEventListener("click", async () => {

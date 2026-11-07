@@ -46,7 +46,7 @@ b{font-weight:700}
 .btn-red{background:var(--red);color:#fff;box-shadow:0 8px 28px rgba(226,85,63,.35)}
 .btn-ghost{background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .btn[disabled]{opacity:.38;cursor:default;box-shadow:none}
-.icon-btn{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 12px;border-radius:999px;background:var(--panel);
+.icon-btn{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 12px;border-radius:999px;background:var(--panel);
   border:1px solid var(--line);font-size:13px;font-weight:700;letter-spacing:.04em;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);position:relative}
 .icon-btn svg{width:18px;height:18px;flex:none}
 .badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--amber);color:var(--amber-ink);
@@ -86,7 +86,7 @@ b{font-weight:700}
 .hud-mid{flex:1;pointer-events:none;position:relative}
 .hud-bottom{display:flex;flex-direction:column;gap:8px;max-width:34rem;width:100%;margin:0 auto}
 .claims{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.claim-chip{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:10px;background:var(--panel);border:1px solid var(--line);
+.claim-chip{color:inherit;font:inherit;min-height:44px;display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:10px;background:var(--panel);border:1px solid var(--line);
   font-size:12px;line-height:1.25;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-align:left}
 .claim-chip i{flex:none;width:16px;height:16px;border-radius:50%;border:2px solid var(--dim)}
 .claim-chip.solved{border-color:rgba(226,85,63,.6)}
