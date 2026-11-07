@@ -292,3 +292,12 @@ body.cinema #cine-t,body.cinema #cine-b{transform:none}
 #namecard strong{display:block;font-family:var(--f-display);font-weight:400;font-size:clamp(40px,12vw,64px);line-height:1.1;letter-spacing:.06em;color:#fff;text-shadow:0 3px 0 #000}
 #namecard span{display:block;font-size:13px;color:#f3d9a8;margin-top:2px}
 @keyframes cardIn{from{transform:translateX(-110%)}}
+
+/* 承諾をもらう */
+.consent-card{background:var(--panel-solid);border:1px solid rgba(242,165,58,.45);border-radius:18px;padding:20px 18px 16px;width:min(26rem,100%);display:flex;flex-direction:column;gap:10px;animation:fadeUp .35s ease}
+.consent-card h2{font-family:var(--f-display);font-weight:400;font-size:24px;margin:0;line-height:1.3}
+.consent-card p{margin:0;font-size:14px;line-height:1.75}
+.consent-card p b{color:var(--amber)}
+.consent-actions{display:grid;gap:8px;margin-top:4px}
+.icon-btn.muted{color:var(--dim);border-style:dashed}
+.t-foot span{line-height:1.6}

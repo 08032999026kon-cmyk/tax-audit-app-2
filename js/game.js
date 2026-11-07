@@ -12,14 +12,14 @@
   /* ---------- 状態 ---------- */
   const S = {
     role: "leader", phase: "title", room: "shop", busy: false,
-    got: new Set(), seen: new Set(), solved: new Set(), visited: new Set(), unlocked: new Set(),
+    got: new Set(), seen: new Set(), solved: new Set(), visited: new Set(), unlocked: new Set(), consent: new Set(),
     hints: 0, tries: 0, t0: 0, done: false
   };
   function save() {
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify({
         role: S.role, room: S.room, got: [...S.got], seen: [...S.seen], solved: [...S.solved], visited: [...S.visited],
-        unlocked: [...S.unlocked], hints: S.hints, tries: S.tries, t0: S.t0, done: S.done
+        unlocked: [...S.unlocked], consent: [...S.consent], hints: S.hints, tries: S.tries, t0: S.t0, done: S.done
       }));
     } catch (e) {}
   }
@@ -35,9 +35,12 @@
   const ICONS = { receipt: "🧾", register: "🖨", order: "📝", calendar: "📅", menu: "📋", key: "🔑", pc: "💻", photo: "🖼", stock: "📦", envelope: "✉", blank: "📄" };
 
   /* ---------- 画面の部品 ---------- */
-  function soundLabel() { return SND.on ? "音 ON" : "音 OFF"; }
-  function refreshSound() { $("b-sound").textContent = soundLabel(); $("t-sound").textContent = soundLabel(); }
-  [$("b-sound"), $("t-sound")].forEach((b) => b.addEventListener("click", () => { SND.toggle(); refreshSound(); SND.play("tap"); }));
+  const SPK_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+  const SPK_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
+  function refreshSound() {
+    [$("b-sound"), $("t-sound")].forEach((b) => { b.innerHTML = (SND.on ? SPK_ON + "音あり" : SPK_OFF + "音なし"); b.setAttribute("aria-pressed", SND.on ? "true" : "false"); b.setAttribute("aria-label", SND.on ? "音を消す" : "音を出す"); b.classList.toggle("muted", !SND.on); });
+  }
+  [$("b-sound"), $("t-sound")].forEach((b) => b.addEventListener("click", () => { const on = SND.toggle(); refreshSound(); if (on) { SND.play("tap"); if (S.phase !== "title") SND.bgm(S.phase === "confront" ? "tense" : "calm"); } else SND.bgm(null); toast(on ? "音を出します" : "音を消しました"); }));
   refreshSound();
 
   let toastTimer = null;
@@ -53,8 +56,8 @@
       if (who === "boss" && expr) W.people.boss.setFace(expr);
       if (who === "mori") W.people.mori.setFace(expr || "normal");
       const box = $("talk-box"); box.classList.toggle("no-face", who === "narr");
-      if (who !== "narr") { const pc = W.portrait(who === "you" ? "you" : who, expr || (who === "boss" ? "normal" : "smile")); const g = $("talk-face").getContext("2d"); g.clearRect(0, 0, 160, 160); g.drawImage(pc, 0, 0); }
-      $("talk-who").textContent = who === "you" ? (S.role === "leader" ? "あなた（代表）" : "代表") : NAMES[who];
+      if (who !== "narr") { const pc = W.portrait(who === "you" || who === "me" ? "you" : who, expr || (who === "boss" ? "normal" : "smile")); const g = $("talk-face").getContext("2d"); g.clearRect(0, 0, 160, 160); g.drawImage(pc, 0, 0); }
+      $("talk-who").textContent = who === "me" ? "あなた（調査官）" : who === "you" ? (S.role === "leader" ? "あなた（代表）" : "代表") : NAMES[who];
       $("talk").hidden = false; box.style.animation = "none"; void box.offsetWidth; box.style.animation = "";
       const el = $("talk-say"); const plain = text.replace(/<[^>]+>/g, ""); let i = 0; el.textContent = "";
       clearInterval(typing);
@@ -169,6 +172,12 @@
     W.showMarkers(S.room, false); $("hud").hidden = true; SND.play("tap");
     await W.flyTo(ws.camPos, ws.focus, 850);
 
+    // 承諾：開ける・触れる前に、社長の「いいですよ」をもらう
+    if (CONSENT[id] && !S.consent.has(id)) {
+      const ok = await askConsent(id);
+      if (!ok) { await W.restore(back, 700); S.busy = false; setPhase("explore"); return; }
+    }
+
     // 鍵のかかった引き出し
     if (sp.lock === "key" && !S.unlocked.has(id)) {
       if (!S.got.has("key")) {
@@ -200,6 +209,34 @@
     }
     await W.restore(back, 750);
     S.busy = false; setPhase("explore");
+  }
+
+  /* ---------- 承諾 ---------- */
+  const CONSENT = {
+    register: ["社長、<b>レジの記録</b>を見せていただけますか？", "……どうぞ。見られて困るものはありませんよ。"],
+    trash: ["<b>ゴミ箱の中</b>を確認させていただいてもよろしいですか？", "ゴ、ゴミ箱？ ……まあ、どうぞ。"],
+    plant: ["こちらの<b>植木鉢</b>を少し確認させてください。", "植木鉢ぃ？ ……好きにしてください。"],
+    pc: ["<b>パソコンの帳簿</b>を見せていただけますか？", "どうぞ。帳簿はきちんと付けていますからね。"],
+    boxes: ["<b>段ボールと入荷の記録</b>を確認してもよろしいですか？", "豆が入っているだけですよ。どうぞ。"],
+    desk: ["<b>机の引き出し</b>を開けて確認してもよろしいですか？", "……か、構いませんよ。開けばの話ですがね。"],
+    safe: ["<b>金庫の中</b>を確認させていただけますか？", "……どうぞ。番号は、私も忘れてしまいましたがねぇ。ククク……。"]
+  };
+  let consentExplained = false;
+  function askConsent(id) {
+    return new Promise((res) => {
+      const label = C.spots[id].label, first = !consentExplained && S.consent.size === 0;
+      $("consent-in").innerHTML = `<div class="eyebrow">承諾をもらう</div><h2>${label}を調べる前に</h2>
+        ${first ? `<p>税務調査では、机や金庫を開けたり、書類やお金に触れたりする前に、必ず相手の<b>承諾</b>（「いいですよ」という同意）をもらいます。<b>勝手に開けたり触ったりはできません。</b></p>` : `<p>勝手には調べられません。社長に<b>承諾</b>をお願いしよう。</p>`}
+        <div class="consent-actions"><button class="btn btn-main" id="cs-ask">社長に承諾をお願いする</button><button class="btn btn-ghost" id="cs-no">やめる</button></div>`;
+      $("consent").hidden = false; SND.play("open"); $("cs-ask").focus({ preventScroll: true });
+      $("cs-no").onclick = () => { SND.play("tap"); $("consent").hidden = true; res(false); };
+      $("cs-ask").onclick = async () => {
+        SND.play("tap"); $("consent").hidden = true; consentExplained = true;
+        await talk("me", CONSENT[id][0]);
+        await talk("boss", CONSENT[id][1], "smug");
+        S.consent.add(id); save(); toast("社長の承諾を得た"); res(true);
+      };
+    });
   }
 
   function showEvidence(ev, isNew, label) {
@@ -371,7 +408,7 @@
       </ul>
       <div class="stats"><span>かかった時間 <b>${mins}分</b></span><span>ヒント <b>${S.hints}回</b></span><span>調べた場所 <b>${S.seen.size}/${Object.keys(C.spots).length}</b></span></div>
       <button class="btn btn-ghost" id="again">はじめから遊ぶ</button>
-      <p class="stats" style="font-size:11px">このお話の会社・人物・資料はすべて架空です。</p>`;
+      <p class="stats" style="font-size:11px;line-height:1.6">このお話はゲームで、会社・人物・資料はすべて架空です。実際の税務調査では、机や金庫を開ける、書類やお金に触れるといったことは、必ず相手の明示の承諾を得てから行います。</p>`;
     $("result").hidden = false;
     $("again").onclick = () => { clearSave(); location.reload(); };
   }
@@ -407,6 +444,7 @@
     await talk("mori", "お店のもうけ（<b>所得</b>）は「売上 − 経費」で決まる。もうけが大きいほど、税金も多くなるんだ。", "normal");
     await talk("mori", "だから、売上を隠したり（<b>売上除外</b>）、ありもしない経費を足したり（<b>架空経費</b>）するごまかしが起きる。", "think");
     await talk("mori", "社長の話に<b>不審な点</b>がないか、店の中を調べよう。<b>光っている印</b>をタップすると調べられるよ。", "smile");
+    await talk("mori", "それと、税務調査では机や金庫を<b>勝手に開けたり、お金や書類に触ったりはできない</b>。調べる前に、社長に<b>承諾</b>（「いいですよ」という同意）をもらおう。", "normal");
     await talk("mori", S.role === "leader"
       ? "証拠がそろったら<b>相談タイム</b>。みんなで相談して、代表のあなたが社長にぶつけよう。"
       : "証拠がそろったら<b>相談タイム</b>。社長に示せるのは<b>代表だけ</b>だから、見つけた証拠を代表に伝えよう。", "smile");
@@ -428,7 +466,7 @@
     S.role = role; $("title").hidden = true;
     if (resume) {
       const d = resume;
-      ["got", "seen", "solved", "visited", "unlocked"].forEach((k) => { S[k] = new Set(d[k] || []); });
+      ["got", "seen", "solved", "visited", "unlocked", "consent"].forEach((k) => { S[k] = new Set(d[k] || []); });
       S.hints = d.hints || 0; S.tries = d.tries || 0; S.t0 = d.t0 || Date.now(); S.room = d.room || "shop";
       S.seen.forEach((id) => W.setMarker(id, "done"));
       if (S.unlocked.has("safe")) W.safeDoor.rotation.y = -1.7;
