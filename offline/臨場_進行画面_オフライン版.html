@@ -74,7 +74,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
 <section class="slide on center" data-title="タイトル">
   <p class="kicker">税務調査 体験ゲーム</p>
   <h1>臨場</h1>
-  <p class="lead">喫茶店「浜風珈琲」に調査に入り、社長の説明の<b>不審な点</b>を、<b>証拠</b>で崩そう。</p>
+  <p class="lead">班で手分けして喫茶店「浜風珈琲」を調べ、社長の説明を<b>証拠</b>で確かめよう。</p>
 </section>
 
 <section class="slide" data-title="今日やること">
@@ -88,15 +88,17 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   <p class="note">これから出てくる会社・人物・資料は、すべて架空です。</p>
 </section>
 
-<section class="slide" data-title="役割">
+<section class="slide" data-title="担当">
   <p class="kicker">ROLE</p>
-  <h2>グループで役割を決めよう</h2>
+  <h2>班で担当を分けよう</h2>
   <div class="grid2">
-    <div class="card"><span class="tag red">代表　1人</span><ul class="big"><li>「代表として始める」を押す</li><li>相談して決めた証拠を<b>社長にぶつける</b></li></ul></div>
-    <div class="card"><span class="tag">メンバー　ほかの人</span><ul class="big"><li>「メンバー」を押す</li><li>店を調べて、見つけた証拠を<b>代表に伝える</b></li></ul></div>
+    <div class="card"><span class="tag" style="background:#f2a53a">代表　班に1人</span><p class="lead">決算書を読み、最後に<b>社長へ証拠を示す</b></p></div>
+    <div class="card"><span class="tag" style="background:#e2553f;color:#fff">売上担当</span><p class="lead">レジや予約の記録を調べる</p></div>
+    <div class="card"><span class="tag" style="background:#4fb3a9">現金担当</span><p class="lead">通帳や金庫を調べる</p></div>
+    <div class="card"><span class="tag" style="background:#8f8cf0">仕入れ担当</span><p class="lead">仕入れの帳簿や在庫を調べる</p></div>
   </div>
-  <p class="note">全員が自分のスマホで店を調べられます。社長に示せるのは代表だけです。間違えても減点はありません。</p>
-  <p class="note">これはゲームです。実際の税務調査では、机や金庫を開けたり、お金や書類に触れたりするときは、必ず相手の明示の承諾を得ます。</p>
+  <p class="note">2〜3人の班：1人で2つ持つ（例：代表＋売上）。5〜6人の班：同じ担当を2人で持つ。担当ごとに見られる資料が違うので、<b style="color:var(--amber)">声に出して伝え合う</b>のがカギです。</p>
+  <p class="note">これはゲームです。実際の税務調査では、書類を見せてもらう・机や金庫を開けてもらうときは、必ず相手の明示の承諾を得ます。</p>
 </section>
 
 <section class="slide" data-title="QRを読み取る">
@@ -105,8 +107,8 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   <div class="qrwrap">
     <div class="qr" id="qr"></div>
     <div style="display:flex;flex-direction:column;gap:2vh;min-width:0">
-      <p class="lead">開いたら、<b>代表</b>か<b>メンバー</b>を選んで始めます。</p>
-      <p class="lead">音が出ます。消したいときは、画面右上の<b>「音あり」</b>を押すと「音なし」になります。</p>
+      <p class="lead">開いたら「はじめる」を押し、<b>自分の担当</b>を選びます。</p>
+      <p class="lead">音が出ます。消したいときは、画面右上の<b>音のボタン</b>を押すと消えます。</p>
       <div class="url" id="url"></div>
     </div>
   </div>
@@ -116,22 +118,22 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   <p class="kicker">HOW TO PLAY</p>
   <h2>この順で進めよう</h2>
   <ol class="steps">
-    <li>指でなぞって見回し、<b>光る印</b>をタップして調べる（開ける・触る前に社長の<b>承諾</b>をもらう）</li>
-    <li>社長の主張と<b>食い違う証拠</b>を探す（迷ったら「ヒント」）</li>
-    <li class="must"><b>相談タイム</b>：どの主張に、どの証拠をぶつけるか、みんなで決める</li>
-    <li>代表が社長にぶつける。<b>3つの主張</b>をすべて崩したらクリア</li>
+    <li><b>第1幕　準備調査（5分）</b>：自分の資料で気になる点をタップ → 班で読み上げ、仮説を選ぶ</li>
+    <li><b>第2幕　臨場（12分）</b>：社長に質問し、<b>承諾をもらって</b>現場を見る。持ち時間に注意</li>
+    <li class="must"><b>第3幕　検討と説明（7分）</b>：発言と証拠の<b>番号</b>を代表に伝える。代表が<b>違う担当の証拠2つ</b>を社長にぶつける</li>
   </ol>
 </section>
 
 <section class="slide" data-title="調査タイム">
   <p class="kicker">INVESTIGATION</p>
-  <h2>調査開始</h2>
+  <h2 id="phase">第1幕　準備調査</h2>
   <div class="timer-wrap">
     <div>
-      <div class="timer" id="timer">18:00</div>
+      <div class="timer" id="timer">05:00</div>
+      <div class="tbtns"><button data-ph="5" data-n="第1幕　準備調査">第1幕 5分</button><button data-ph="12" data-n="第2幕　臨場">第2幕 12分</button><button data-ph="7" data-n="第3幕　検討と説明">第3幕 7分</button></div>
       <div class="tbtns"><button class="primary" id="t-start">スタート</button><button id="t-pause">一時停止</button><button id="t-plus">＋1分</button><button id="t-minus">−1分</button><button id="t-reset">リセット</button></div>
     </div>
-    <div class="card"><h3>迷ったら</h3><ul class="big"><li>画面右上の<b>ヒント</b>を押す</li><li>社長の主張を読み直す</li><li>日付・金額を見比べる</li><li>手を挙げてスタッフへ</li></ul></div>
+    <div class="card"><h3>迷ったら</h3><ul class="big"><li>分かったことを<b>声に出して</b>班に伝える</li><li>森先輩の<b>ヒント</b>を読む</li><li>日付・金額を見比べる</li><li>手を挙げてスタッフへ</li></ul></div>
   </div>
 </section>
 
@@ -142,6 +144,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
     <li>最初に「あれ？」と感じた<b>不審な点</b>は？（端緒）</li>
     <li>そこから、どこを調べようと<b>当たりをつけた</b>？</li>
     <li>社長が言い逃れできない<b>決め手の証拠</b>は、どれだった？（立証）</li>
+    <li>ほかの担当から聞いて<b>つながった</b>のは、どの情報だった？</li>
   </ol>
 </section>
 
@@ -2474,180 +2477,213 @@ var qrcode = function() {
 
 </script>
 <script>
-/* 事件データ（すべて架空）
- * 喫茶店「浜風珈琲」　社長：白洲 守（しらす まもる）
- * 不正：①貸切パーティーの売上85,000円をレジに通さず金庫に隠した（売上除外）
- *       ②コーヒー豆の仕入れ30万円を、白紙の領収書を使ってでっち上げた（架空経費）
+/* 事件データ（すべて架空）　喫茶店「浜風珈琲」（株式会社浜風珈琲・社長 白洲 守）
+ * 答え：①土曜夜の貸切パーティーの売上をレジに通さず金庫に隠した（売上除外 153万円＝18回）
+ *       ②山海物産の白紙の領収書で、豆の仕入れ30万円×6回をでっち上げた（架空経費 180万円）
+ * 担当（代表・売上・現金・仕入れ）ごとに見られる物が違う。証拠には「番号」があり、口で伝え合う。
  */
-window.CASE = {
-  title: "浜風珈琲",
-  boss: "白洲社長",
-  partner: "森先輩",
+window.CASE = (function () {
+  const yen = (n) => n.toLocaleString("ja-JP");
 
-  /* 社長の主張。answer が正解の証拠。near は「惜しい」証拠への社長の反論 */
-  claims: [
-    {
-      id: "c1",
-      label: "売上",
-      text: "売上は、全部レジを通して記録しています。",
-      answer: "order",
-      win: "そ、その注文票は……。ええと、レジを打ち忘れただけで……。",
-      wrong: "それが何か？ 売上は全部レジに入っていますよ。",
-      near: {
-        register: "レジの記録？ 夜は店を閉めているんだから、記録がないのは当然でしょう。",
-        calendar: "それは予定を書いただけ。その貸切はキャンセルになったんですよ。",
-        menu: "メニューに貸切コースがあっても、やったとは限らないでしょう？"
-      },
-      solved: "レジを通していない売上があった"
+  /* ---------- 担当 ---------- */
+  const roles = {
+    lead: { name: "代表", sub: "調査の責任者", color: "#f2a53a", mark: "代",
+      desc: "決算書の全体を見て、最後に社長へ説明する。仲間から証拠の番号を聞き取って組み立てる。" },
+    sales: { name: "売上担当", sub: "売上を調べる", color: "#e2553f", mark: "売",
+      desc: "レジや予約の記録を調べる。売上について社長に質問できる。" },
+    cash: { name: "現金担当", sub: "お金の流れを調べる", color: "#4fb3a9", mark: "現",
+      desc: "通帳や金庫を調べる。現金の扱いについて社長に質問できる。" },
+    buy: { name: "仕入れ担当", sub: "経費を調べる", color: "#8f8cf0", mark: "仕",
+      desc: "仕入れの帳簿や在庫を調べる。仕入れ先について社長に質問できる。" }
+  };
+
+  /* ---------- 第1幕：準備調査（担当ごとの資料と「気になる点」） ---------- */
+  const prep = {
+    lead: {
+      title: "決算書（3期くらべ）", code: "代0",
+      html: `<table class="fs"><thead><tr><th>（万円）</th><th>前々期</th><th>前期</th><th>今期</th></tr></thead><tbody>
+        <tr><th>売上</th><td>1,820</td><td>1,850</td><td data-hit="sales">1,790</td></tr>
+        <tr><th>仕入れ</th><td>564</td><td>574</td><td data-hit="buy">752</td></tr>
+        <tr class="sub"><th>原価率</th><td>31.0%</td><td>31.0%</td><td data-hit="rate">42.0%</td></tr>
+        <tr><th>人件費</th><td>610</td><td>620</td><td data-hit="staff">625</td></tr>
+        <tr><th>家賃・その他</th><td>456</td><td>460</td><td>470</td></tr>
+        <tr class="total"><th>所得（もうけ）</th><td>190</td><td>196</td><td data-hit="loss">−57</td></tr></tbody></table>
+        <p class="cap">原価率＝売上に対する仕入れの割合。喫茶店ではふつう30%前後。</p>`,
+      hits: {
+        loss: { good: true, text: "今期だけ<b>赤字</b>。お客さんが減ったわけでもないのに？" },
+        rate: { good: true, text: "<b>原価率が31%→42%</b>。値段も席数も同じなのに、仕入れの割合だけ急に上がっている。" },
+        sales: { good: false, text: "売上は少し下がっただけ。これだけでは何とも言えない。" },
+        buy: { good: true, text: "仕入れが<b>約180万円</b>増えている。何が増えたのかな。" },
+        staff: { good: false, text: "人件費はほとんど変わっていない。" }
+      }
     },
-    {
-      id: "c2",
-      label: "現金",
-      text: "お客さんからもらった現金は、その日のうちに全部銀行に入れています。",
-      answer: "envelope",
-      win: "そ、その封筒は……！ ちょっと預かっているだけで……。",
-      wrong: "ふふ、それで何が分かるんです？ 現金は全部銀行ですよ。",
-      near: {
-        order: "注文票は……まあ、認めましょう。でも、そのお金はちゃんと銀行に入れましたよ。",
-        ledger: "パソコンの帳簿を見たでしょう？ 銀行に入れた分はきちんと書いてあります。",
-        photo: "開店の写真がどうかしました？"
-      },
-      solved: "銀行に入れていない現金が金庫にあった"
+    sales: {
+      title: "月ごとの売上と客数／お店のホームページ", code: "売0",
+      html: `<div class="mini-chart" aria-label="月ごとの客数はほぼ横ばい">
+          <div class="bars">${[96, 98, 97, 99, 100, 98, 97, 99, 98, 100, 99, 97].map((v, i) => `<i style="--h:${v}%"><span>${i + 1}</span></i>`).join("")}</div>
+          <p>客数：毎月ほぼ同じ（1日 約60人）</p></div>
+        <div class="web" data-hit="web"><div class="web-bar">hamakaze-coffee.example</div>
+          <h4>浜風珈琲からのお知らせ</h4><p><b>4月より、土曜の夜は貸切パーティー承ります！</b><br>（20名さままで・コース 4,250円）</p></div>
+        <table class="fs small"><tr><th>時間帯別の売上（今期）</th><td>朝〜夕方</td><td data-hit="night">夜（19時〜）</td></tr>
+        <tr><th></th><td>1,790万円</td><td>0円</td></tr></table>`,
+      hits: {
+        web: { good: true, text: "4月から<b>土曜の夜の貸切</b>を始めたらしい。" },
+        night: { good: true, text: "なのに<b>夜の売上が0円</b>。貸切の売上はどこへ？" }
+      }
     },
-    {
-      id: "c3",
-      label: "仕入れ",
-      text: "先月の30万円は、コーヒー豆の仕入れ代です。領収書もありますよ。",
-      answer: "blank",
-      win: "あっ……その領収書の束は……。わ、私が書いたものです……。",
-      wrong: "領収書があるんだから、正しい経費ですよ。",
-      near: {
-        stock: "在庫表？ 豆は別の倉庫に置いてあるんですよ。ここにないのは当然です。",
-        ledger: "帳簿にもちゃんと書いてあるでしょう。正しい仕入れです。",
-        receipt: "ほら、山海物産の領収書。ハンコもあるし、本物ですよ。"
-      },
-      solved: "仕入れ先の白紙の領収書を社長が持っていた"
+    cash: {
+      title: "支払い方法のうちわけ", code: "現0",
+      html: `<table class="fs"><thead><tr><th>仕入れ先</th><th>今期の金額</th><th>支払い方法</th></tr></thead><tbody>
+        <tr><td>丸浜食品</td><td>312万円</td><td>銀行振込</td></tr>
+        <tr><td>海辺ベーカリー</td><td>140万円</td><td>銀行振込</td></tr>
+        <tr><td>前川コーヒー（豆）</td><td>120万円</td><td>銀行振込</td></tr>
+        <tr data-hit="sankai"><td><b>山海物産（豆）</b></td><td><b>180万円</b></td><td><b>現金</b></td></tr></tbody></table>
+        <p class="cap">売上はほとんどが現金。毎日の入金額は、レジの合計と同じと説明されている。</p>`,
+      hits: { sankai: { good: true, text: "<b>山海物産だけ現金払い</b>。しかも今期から急に180万円。" } }
+    },
+    buy: {
+      title: "原価率の動きと同業の目安", code: "仕0",
+      html: `<div class="line-chart" aria-label="原価率は31%から42%に上がった">
+          <svg viewBox="0 0 300 140"><line x1="30" y1="110" x2="290" y2="110" class="ax"/>
+          <line x1="30" y1="80" x2="290" y2="80" class="ref"/><text x="292" y="76" class="reft" text-anchor="end">同業の目安 30%</text>
+          <polyline points="60,78 160,78 260,36" class="ln"/><circle cx="60" cy="78" r="4"/><circle cx="160" cy="78" r="4"/><circle cx="260" cy="36" r="6" class="hot" data-hit="rate"/>
+          <text x="60" y="128" text-anchor="middle">前々期</text><text x="160" y="128" text-anchor="middle">前期</text><text x="260" y="128" text-anchor="middle">今期</text>
+          <text x="60" y="68" text-anchor="middle">31%</text><text x="160" y="68" text-anchor="middle">31%</text><text x="260" y="24" text-anchor="middle" class="hot-t">42%</text></svg></div>
+        <table class="fs small"><tr><th>新しい仕入れ先</th><td data-hit="new">山海物産（今期から）180万円</td></tr></table>`,
+      hits: {
+        rate: { good: true, text: "<b>今期だけ原価率が42%</b>。同業の目安（30%前後）よりかなり高い。" },
+        new: { good: true, text: "今期からの<b>新しい仕入れ先</b>が180万円。増えた分とほぼ同じ額だ。" }
+      }
     }
-  ],
+  };
 
-  /* 調べられる物（spot）と、そこで手に入る証拠（evidence） */
-  evidence: {
-    receipt: {
-      name: "社長が見せた領収書", room: "intro", icon: "receipt",
-      html: `<h3>社長が見せた領収書</h3><h2>領収書　山海物産</h2>
-        <div class="doc receipt"><div class="r-head">領 収 書</div>
-        <div class="r-to">浜風珈琲 様</div><div class="r-amt">¥300,000-</div>
-        <div class="r-for">但　コーヒー豆代として</div>
-        <div class="r-foot">10月28日　<b>山海物産株式会社</b><span class="hanko">山海</span></div></div>
-        <p class="note">社長が「仕入れの証拠」として見せてきた領収書。</p>`
-    },
-    register: {
-      name: "レジの記録", room: "shop", icon: "register",
-      html: `<h3>証拠　レジ</h3><h2>レジの記録（11月2日 土曜）</h2>
-        <table class="doc"><tr><td>10:12</td><td>ブレンド ×2</td><td>¥960</td></tr>
-        <tr><td>12:40</td><td>ランチセット ×6</td><td>¥7,200</td></tr>
-        <tr><td>15:05</td><td>ケーキセット ×3</td><td>¥2,850</td></tr>
-        <tr><td>…</td><td>ほか 52件</td><td>…</td></tr>
-        <tr class="hl"><td>18:58</td><td><b>レジ締め　1日の合計</b></td><td><b>¥68,400</b></td></tr></table>
-        <p class="note">この日のレジは <b>18:58</b> に締められている。<b>19時より後の売上は記録されていない。</b></p>`
-    },
-    order: {
-      name: "手書きの注文票", room: "shop", icon: "order", key: true,
-      html: `<h3>証拠　ゴミ箱の中</h3><h2>くしゃくしゃの手書き注文票</h2>
-        <div class="doc hand crumple"><div>11/2（土）19:30〜</div><div>貸切パーティー　山田様　20名</div>
-        <div>貸切コース 4,250円 × 20名</div><div class="big">合計 ¥85,000</div><div>現金で受け取り済み <span class="hanko red">済</span></div></div>
-        <p class="note">捨てられていた注文票。11月2日の夜に、<b>85,000円の売上</b>があったようだ。</p>`
-    },
-    calendar: {
-      name: "カレンダー", room: "shop", icon: "calendar",
-      html: `<h3>証拠　壁</h3><h2>11月のカレンダー</h2>
-        <div class="doc hand">11月2日（土）に赤ペンで<br><b>「夜 貸切　山田様 20名」</b></div>
-        <p class="note">11月2日の夜に、貸切の予定があったようだ。</p>`
-    },
-    menu: {
-      name: "メニュー表", room: "shop", icon: "menu",
-      html: `<h3>証拠　本棚</h3><h2>メニュー表</h2>
-        <table class="doc"><tr><td>ブレンド</td><td>¥480</td></tr><tr><td>ランチセット</td><td>¥1,200</td></tr>
-        <tr><td>ケーキセット</td><td>¥950</td></tr><tr class="hl"><td><b>夜の貸切コース（1名）</b></td><td><b>¥4,250</b></td></tr></table>
-        <p class="note">夜は貸切営業もしているらしい。</p>`
-    },
-    key: {
-      name: "小さな鍵", room: "shop", icon: "key", item: true,
-      html: `<h3>見つけた物　観葉植物の鉢</h3><h2>小さな鍵</h2>
-        <div class="doc center"><div class="key-art" aria-hidden="true"></div></div>
-        <p class="note">鉢の土に埋められていた。<b>どこかの引き出しの鍵</b>かもしれない。</p>`
-    },
-    ledger: {
-      name: "パソコンの帳簿", room: "office", icon: "pc",
-      html: `<h3>証拠　事務室のパソコン</h3><h2>会計ソフトの帳簿</h2>
-        <table class="doc"><tr><th>日付</th><th>内容</th><th>金額</th></tr>
-        <tr><td>10/28</td><td>仕入れ　山海物産（コーヒー豆）</td><td>¥300,000</td></tr>
-        <tr><td>11/2</td><td>売上（レジ）</td><td>¥68,400</td></tr>
-        <tr><td>11/4</td><td>銀行に入金</td><td>¥68,400</td></tr></table>
-        <p class="note">モニターの端に付箋：<b>「金庫の番号＝お店の誕生日」</b></p>`
-    },
-    photo: {
-      name: "写真立て", room: "office", icon: "photo",
-      html: `<h3>証拠　事務室の棚</h3><h2>開店の日の写真</h2>
-        <div class="doc center photo-art"><div class="ph-frame"><div class="ph-sky"></div><div class="ph-shop">浜風珈琲</div></div>
-        <div class="hand">祝 開店　<b>2019年 10月 15日</b></div></div>
-        <p class="note">お店の誕生日は <b>10月15日</b>。</p>`
-    },
-    stock: {
-      name: "豆の在庫表", room: "office", icon: "stock",
-      html: `<h3>証拠　段ボールの横</h3><h2>コーヒー豆の入荷記録</h2>
-        <table class="doc"><tr><th>月</th><th>入荷</th><th>金額の目安</th></tr>
-        <tr><td>8月</td><td>3袋</td><td>約45,000円</td></tr><tr><td>9月</td><td>3袋</td><td>約45,000円</td></tr>
-        <tr class="hl"><td>10月</td><td>3袋</td><td>約45,000円</td></tr></table>
-        <p class="note">10月も<b>いつもと同じ3袋</b>しか入っていない。30万円分も買ったはずなのに……？</p>`
-    },
-    envelope: {
-      name: "「別」の封筒", room: "office", icon: "envelope", key: true,
-      html: `<h3>証拠　金庫の中</h3><h2>「別」と書かれた封筒</h2>
-        <div class="doc"><div class="env"><span>別</span></div>
-        <table><tr><td>一万円札</td><td>8枚</td></tr><tr><td>千円札</td><td>5枚</td></tr><tr class="hl"><td><b>合計</b></td><td><b>¥85,000</b></td></tr></table></div>
-        <p class="note">封筒の裏に鉛筆で<b>「11/2 貸切分」</b>。銀行に入れずに、金庫にしまわれていた。</p>`
-    },
-    blank: {
-      name: "白紙の領収書の束", room: "office", icon: "blank", key: true,
-      html: `<h3>証拠　机の引き出し</h3><h2>白紙の領収書の束</h2>
-        <div class="doc receipt blank"><div class="r-head">領 収 書</div><div class="r-to">　　　　様</div><div class="r-amt">¥　　　　　-</div>
-        <div class="r-for">但</div><div class="r-foot"><b>山海物産株式会社</b><span class="hanko">山海</span></div></div>
-        <p class="note">仕入れ先「山海物産」のハンコが押された<b>白紙の領収書が20枚</b>。1枚目だけ切り取られている。社長が自分で書いたのでは……？</p>`
-    }
-  },
+  const hypotheses = [
+    { id: "h1", text: "売上の一部が、帳簿に載っていないのでは？", good: true, note: "夜の貸切の売上はどこへ行ったのか、確かめよう。" },
+    { id: "h2", text: "仕入れが、実際より多く記録されているのでは？", good: true, note: "現金払いの山海物産が気になる。" },
+    { id: "h3", text: "豆が値上がりしただけでは？", good: "maybe", note: "あり得る。仮説は現場で確かめるもの。入荷の記録を見よう。" },
+    { id: "h4", text: "家賃が高すぎるのでは？", good: false, note: "家賃はごまかしとは関係がなさそうだ。" },
+    { id: "h5", text: "人を雇いすぎているのでは？", good: false, note: "人件費はほとんど変わっていない。" }
+  ];
 
-  /* 調べられる場所（画面上の位置は js/scene.js の SPOTS）。gives に入っている証拠が手に入る */
-  spots: {
-    register: { room: "shop", label: "レジ", gives: "register" },
-    trash:    { room: "shop", label: "ゴミ箱", gives: "order" },
-    calendar: { room: "shop", label: "カレンダー", gives: "calendar" },
-    shelf:    { room: "shop", label: "本棚", gives: "menu" },
-    plant:    { room: "shop", label: "観葉植物", gives: "key" },
-    pc:       { room: "office", label: "パソコン", gives: "ledger" },
-    photo:    { room: "office", label: "写真立て", gives: "photo" },
-    boxes:    { room: "office", label: "段ボール", gives: "stock" },
-    safe:     { room: "office", label: "金庫", gives: "envelope", lock: "dial", code: "1015" },
-    desk:     { room: "office", label: "机の引き出し", gives: "blank", lock: "key" }
-  },
+  /* ---------- 第2幕：臨場（質問と、調べられる物） ---------- */
+  // cost は調査の持ち時間（分）。open:true は「社長に開けてもらう」物。
+  const questions = {
+    lead: [
+      { id: "q-hours", q: "お店の営業時間を教えてください。", a: "朝8時から夕方7時までです。夜はやっていませんよ。", cost: 10 },
+      { id: "q-books", q: "帳簿はどなたがつけていますか。", a: "全部、私がつけています。税理士さんには年に一度見てもらうだけです。", cost: 10 },
+      { id: "q-staff", q: "従業員は何人いらっしゃいますか。", a: "私とアルバイトが2人です。", cost: 10 }
+    ],
+    sales: [
+      { id: "q-night", q: "夜の営業はしていますか。", a: "夜は閉めています。", key: "S1", cost: 10 },
+      { id: "q-party", q: "ホームページにある貸切パーティーは、実際にやっていますか。", a: "載せてはみたんですがね。申し込みはほとんどありませんよ。", cost: 10 },
+      { id: "q-reg", q: "売上はどのように記録していますか。", a: "全部レジを通しています。レジは閉店のときに締めます。", cost: 10 }
+    ],
+    cash: [
+      { id: "q-deposit", q: "お客さんからの現金は、どうしていますか。", a: "毎日、全部銀行に入れています。", key: "S2", cost: 10 },
+      { id: "q-safe", q: "金庫には何が入っていますか。", a: "釣り銭と、私の私物だけですよ。", cost: 10 },
+      { id: "q-who", q: "お金の管理は、どなたがしていますか。", a: "私だけです。アルバイトには触らせません。", cost: 10 }
+    ],
+    buy: [
+      { id: "q-pay", q: "山海物産さんへの支払いは、どのようにしていますか。", a: "現金で払って、その場で領収書をもらっています。", key: "S3", cost: 10 },
+      { id: "q-price", q: "今期は仕入れが増えていますが、なぜでしょう。", a: "豆がだいぶ値上がりしましてね。困ったものです。", key: "S4", cost: 10 },
+      { id: "q-sankai", q: "山海物産さんとは、いつからの取引ですか。", a: "今年からです。知り合いの紹介でね。", cost: 10 }
+    ]
+  };
 
-  /* ヒント：上から順に、条件に当てはまる最初の1つを出す */
-  hints: [
-    { when: s => s.seen.size === 0, text: "まずは光っている物をタップして、店の中を調べてみよう。" },
-    { when: s => !s.solved.has("c1") && !s.got.has("register"), text: "社長は「売上は全部レジ」と言っていた。まずはレジの記録を見てみよう。" },
-    { when: s => !s.solved.has("c1") && !s.got.has("order"), text: "レジは夜7時前に締められていた。夜の売上の手がかりが、捨てられていないかな？" },
-    { when: s => !s.solved.has("c1"), text: "「手書きの注文票」はレジに記録されていない売上だ。相談タイムで「売上」の主張にぶつけよう。" },
-    { when: s => !s.visited.has("office"), text: "店の奥に「事務室」と書かれたドアがある。青い印をタップしてみよう。" },
-    { when: s => !s.solved.has("c2") && !s.got.has("ledger"), text: "事務室のパソコンを調べてみよう。何かメモが貼ってあるかも。" },
-    { when: s => !s.solved.has("c2") && !s.got.has("photo"), text: "金庫の番号は「お店の誕生日」。お店が開いた日が分かる物はないかな？" },
-    { when: s => !s.solved.has("c2") && !s.got.has("envelope"), text: "開店の日は 10月15日。金庫に「1015」を入れてみよう。" },
-    { when: s => !s.solved.has("c2"), text: "「別」の封筒は、銀行に入れていない現金だ。「現金」の主張にぶつけよう。" },
-    { when: s => !s.solved.has("c3") && !s.got.has("stock"), text: "本当に30万円分も豆を買ったのかな？ 事務室の段ボールを調べてみよう。" },
-    { when: s => !s.solved.has("c3") && !s.got.has("key"), text: "机の引き出しには鍵がかかっている。店の中に鍵が隠されていないかな？ 植物のあたりが怪しい。" },
-    { when: s => !s.solved.has("c3") && !s.got.has("blank"), text: "鍵を持っていれば、事務室の机の引き出しを開けられる。" },
-    { when: s => !s.solved.has("c3"), text: "「白紙の領収書の束」があれば、領収書は自分で書けてしまう。「仕入れ」の主張にぶつけよう。" }
-  ]
-};
+  const statements = {
+    // num は「発言の番号」。聞いた人が代表に口で伝え、代表が入力すると検討の板に出る
+    S1: { text: "夜は閉めています。", by: "sales", num: "31" },
+    S2: { text: "毎日、全部銀行に入れています。", by: "cash", num: "58" },
+    S3: { text: "現金で払って、その場で領収書をもらっています。", by: "buy", num: "74" },
+    S4: { text: "豆がだいぶ値上がりしましてね。", by: "buy", num: "16" }
+  };
+
+  const places = {
+    lead: [
+      { id: "shift", code: "代1", where: "事務室の壁", name: "アルバイトのシフト表", cost: 20, consent: "壁のシフト表を見せていただけますか。", ok: "……どうぞ。",
+        doc: () => `<table class="ledger shift"><caption>11月 シフト表</caption><tr><th>日</th><th>佐藤</th><th>田中</th></tr>
+          <tr><td>11/1（金）</td><td>8–15</td><td>12–19</td></tr><tr class="hl"><td>11/2（土）</td><td>8–15</td><td><b>19–23</b></td></tr>
+          <tr><td>11/3（日）</td><td>8–15</td><td>12–19</td></tr><tr><td>…</td><td></td><td></td></tr>
+          <tr class="hl"><td>11/9（土）</td><td>12–19</td><td><b>19–23</b></td></tr></table>`,
+        note: "土曜の<b>19時〜23時</b>にアルバイトが入っている。夜は閉めているはずでは？" },
+      { id: "photo", code: "代2", where: "事務室の棚", name: "開店の日の写真", cost: 20, decoy: true, consent: "棚の写真を拝見してもよろしいですか。", ok: "開店の日の写真ですよ。どうぞ。",
+        doc: () => `<div class="photo-print"><div class="ph"></div><p>祝 開店 2019.10.15</p></div>`,
+        note: "開店の日の記念写真。今回の調査には関係なさそうだ。" }
+    ],
+    sales: [
+      { id: "register", code: "売1", where: "店内のレジ", name: "レジの日計表", cost: 20, consent: "レジの記録を見せていただけますか。", ok: "どうぞ。毎日きちんと締めていますよ。",
+        doc: () => `<div class="receipt-roll"><b>日計表 11/2（土）</b><span>ブレンド ×64</span><span>ランチ ×21</span><span>ケーキセット ×18</span><span>…</span><b>合計 ¥68,400</b><em>レジ締め 18:58</em></div>`,
+        note: "レジは毎日<b>18:58</b>に締められている。夜の売上は1円も入っていない。" },
+      { id: "calendar", code: "売2", where: "店内の壁", name: "予約カレンダー", cost: 20, consent: "壁のカレンダーを拝見してもよろしいですか。", ok: "ただのカレンダーですよ。",
+        doc: () => `<div class="calendar"><b>11月</b><div class="cal">${Array.from({ length: 30 }, (_, i) => { const d = i + 1, sat = (d + 4) % 7 === 6; return `<span class="${sat ? "sat" : ""}">${d}${sat && d !== 30 ? '<i>貸切</i>' : ""}</span>`; }).join("")}</div><p class="hand">4月から 貸切 計18回</p></div>`,
+        note: "土曜日に<b>「貸切」</b>の書き込み。4月から<b>18回</b>と手書きのメモもある。" },
+      { id: "trash", code: "売3", where: "カウンター下のゴミ箱", name: "手書きの注文票", cost: 20, consent: "ゴミ箱の中を確認させていただいてもよろしいですか。", ok: "ゴ、ゴミ箱？ ……まあ、どうぞ。",
+        doc: () => `<div class="order-slip hand"><div>11/2（土）19:30〜</div><div>貸切パーティー　山田様 20名</div><div>コース 4,250円 × 20名</div><div class="big">合計 ¥85,000</div><div>現金にて受領 <span class="hanko">済</span></div></div>`,
+        note: "11月2日の夜に<b>85,000円</b>の貸切。<b>現金で受け取り済み</b>。" },
+      { id: "menu", code: "売4", where: "カウンター", name: "メニュー表", cost: 20, decoy: true, consent: "メニュー表を拝見してもよろしいですか。", ok: "どうぞどうぞ。",
+        doc: () => `<table class="ledger"><tr><td>ブレンド</td><td>¥480</td></tr><tr><td>ランチセット</td><td>¥1,200</td></tr><tr><td>ケーキセット</td><td>¥950</td></tr></table>`,
+        note: "値段は前の年と同じ。ここには手がかりはなさそうだ。" }
+    ],
+    cash: [
+      { id: "bank", code: "現1", where: "事務室の机の上", name: "預金通帳", cost: 20, consent: "預金通帳を見せていただけますか。", ok: "どうぞ。入金はきちんとしています。",
+        doc: () => `<table class="ledger bank"><caption>普通預金　浜風珈琲</caption><tr><th>日付</th><th>摘要</th><th>出金</th><th>入金</th></tr>
+          <tr><td>11/1</td><td>入金</td><td></td><td>61,200</td></tr><tr><td>11/2</td><td>入金</td><td></td><td>68,400</td></tr>
+          <tr><td>11/5</td><td>振込 丸浜食品</td><td>264,000</td><td></td></tr><tr><td>11/5</td><td>振込 前川コーヒー</td><td>98,000</td><td></td></tr>
+          <tr class="hl"><td colspan="4">山海物産への支払いも、30万円の引き出しも、1年間一度もない</td></tr></table>`,
+        note: "入金額は<b>レジの合計とぴったり同じ</b>。<b>山海物産に払った30万円</b>の出どころが、通帳のどこにもない。" },
+      { id: "safe", code: "現2", where: "事務室の金庫", name: "「別」の封筒とノート", cost: 30, open: true, consent: "金庫を開けて、中を見せていただけますか。", ok: "……釣り銭と私物だけですよ。（社長がしぶしぶ金庫を開ける）",
+        doc: () => `<div class="envelope"><span>別</span><small>裏に鉛筆で「11/2」</small><b>¥85,000</b></div>
+          <table class="ledger hand small"><caption>小さなノート</caption><tr><td>4/6 貸切</td><td>78,000</td></tr><tr><td>4/20 貸切</td><td>91,000</td></tr><tr><td>…</td><td>…</td></tr><tr><td>11/2 貸切</td><td>85,000</td></tr><tr class="hl"><td>18回 計</td><td>1,530,000</td></tr></table>`,
+        note: "「別」の封筒に<b>85,000円</b>（裏に11/2）。ノートには<b>貸切18回・計153万円</b>。" },
+      { id: "change", code: "現3", where: "レジの引き出し", name: "釣り銭", cost: 20, decoy: true, consent: "レジの釣り銭を確認させていただいてもよろしいですか。", ok: "どうぞ。",
+        doc: () => `<table class="ledger"><tr><td>千円札</td><td>20枚</td></tr><tr><td>硬貨</td><td>¥8,640</td></tr></table>`,
+        note: "ふつうの釣り銭。気になる点はない。" }
+    ],
+    buy: [
+      { id: "ledger", code: "仕1", where: "事務室の本棚", name: "仕入帳と山海物産の領収書", cost: 20, consent: "仕入帳と領収書を見せていただけますか。", ok: "どうぞ。領収書は全部そろっていますよ。",
+        doc: () => `<table class="ledger"><caption>仕入帳（山海物産）</caption><tr><td>5/10</td><td>豆</td><td>300,000</td><td>現金</td></tr><tr><td>6/14</td><td>豆</td><td>300,000</td><td>現金</td></tr><tr><td>…</td><td></td><td></td><td></td></tr><tr class="hl"><td>6回</td><td>計</td><td>1,800,000</td><td></td></tr></table>
+          <div class="receipt-mini hand">領収書　¥300,000-　山海物産<span class="hanko">山海</span></div>`,
+        note: "30万円ずつ<b>6回、計180万円</b>。領収書の字が、社長のメモの字と似ている……？" },
+      { id: "stock", code: "仕2", where: "倉庫の棚", name: "豆の入荷記録", cost: 20, consent: "豆の入荷記録を見せていただけますか。", ok: "豆ですか？ どうぞ。",
+        doc: () => `<table class="ledger"><caption>豆の入荷記録</caption><tr><th></th><th>前期</th><th>今期</th></tr><tr><td>入荷量</td><td>月 3袋</td><td>月 3袋</td></tr><tr class="hl"><td>1袋の値段</td><td>15,000円</td><td>15,000円</td></tr><tr><td>仕入れ先</td><td>前川コーヒー</td><td>前川コーヒーのみ</td></tr></table>`,
+        note: "豆の量も<b>値段も前期と同じ</b>。しかも届いているのは前川コーヒーの豆だけ。" },
+      { id: "desk", code: "仕3", where: "事務室の机の引き出し", name: "白紙の領収書の束", cost: 30, open: true, consent: "机の引き出しを開けて、中を見せていただけますか。", ok: "……か、構いませんよ。（社長が鍵で引き出しを開ける）",
+        doc: () => `<div class="receipt-blank"><b>領 収 書</b><span>　　　　様</span><span>¥　　　　　-</span><span>但</span><em>山海物産株式会社<span class="hanko">山海</span></em><small>× 14枚（使った跡あり）</small></div>`,
+        note: "山海物産のハンコが押された<b>白紙の領収書</b>。これがあれば、金額を好きに書けてしまう。" },
+      { id: "fridge", code: "仕4", where: "厨房", name: "冷蔵庫の中", cost: 20, decoy: true, consent: "冷蔵庫の中を拝見してもよろしいですか。", ok: "食材しかありませんよ。",
+        doc: () => `<table class="ledger"><tr><td>牛乳</td><td>12本</td></tr><tr><td>ケーキ</td><td>3種</td></tr></table>`,
+        note: "ふつうの食材。手がかりはない。" }
+    ]
+  };
+
+  /* ---------- 第3幕：崩す発言と、認めさせる組み合わせ ---------- */
+  // need: [Aのどれか, Bのどれか] の2つ（違う担当）がそろうと社長が認める
+  const board = [
+    { id: "S1", need: [["売3", "売2"], ["代1"]],
+      half: "その注文票？ ああ、それはキャンセルになった予約ですよ。",
+      win: "……アルバイトのシフトまで。わ、分かりました。夜も、貸切をやっていました。",
+      miss: "それが夜の営業と何の関係があるんです？" },
+    { id: "S2", need: [["現2"], ["売3"]],
+      half: "この封筒は私の個人的なお金です。売上とは関係ありません。",
+      win: "注文票と同じ85,000円……。はい、貸切の売上は、銀行に入れずに金庫にしまっていました。",
+      miss: "ふふ、それで何が分かるんです？ 現金は全部銀行ですよ。" },
+    { id: "S3", need: [["仕3"], ["現1"]],
+      half: "その白紙の領収書は、山海さんが置いていっただけ。使ってなんかいませんよ。",
+      win: "通帳に30万円の引き出しが一度もない……。払っていません。領収書は、私が書きました。",
+      miss: "領収書があるんだから、ちゃんと払っていますよ。" },
+    { id: "S4", need: [["仕2"], ["代0", "仕0"]],
+      half: "入荷の記録？ 豆は別の倉庫に置いてあるんです。",
+      win: "原価率が急に上がったのは……値上がりのせいではありません。",
+      miss: "豆の値段なんて、いろいろですからね。" }
+  ];
+
+  // 番号 → 名前（第3幕で代表が入力したときに表示する）
+  const codes = {};
+  Object.keys(prep).forEach((r) => { codes[prep[r].code] = { name: prep[r].title, role: r }; });
+  Object.keys(places).forEach((r) => places[r].forEach((p) => { codes[p.code] = { name: p.name, role: r }; }));
+
+  return { yen, roles, prep, hypotheses, questions, statements, places, board, codes, TIME: 90 };
+})();
 
 </script>
 <script>
@@ -2677,7 +2713,7 @@ window.CASE = {
   $("full").onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}catch(e){}};
 
   /* タイマー */
-  let total=18*60,left=total,tid=null;
+  let total=5*60,left=total,tid=null;
   const fmt=s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
   function paint(){$("timer").textContent=fmt(left);$("timer").classList.toggle("low",left<=60);}
   $("t-start").onclick=()=>{if(tid)return;tid=setInterval(()=>{left=Math.max(0,left-1);paint();if(!left){clearInterval(tid);tid=null;}},1000);};
@@ -2685,12 +2721,14 @@ window.CASE = {
   $("t-plus").onclick=()=>{left+=60;paint();};
   $("t-minus").onclick=()=>{left=Math.max(0,left-60);paint();};
   $("t-reset").onclick=()=>{clearInterval(tid);tid=null;left=total;paint();};
+  document.querySelectorAll("[data-ph]").forEach(b=>b.onclick=()=>{clearInterval(tid);tid=null;total=+b.dataset.ph*60;left=total;$("phase").textContent=b.dataset.n;paint();});
   paint();
 
   /* 答え */
   $("reveal").onclick=()=>{
     const C=window.CASE;
-    $("answers").innerHTML=C.claims.map(c=>`<div class="ans"><small>社長の主張（${c.label}）</small><div class="claim">「${c.text}」</div><small>決め手の証拠</small><div class="ev">${C.evidence[c.answer].name}</div><p>${c.solved}</p></div>`).join("");
+    const nm=c=>`${c} ${C.codes[c].name}`;
+    $("answers").innerHTML=C.board.map(b=>{const S=C.statements[b.id];return `<div class="ans"><small>社長の発言（発言${S.num}・${C.roles[S.by].name}が聞いた）</small><div class="claim">「${S.text}」</div><small>崩した証拠（2つ）</small><div class="ev">${b.need[0].map(nm).join(" / ")}<br>＋ ${b.need[1].map(nm).join(" / ")}</div><p>${b.win}</p></div>`;}).join("")+`<div class="ans"><small>全体</small><div class="claim">売上除外 153万円 ＋ 架空経費 180万円</div><p>申告した所得 −57万円 → 正しい所得 276万円</p></div>`;
     $("answers").hidden=false;$("reveal").hidden=true;
   };
 

@@ -74,7 +74,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
 <section class="slide on center" data-title="タイトル">
   <p class="kicker">税務調査 体験ゲーム</p>
   <h1>臨場</h1>
-  <p class="lead">喫茶店「浜風珈琲」に調査に入り、社長の説明の<b>不審な点</b>を、<b>証拠</b>で崩そう。</p>
+  <p class="lead">班で手分けして喫茶店「浜風珈琲」を調べ、社長の説明を<b>証拠</b>で確かめよう。</p>
 </section>
 
 <section class="slide" data-title="今日やること">
@@ -88,15 +88,17 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   <p class="note">これから出てくる会社・人物・資料は、すべて架空です。</p>
 </section>
 
-<section class="slide" data-title="役割">
+<section class="slide" data-title="担当">
   <p class="kicker">ROLE</p>
-  <h2>グループで役割を決めよう</h2>
+  <h2>班で担当を分けよう</h2>
   <div class="grid2">
-    <div class="card"><span class="tag red">代表　1人</span><ul class="big"><li>「代表として始める」を押す</li><li>相談して決めた証拠を<b>社長にぶつける</b></li></ul></div>
-    <div class="card"><span class="tag">メンバー　ほかの人</span><ul class="big"><li>「メンバー」を押す</li><li>店を調べて、見つけた証拠を<b>代表に伝える</b></li></ul></div>
+    <div class="card"><span class="tag" style="background:#f2a53a">代表　班に1人</span><p class="lead">決算書を読み、最後に<b>社長へ証拠を示す</b></p></div>
+    <div class="card"><span class="tag" style="background:#e2553f;color:#fff">売上担当</span><p class="lead">レジや予約の記録を調べる</p></div>
+    <div class="card"><span class="tag" style="background:#4fb3a9">現金担当</span><p class="lead">通帳や金庫を調べる</p></div>
+    <div class="card"><span class="tag" style="background:#8f8cf0">仕入れ担当</span><p class="lead">仕入れの帳簿や在庫を調べる</p></div>
   </div>
-  <p class="note">全員が自分のスマホで店を調べられます。社長に示せるのは代表だけです。間違えても減点はありません。</p>
-  <p class="note">これはゲームです。実際の税務調査では、机や金庫を開けたり、お金や書類に触れたりするときは、必ず相手の明示の承諾を得ます。</p>
+  <p class="note">2〜3人の班：1人で2つ持つ（例：代表＋売上）。5〜6人の班：同じ担当を2人で持つ。担当ごとに見られる資料が違うので、<b style="color:var(--amber)">声に出して伝え合う</b>のがカギです。</p>
+  <p class="note">これはゲームです。実際の税務調査では、書類を見せてもらう・机や金庫を開けてもらうときは、必ず相手の明示の承諾を得ます。</p>
 </section>
 
 <section class="slide" data-title="QRを読み取る">
@@ -105,8 +107,8 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   <div class="qrwrap">
     <div class="qr" id="qr"></div>
     <div style="display:flex;flex-direction:column;gap:2vh;min-width:0">
-      <p class="lead">開いたら、<b>代表</b>か<b>メンバー</b>を選んで始めます。</p>
-      <p class="lead">音が出ます。消したいときは、画面右上の<b>「音あり」</b>を押すと「音なし」になります。</p>
+      <p class="lead">開いたら「はじめる」を押し、<b>自分の担当</b>を選びます。</p>
+      <p class="lead">音が出ます。消したいときは、画面右上の<b>音のボタン</b>を押すと消えます。</p>
       <div class="url" id="url"></div>
     </div>
   </div>
@@ -116,22 +118,22 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   <p class="kicker">HOW TO PLAY</p>
   <h2>この順で進めよう</h2>
   <ol class="steps">
-    <li>指でなぞって見回し、<b>光る印</b>をタップして調べる（開ける・触る前に社長の<b>承諾</b>をもらう）</li>
-    <li>社長の主張と<b>食い違う証拠</b>を探す（迷ったら「ヒント」）</li>
-    <li class="must"><b>相談タイム</b>：どの主張に、どの証拠をぶつけるか、みんなで決める</li>
-    <li>代表が社長にぶつける。<b>3つの主張</b>をすべて崩したらクリア</li>
+    <li><b>第1幕　準備調査（5分）</b>：自分の資料で気になる点をタップ → 班で読み上げ、仮説を選ぶ</li>
+    <li><b>第2幕　臨場（12分）</b>：社長に質問し、<b>承諾をもらって</b>現場を見る。持ち時間に注意</li>
+    <li class="must"><b>第3幕　検討と説明（7分）</b>：発言と証拠の<b>番号</b>を代表に伝える。代表が<b>違う担当の証拠2つ</b>を社長にぶつける</li>
   </ol>
 </section>
 
 <section class="slide" data-title="調査タイム">
   <p class="kicker">INVESTIGATION</p>
-  <h2>調査開始</h2>
+  <h2 id="phase">第1幕　準備調査</h2>
   <div class="timer-wrap">
     <div>
-      <div class="timer" id="timer">18:00</div>
+      <div class="timer" id="timer">05:00</div>
+      <div class="tbtns"><button data-ph="5" data-n="第1幕　準備調査">第1幕 5分</button><button data-ph="12" data-n="第2幕　臨場">第2幕 12分</button><button data-ph="7" data-n="第3幕　検討と説明">第3幕 7分</button></div>
       <div class="tbtns"><button class="primary" id="t-start">スタート</button><button id="t-pause">一時停止</button><button id="t-plus">＋1分</button><button id="t-minus">−1分</button><button id="t-reset">リセット</button></div>
     </div>
-    <div class="card"><h3>迷ったら</h3><ul class="big"><li>画面右上の<b>ヒント</b>を押す</li><li>社長の主張を読み直す</li><li>日付・金額を見比べる</li><li>手を挙げてスタッフへ</li></ul></div>
+    <div class="card"><h3>迷ったら</h3><ul class="big"><li>分かったことを<b>声に出して</b>班に伝える</li><li>森先輩の<b>ヒント</b>を読む</li><li>日付・金額を見比べる</li><li>手を挙げてスタッフへ</li></ul></div>
   </div>
 </section>
 
@@ -142,6 +144,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
     <li>最初に「あれ？」と感じた<b>不審な点</b>は？（端緒）</li>
     <li>そこから、どこを調べようと<b>当たりをつけた</b>？</li>
     <li>社長が言い逃れできない<b>決め手の証拠</b>は、どれだった？（立証）</li>
+    <li>ほかの担当から聞いて<b>つながった</b>のは、どの情報だった？</li>
   </ol>
 </section>
 
@@ -174,7 +177,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
 </div></div>
 
 <script src="js/vendor/qrcode.js"></script>
-<script src="js/data.js"></script>
+<script src="js/case.js"></script>
 <script>
 (function(){
   "use strict";
@@ -202,7 +205,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   $("full").onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}catch(e){}};
 
   /* タイマー */
-  let total=18*60,left=total,tid=null;
+  let total=5*60,left=total,tid=null;
   const fmt=s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
   function paint(){$("timer").textContent=fmt(left);$("timer").classList.toggle("low",left<=60);}
   $("t-start").onclick=()=>{if(tid)return;tid=setInterval(()=>{left=Math.max(0,left-1);paint();if(!left){clearInterval(tid);tid=null;}},1000);};
@@ -210,12 +213,14 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   $("t-plus").onclick=()=>{left+=60;paint();};
   $("t-minus").onclick=()=>{left=Math.max(0,left-60);paint();};
   $("t-reset").onclick=()=>{clearInterval(tid);tid=null;left=total;paint();};
+  document.querySelectorAll("[data-ph]").forEach(b=>b.onclick=()=>{clearInterval(tid);tid=null;total=+b.dataset.ph*60;left=total;$("phase").textContent=b.dataset.n;paint();});
   paint();
 
   /* 答え */
   $("reveal").onclick=()=>{
     const C=window.CASE;
-    $("answers").innerHTML=C.claims.map(c=>`<div class="ans"><small>社長の主張（${c.label}）</small><div class="claim">「${c.text}」</div><small>決め手の証拠</small><div class="ev">${C.evidence[c.answer].name}</div><p>${c.solved}</p></div>`).join("");
+    const nm=c=>`${c} ${C.codes[c].name}`;
+    $("answers").innerHTML=C.board.map(b=>{const S=C.statements[b.id];return `<div class="ans"><small>社長の発言（発言${S.num}・${C.roles[S.by].name}が聞いた）</small><div class="claim">「${S.text}」</div><small>崩した証拠（2つ）</small><div class="ev">${b.need[0].map(nm).join(" / ")}<br>＋ ${b.need[1].map(nm).join(" / ")}</div><p>${b.win}</p></div>`;}).join("")+`<div class="ans"><small>全体</small><div class="claim">売上除外 153万円 ＋ 架空経費 180万円</div><p>申告した所得 −57万円 → 正しい所得 276万円</p></div>`;
     $("answers").hidden=false;$("reveal").hidden=true;
   };
 
