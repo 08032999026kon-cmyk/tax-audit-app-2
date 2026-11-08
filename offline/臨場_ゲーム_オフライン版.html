@@ -70,7 +70,7 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35}
 .steps{max-width:34rem;margin:8px auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
 .steps i{height:3px;border-radius:2px;background:rgba(255,255,255,.12)}
 .steps i.on{background:var(--role)}
-@media (max-width:400px){.icon-btn .t{display:none}.icon-btn{padding:0 10px}}
+@media (max-width:480px){.icon-btn .t{display:none}.icon-btn{padding:0 10px}}
 
 /* いまやること */
 .todo{display:flex;gap:10px;align-items:flex-start;margin:6px 0 16px;padding:12px 14px;border-radius:14px;background:rgba(242,165,58,.08);border:1px solid rgba(242,165,58,.3)}
@@ -342,6 +342,13 @@ svg [data-hit]{fill:var(--red)}
 .photo-print p{text-align:center;font-family:var(--f-hand);margin:8px 0 0}
 #talk[hidden],#talkdim[hidden]{display:none!important}
 @media (max-height:500px){.scene-strip{height:72px}.boss-card{min-height:110px}}
+
+/* 班に伝えること */
+.tells{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.tell{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--paper);color:var(--paper-ink);box-shadow:0 10px 24px -16px rgba(0,0,0,.8)}
+.tell .code{flex:none;margin-top:2px}
+.tell small{display:block;font-size:11.5px;color:var(--paper-dim);font-weight:700}
+.tell p{margin:2px 0 0;font-family:var(--f-doc);font-size:16px;line-height:1.65}
 
 </style>
 </head>
@@ -841,6 +848,7 @@ window.ASSETS = {
   const ICON = {
     snd: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>',
     mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>',
+    hint: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>',
     memo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>',
     talk: '<svg viewBox="0 0 24 24" fill="none" stroke="#9fe3da" stroke-width="2" stroke-linecap="round"><path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M19 9h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-3-3h-3"/></svg>'
   };
@@ -863,6 +871,7 @@ window.ASSETS = {
     const n = notesCount();
     const label = a ? a[1] : "導入";
     b.innerHTML = `<div class="row"><div class="act"><small>${label}</small><strong>${myRoles().map((r) => C.roles[r].name).join("・") || "担当なし"}</strong></div>
+      ${a && a[0] < 3 ? `<button class="icon-btn" data-act="hint">${ICON.hint}<span>ヒント</span></button>` : ""}
       ${st.screen === "a2" || st.screen === "a3" ? `<button class="icon-btn" data-act="notes">${ICON.memo}<span class="t">メモ</span>${n ? `<span class="badge">${n}</span>` : ""}</button>` : ""}
       ${sndBtn()}</div>
       <div class="steps">${[0, 1, 2, 3].map((i) => `<i class="${a && i <= a[0] ? "on" : ""}"></i>`).join("")}</div>`;
@@ -1001,9 +1010,11 @@ window.ASSETS = {
       ${todo("気になる数字や文をタップしよう", `${C.roles[r].name}の資料です。見つけた点：${found.length} / ${total}`)}
       ${switcher()}
       <div class="paper ${st.a1.hint ? "hit-mode" : ""}" id="prepdoc"><span class="tag">${codeTag(P.code)}</span><h3>${P.title}</h3>${P.html}</div>
-      ${st.a1.hint ? "" : `<button class="btn btn-ghost" style="margin-top:10px;min-height:44px;font-size:14px" data-act="hint1">森先輩のヒント（タップできる所を光らせる）</button>`}
+      ${st.a1.hint ? "" : `<button class="btn btn-ghost" style="margin-top:10px;min-height:44px;font-size:14px" data-act="hint">見つからないときは「ヒント」（気になる所が光ります）</button>`}
+      <p class="eyebrow" style="margin-top:18px">班に伝えること（声に出して読もう）</p>
+      ${all.length ? "" : `<p class="muted" style="font-size:13px">資料の気になる所をタップすると、ここに出ます。</p>`}
       <div class="finds">${all.map((k) => { const [rr, h] = k.split(":"); const H = C.prep[rr].hits[h]; return `<div class="find ${H.good ? "" : "meh"}"><span class="dot"></span><span><span class="muted" style="font-size:11.5px">${C.roles[rr].name}</span><br>${H.text}</span></div>`; }).join("")}</div>
-      ${huddle("<b>相談タイム</b>：担当ごとに、見つけた点を順番に読み上げよう。ほかの担当の資料とつながる点はある？")}
+      ${huddle("<b>相談タイム</b>：代表 → 売上 → 現金 → 仕入れ の順に、上の「班に伝えること」を読み上げよう。")}
       <p class="eyebrow" style="margin-top:18px">当たりをつける</p>
       <h2 style="font-size:18px;margin:4px 0 10px">班で話して、確かめたい仮説を選ぼう（2つまで）</h2>
       <div class="hypo">${C.hypotheses.map((h) => `<button data-act="hypo" data-h="${h.id}" aria-pressed="${st.a1.hypo.includes(h.id)}">${h.text}</button>${st.a1.hypo.includes(h.id) ? `<div class="note" style="margin-top:0"><span>${h.note}</span></div>` : ""}`).join("")}</div>
@@ -1050,7 +1061,8 @@ window.ASSETS = {
       <div class="tabs" role="tablist"><button role="tab" data-act="tab" data-t="ask" aria-selected="${tab === "ask"}">社長に聞く</button><button role="tab" data-act="tab" data-t="look" aria-selected="${tab === "look"}">現場を見る</button></div>
       ${tab === "ask" ? `<div class="qlist">${qs}</div>` : `<div class="places">${ps}</div><p class="disclaim">これはゲームです。実際の税務調査でも、書類を見せてもらったり、金庫や机を開けてもらったりするときは、必ず相手の<b>明示の承諾</b>を得ます。調査官が勝手に開けたり、お金や書類に触れたりはしません。</p>`}
       ${L < 10 ? `<p class="note">${C.roles[r].name}の持ち時間を使い切りました。${myRoles().length > 1 ? "ほかの担当に切り替えるか、" : ""}班の仲間に分かったことを伝えよう。</p>` : ""}
-      ${huddle("<b>声をかけ合おう</b>：分かったことは、その場で班に伝えよう。<br>例「夜の売上は0円だった」「金庫に85,000円あった」")}
+      <p class="eyebrow" style="margin-top:18px">班に伝えること（見つけたら、すぐ読み上げよう）</p>
+      ${tellCards(myTells(), "社長に聞いたり、現場を見たりすると、ここに出ます。")}
     </div></section>
     <div class="foot-act"><div class="in"><button class="btn btn-ghost" data-act="notes">メモ</button><button class="btn btn-main" data-act="end-a2">臨場を終えて署にもどる</button></div></div>`;
   }
@@ -1092,6 +1104,35 @@ window.ASSETS = {
       <div class="acts"><button class="btn btn-main" data-x="close">メモに入れて閉じる</button></div>`, (d) => { d.querySelector('[data-x="close"]').onclick = closeSheet; });
   }
 
+  /* 班に伝える一文（見つけた物ごと）。読み上げやすい短い文にする */
+  const TELL = {
+    "代0": "今期だけ赤字。原価率（売上に対する仕入れの割合）が31%から42%に上がっている。",
+    "売0": "4月から土曜の夜に貸切を始めたのに、夜の売上が0円。",
+    "現0": "山海物産にだけ、現金で180万円払っている。",
+    "仕0": "原価率が急に42%に。今期からの新しい仕入れ先・山海物産が180万円。",
+    "代1": "シフト表では、土曜の夜19時〜23時にアルバイトが入っている。",
+    "売1": "レジは毎日18時58分に締めている。夜の売上は入っていない。",
+    "売2": "予約カレンダーに、土曜の「貸切」が4月から18回。",
+    "売3": "ゴミ箱に、11月2日の夜の貸切 85,000円の注文票。現金で受け取り済み。",
+    "現1": "通帳の入金はレジの合計と同じ。山海物産に払った30万円が、どこからも出ていない。",
+    "現2": "金庫に「別」の封筒 85,000円（裏に11/2）と、貸切18回・計153万円のノート。",
+    "仕1": "山海物産に30万円×6回＝180万円。領収書はそろっている。",
+    "仕2": "豆の量も値段も去年と同じ。届いているのは前川コーヒーの豆だけ。",
+    "仕3": "机の引き出しに、山海物産のハンコを押した白紙の領収書の束。"
+  };
+  const sayTell = (k) => `社長は「${C.statements[k].text}」と言っていた。`;
+  // 自分が班に伝えられること（発言 → 準備調査 → 現場で見た物）
+  function myTells() {
+    const out = [];
+    saidList().forEach((k) => out.push({ tag: numTag(0, C.statements[k].by), text: sayTell(k), kind: `社長の発言（${C.roles[C.statements[k].by].name}が聞いた）` }));
+    myRoles().forEach((r) => { if (st.a1.found.some((f) => f.startsWith(r + ":"))) out.push({ tag: codeTag(C.prep[r].code), text: TELL[C.prep[r].code], kind: C.prep[r].title }); });
+    st.a2.seen.forEach((c) => { if (TELL[c]) out.push({ tag: codeTag(c), text: TELL[c], kind: C.codes[c].name }); });
+    return out;
+  }
+  const tellCards = (list, empty) => list.length
+    ? `<div class="tells">${list.map((t) => `<div class="tell">${t.tag}<div><small>${esc(t.kind)}</small><p>${esc(t.text)}</p></div></div>`).join("")}</div>`
+    : `<p class="muted" style="font-size:13px">${empty}</p>`;
+
   /* 自分のメモ（聞いた発言・見た証拠・準備調査の資料） */
   function saidList() {
     return Object.keys(C.statements).filter((k) => { const S = C.statements[k]; const q = C.questions[S.by].find((x) => x.key === k); return q && st.a2.asked.includes(q.id); });
@@ -1114,21 +1155,26 @@ window.ASSETS = {
   /* ---------- 第3幕 ---------- */
   function vA3() {
     const lead = isLead();
-    const mine = `<p class="eyebrow" style="margin-top:18px">あなたのメモ</p><div class="mycodes" style="margin-top:8px">${myCodes()}</div>`;
     if (!lead) {
       return `<section class="screen"><div class="wrap">
-        ${todo("見つけたことを、代表に伝えよう", "「社長はこう言っていたけど、この証拠と食い違う」と話そう。")}
-        ${huddle("<b>作戦会議</b>：社長のどの発言が、どの証拠と食い違う？ 違う担当の証拠を<b>2つ</b>組み合わせると、社長は言い逃れできません。")}
-        ${mine}
+        ${todo("下の「代表に伝えること」を、代表に読み上げよう", "代表 → 売上 → 現金 → 仕入れ の順に、1人ずつ読み上げます。")}
+        <p class="eyebrow" style="margin-top:6px">代表に伝えること</p>
+        ${tellCards(myTells(), "伝えることはありません。ほかの人の話を聞いて、代表と一緒に考えよう。")}
+        ${huddle("<b>作戦会議</b>：社長のどの発言が、どの証拠と食い違う？ <b>違う担当の証拠を2つ</b>組み合わせると、社長は言い逃れできません。")}
       </div></section>
       <div class="foot-act"><div class="in"><button class="btn btn-ghost" data-act="to-result">ふりかえりへ<small>代表の説明が終わってから</small></button></div></div>`;
     }
     const slots = C.board.map(slotHtml).join("");
     return `<section class="screen"><div class="wrap">
-      ${todo("仲間の話を聞いて、社長の発言を崩そう", "発言ごとに「証拠を選ぶ」を2回押し、「社長にぶつける」を押す")}
-      ${huddle("<b>代表だけ</b>が社長に証拠を示せます。仲間に「何を見つけた？」と聞いて、組み合わせを決めよう。")}
-      <div style="margin-top:14px">${slots}</div>
-      ${mine}
+      <div class="paper" style="margin-bottom:14px"><h3>進め方</h3><ol style="margin:0;padding-left:1.3em;font-size:14.5px;line-height:1.8">
+        <li>仲間に1人ずつ、<b>見つけたことを読み上げてもらう</b>（代表 → 売上 → 現金 → 仕入れ の順）。</li>
+        <li>下の社長の発言と<b>食い違う証拠</b>を探す。</li>
+        <li><b>違う担当の証拠を2つ</b>選んで「社長にぶつける」。</li></ol>
+        <p class="cap" style="margin-top:8px">迷ったら、発言ごとの「ヒント」を押そう。</p></div>
+      <p class="eyebrow">あなた（代表）が伝えること</p>
+      ${tellCards(myTells(), "まだありません。")}
+      <p class="eyebrow" style="margin-top:18px">崩す社長の発言</p>
+      <div style="margin-top:8px">${slots}</div>
     </div></section>
     <div class="foot-act"><div class="in"><button class="btn btn-ghost" data-act="end-a3" ${st.a3.won.length ? "" : "disabled"}>説明を終える</button></div></div>`;
   }
@@ -1138,7 +1184,7 @@ window.ASSETS = {
     return `<div class="slot ${won ? "won" : ""}">${won ? `<span class="won-tag">崩した！</span>` : ""}
       ${numTag(S.num, S.by)}<p class="st">社長「${esc(S.text)}」</p>
       <div class="pair">${pick(0)}<span class="plus">＋</span>${pick(1)}</div>
-      ${won ? "" : `<p class="muted" style="font-size:12px;margin:6px 0 0">違う担当の証拠を1つずつ選ぶ</p>`}
+      ${won ? "" : `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px"><span class="muted" style="font-size:12px">違う担当の証拠を1つずつ選ぶ</span><button class="chip" data-act="slot-hint" data-s="${b.id}">ヒント</button></div>`}
       ${won ? "" : `<button class="btn btn-red go" data-act="thrust" data-s="${b.id}" ${pk[0] && pk[1] ? "" : "disabled"}>社長にぶつける</button>`}</div>`;
   }
   // 証拠を一覧から選ぶ（担当ごとにまとめて表示）
@@ -1146,8 +1192,8 @@ window.ASSETS = {
     const pk = st.a3.picks[sid] || [], other = pk[1 - idx];
     const item = (code, name, sub) => `<button class="mycode" data-c="${code}" ${code === other ? "disabled style=\"opacity:.35\"" : ""}>${codeTag(code)}<span class="tx">${esc(name)}<small>${esc(sub)}</small></span></button>`;
     const groups = ORDER.map((r) => `<p class="eyebrow" style="margin:14px 0 6px;color:${roleColor(r)}">${C.roles[r].name}が調べた物</p><div class="mycodes">
-      ${item(C.prep[r].code, C.prep[r].title, "準備調査の資料")}${C.places[r].map((p) => item(p.code, p.name, p.where)).join("")}</div>`).join("");
-    sheet(`<h2>証拠を選ぶ</h2><p class="muted" style="font-size:13px;margin:0">仲間に「何を見つけた？」と聞いて選ぼう。</p>${groups}
+      ${item(C.prep[r].code, C.prep[r].title, has(r) ? "準備調査：" + TELL[C.prep[r].code] : `準備調査の資料（${C.roles[r].name}の人に聞こう）`)}${C.places[r].map((p) => item(p.code, p.name, st.a2.seen.includes(p.code) ? (TELL[p.code] || "（手がかりはなかった）") : `${p.where}（${C.roles[r].name}の人に聞こう）`)).join("")}</div>`).join("");
+    sheet(`<h2>証拠を選ぶ</h2><p class="muted" style="font-size:13px;margin:0">仲間が読み上げた物の名前を探して選ぼう。</p>${groups}
       <div class="acts"><button class="btn btn-ghost" data-x="no">やめる</button></div>`, (d) => {
       d.querySelector('[data-x="no"]').onclick = closeSheet;
       d.querySelectorAll("[data-c]").forEach((btn) => (btn.onclick = () => {
@@ -1239,6 +1285,47 @@ window.ASSETS = {
     <div class="foot-act"><div class="in"><button class="btn btn-ghost" data-act="reset">最初からやり直す</button></div></div>`;
   }
 
+  /* ---------- ヒント（森先輩） ---------- */
+  function hint() {
+    const r = cur(), R = C.roles[r];
+    if (st.screen === "a1") {
+      st.a1.hint = true; save(); render();
+      const left1 = Object.keys(C.prep[r].hits).filter((h) => !st.a1.found.includes(r + ":" + h));
+      talk([left1.length
+        ? { who: "mori", text: `資料の<b>光っている所</b>が気になる所だ。タップすると「班に伝えること」に入る。${myRoles().length > 1 ? "上のボタンで担当を切り替えられるぞ。" : ""}` }
+        : { who: "mori", text: "見つけたことを班に読み上げたら、下で<b>仮説</b>を選ぼう。夜の売上と、現金で払っている仕入れ先が気になるな。" }]);
+      return;
+    }
+    if (st.screen === "a2") {
+      const todoQ = C.questions[r].filter((q) => q.key && !st.a2.asked.includes(q.id)).map((q) => `「${q.q}」`);
+      const todoP = C.places[r].filter((p) => !p.decoy && !st.a2.seen.includes(p.code)).map((p) => `<b>${p.name}</b>`);
+      const lines = [];
+      if (todoQ.length) lines.push({ who: "mori", text: `${R.name}なら、社長に${todoQ.join("、")}と聞いてみよう。` });
+      if (todoP.length) lines.push({ who: "mori", text: `現場では、${todoP.join("、")}を見せてもらうといい。` });
+      if (!lines.length) lines.push({ who: "mori", text: `${R.name}の大事な所は全部調べた。<b>班に伝えること</b>を読み上げよう。${myRoles().length > 1 ? "ほかの担当にも切り替えてみて。" : ""}` });
+      lines.push({ who: "mori", text: "見つけたことは、下の<b>班に伝えること</b>に出る。その場で声に出して伝えよう。" });
+      talk(lines); return;
+    }
+    if (st.screen === "a3") {
+      if (isLead()) { talk([{ who: "mori", text: "まず仲間に1人ずつ、見つけたことを読み上げてもらおう。それから、社長の発言ごとの<b>ヒント</b>を押すと、どの担当の証拠が使えるか教える。" }]); return; }
+      const mine = new Set(st.a2.seen.concat(myRoles().map((x) => C.prep[x].code)));
+      const lines = C.board.filter((b) => b.need.flat().some((c) => mine.has(c))).map((b) => {
+        const c = b.need.flat().find((x) => mine.has(x));
+        return { who: "mori", text: `あなたの<b>${C.codes[c].name}</b>は、社長の「${C.statements[b.id].text}」と食い違う。代表にそう伝えよう。` };
+      });
+      talk(lines.length ? lines : [{ who: "mori", text: "代表の話を一緒に聞いて、どの発言とどの証拠が食い違うか考えよう。" }]);
+    }
+  }
+  function slotHint(sid) {
+    const b = C.board.find((x) => x.id === sid);
+    st.a3.hints = st.a3.hints || {}; const lv = (st.a3.hints[sid] = Math.min(2, (st.a3.hints[sid] || 0) + 1)); save();
+    const rolesOf = (g) => [...new Set(g.map((c) => C.roles[C.codes[c].role].name))].join("か");
+    const names = (g) => g.map((c) => C.codes[c].name).join("」か「");
+    talk([lv === 1
+      ? { who: "mori", text: `「${C.statements[sid].text}」には、<b>${rolesOf(b.need[0])}</b>の証拠と、<b>${rolesOf(b.need[1])}</b>の証拠を組み合わせよう。その担当の人に、何を見つけたか聞いてみて。` }
+      : { who: "mori", text: `使えるのは「<b>${names(b.need[0])}</b>」と、「<b>${names(b.need[1])}</b>」だ。` }]);
+  }
+
   /* ---------- 操作 ---------- */
   function confirmSheet(title, body, okLabel, fn) {
     sheet(`<h2>${title}</h2><p class="consent-lede">${body}</p><div class="acts"><button class="btn btn-main" data-x="ok">${okLabel}</button><button class="btn btn-ghost" data-x="no">もどる</button></div>`, (d) => {
@@ -1261,7 +1348,8 @@ window.ASSETS = {
     "intro-again"() { talk(INTRO); },
     async "to-a1"() { go("a1"); await talk([{ who: "mori", text: "まずは<b>準備調査</b>だ。手元の資料で、気になる数字や文をタップしてくれ。" }, { who: "mori", text: "見つけたら、<b>班のみんなに読み上げる</b>こと。ほかの担当の資料とつながるかもしれない。" }]); },
     cur(el) { st.cur = el.dataset.r; SND.play("tap"); save(); render(); },
-    hint1() { st.a1.hint = true; save(); render(); },
+    hint() { hint(); },
+    "slot-hint"(el) { slotHint(el.dataset.s); },
     hypo(el) {
       const h = el.dataset.h, on = st.a1.hypo.includes(h);
       if (!on && st.a1.hypo.length >= 2) { toast("仮説は2つまで。外してから選ぼう"); return; }
