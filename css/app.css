@@ -75,8 +75,7 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35}
 
 /* ---------- タイトル ---------- */
 #title{display:flex;flex-direction:column;justify-content:flex-end;min-height:100dvh;padding:var(--top) 0 calc(var(--bot) + 8px);position:relative;overflow:hidden}
-#title .bg{position:absolute;inset:0;background-size:cover;background-position:60% 50%;filter:brightness(.42) saturate(.9);transform:scale(1.06);animation:drift 24s ease-in-out infinite alternate}
-@keyframes drift{to{transform:scale(1.12) translateX(-2%)}}
+#title .bg{position:absolute;inset:0;background-size:cover;background-position:60% 50%;filter:brightness(.42) saturate(.9)}
 #title .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(19,22,29,.1) 0%,rgba(19,22,29,.75) 45%,var(--desk) 78%)}
 #title .wrap{position:relative;display:flex;flex-direction:column;gap:14px}
 .file{position:relative;padding:22px 20px 18px;border-radius:6px 16px 16px 16px;background:linear-gradient(160deg,#d9c39a,#c7ad7f);color:#2c2112;box-shadow:0 30px 60px -20px rgba(0,0,0,.7)}

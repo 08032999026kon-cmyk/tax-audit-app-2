@@ -1,5 +1,5 @@
 /* 臨場 v2 ― 進行（画面の切り替え・保存・会話・検討の板）
- * 通信はしない。各自のスマホで遊び、手がかりの「番号」は口で伝え合う。
+ * 通信はしない。各自のスマホで遊び、見つけたことは口で伝え合う。代表が一覧から発言と証拠を選んで社長にぶつける。
  * 保存は localStorage（"rinjo:v2"）。URL の末尾に #debug で window.__rinjo が使える。
  */
 (function () {
@@ -57,8 +57,9 @@
     talk: '<svg viewBox="0 0 24 24" fill="none" stroke="#9fe3da" stroke-width="2" stroke-linecap="round"><path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M19 9h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-3-3h-3"/></svg>'
   };
   const sndBtn = () => `<button class="icon-btn ${SND.on ? "" : "muted-snd"}" data-act="sound" aria-label="音のオンとオフ（いまは${SND.on ? "オン" : "オフ"}）">${SND.on ? ICON.snd : ICON.mute}<span class="t">音 ${SND.on ? "オン" : "オフ"}</span></button>`;
-  const codeTag = (code, big) => { const r = C.codes[code] ? C.codes[code].role : "lead"; return `<span class="code${big ? " big" : ""}" style="--c:${roleColor(r)}">${esc(code)}</span>`; };
-  const numTag = (num, by, big) => `<span class="code${big ? " big" : ""}" style="--c:${roleColor(by)}">発言${esc(num)}</span>`;
+  // 担当の色の小さな札（番号は見せない）
+  const codeTag = (code, big) => { const r = C.codes[code] ? C.codes[code].role : "lead"; return `<span class="code${big ? " big" : ""}" style="--c:${roleColor(r)}">${C.roles[r].mark}</span>`; };
+  const numTag = (num, by, big) => `<span class="code${big ? " big" : ""}" style="--c:${roleColor(by)}">発言</span>`;
   const huddle = (html) => `<div class="huddle"><div class="ic">${ICON.talk}</div><p>${html}</p></div>`;
   const todo = (t, s) => `<div class="todo"><p>${t}${s ? `<small>${s}</small>` : ""}</p></div>`;
   function toast(t) { const o = document.getElementById("toast"); if (o) o.remove(); const d = document.createElement("div"); d.id = "toast"; d.innerHTML = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2700); }
@@ -272,7 +273,7 @@
     if (q.cost > left(r)) return;
     st.a2.used[r] = (st.a2.used[r] || 0) + q.cost; st.a2.asked.push(id); st.a2.last = { r, id }; save();
     const lines = [{ who: "you", text: q.q }, { who: "boss", text: q.a, face: q.key ? "boss_smug" : "boss_grin", sfx: q.key ? "bossTick" : null }];
-    if (q.key) { const S = C.statements[q.key]; lines.push({ who: null, text: `社長の発言を<b>「発言${S.num}」</b>としてメモに記録した。<br>第3幕で、この番号を代表に伝えます。`, sfx: "paper" }); }
+    if (q.key) { const S = C.statements[q.key]; lines.push({ who: null, text: `社長の発言を<b>メモに記録</b>した。<br>第3幕で、この発言のことを代表に伝えよう。`, sfx: "paper" }); }
     await talk(lines); render();
   }
 
@@ -297,7 +298,7 @@
   function evidence(p, r, first) {
     if (first) SND.play(p.decoy ? "paper" : "item");
     const hint = HINT[p.code];
-    sheet(`<div class="ev-head">${codeTag(p.code, true)}<p><b style="color:var(--ink)">${esc(p.name)}</b><br>証拠の番号。第3幕で、この番号を代表に伝えます。</p></div>
+    sheet(`<div class="ev-head">${codeTag(p.code, true)}<p><b style="color:var(--ink)">${esc(p.name)}</b><br>メモに入りました。第3幕で、代表に伝えよう。</p></div>
       <div class="paper">${p.doc()}</div>
       <div class="note"><span class="face-s" style="${faceCss("mori")}"></span><span>${p.note}${hint ? `<br><span class="muted">${hint}</span>` : ""}</span></div>
       <div class="acts"><button class="btn btn-main" data-x="close">メモに入れて閉じる</button></div>`, (d) => { d.querySelector('[data-x="close"]').onclick = closeSheet; });
@@ -315,7 +316,7 @@
     return out.join("");
   }
   function notes() {
-    sheet(`<h2>メモ</h2><p class="muted" style="font-size:13px;margin:0 0 10px">番号は、第3幕で代表に口で伝えます。</p><div class="mycodes">${myCodes()}</div>
+    sheet(`<h2>メモ</h2><p class="muted" style="font-size:13px;margin:0 0 10px">第3幕で、見つけたことを代表に口で伝えます。</p><div class="mycodes">${myCodes()}</div>
       <div class="acts"><button class="btn btn-ghost" data-x="close">閉じる</button></div>`, (d) => {
       d.querySelector('[data-x="close"]').onclick = closeSheet;
       d.querySelectorAll('[data-act="ev"]').forEach((b) => (b.onclick = () => { const c = b.dataset.p, r = C.codes[c].role; evidence(C.places[r].find((x) => x.code === c), r); }));
@@ -328,73 +329,41 @@
     const mine = `<p class="eyebrow" style="margin-top:18px">あなたのメモ</p><div class="mycodes" style="margin-top:8px">${myCodes()}</div>`;
     if (!lead) {
       return `<section class="screen"><div class="wrap">
-        ${todo("あなたの番号を、代表に伝えよう", "まず「発言」の番号。次に、その発言と食い違う証拠の番号。")}
+        ${todo("見つけたことを、代表に伝えよう", "「社長はこう言っていたけど、この証拠と食い違う」と話そう。")}
         ${huddle("<b>作戦会議</b>：社長のどの発言が、どの証拠と食い違う？ 違う担当の証拠を<b>2つ</b>組み合わせると、社長は言い逃れできません。")}
         ${mine}
       </div></section>
       <div class="foot-act"><div class="in"><button class="btn btn-ghost" data-act="to-result">ふりかえりへ<small>代表の説明が終わってから</small></button></div></div>`;
     }
-    const slots = C.board.filter((b) => st.a3.open.includes(b.id)).map(slotHtml).join("");
-    const rest = C.board.length - st.a3.open.length;
+    const slots = C.board.map(slotHtml).join("");
     return `<section class="screen"><div class="wrap">
-      ${todo("仲間から番号を聞いて、社長の発言を崩そう", "① 発言の番号を入れる → ② 証拠を2つ選ぶ → ③ 社長にぶつける")}
-      <button class="btn btn-main" data-act="num">発言の番号を入れる${rest ? `<small>（まだ出ていない発言 ${rest}）</small>` : ""}</button>
-      <div style="margin-top:14px">${slots || `<p class="muted" style="font-size:14px">仲間に「社長の発言の番号」を聞いてみよう。社長の話を聞いた人がメモに持っています。</p>`}</div>
-      ${huddle("<b>代表だけ</b>が社長に証拠を示せます。番号を聞き取って組み立てよう。ほかの人は代表に番号を伝えます。")}
+      ${todo("仲間の話を聞いて、社長の発言を崩そう", "発言ごとに「証拠を選ぶ」を2回押し、「社長にぶつける」を押す")}
+      ${huddle("<b>代表だけ</b>が社長に証拠を示せます。仲間に「何を見つけた？」と聞いて、組み合わせを決めよう。")}
+      <div style="margin-top:14px">${slots}</div>
       ${mine}
     </div></section>
     <div class="foot-act"><div class="in"><button class="btn btn-ghost" data-act="end-a3" ${st.a3.won.length ? "" : "disabled"}>説明を終える</button></div></div>`;
   }
   function slotHtml(b) {
     const S = C.statements[b.id], won = st.a3.won.includes(b.id), pk = st.a3.picks[b.id] || [];
-    const pick = (i) => { const c = pk[i]; return c ? `<button class="pick set" data-act="pick" data-s="${b.id}" data-i="${i}" ${won ? "disabled" : ""}>${codeTag(c)}<span>${esc(C.codes[c].name)}</span></button>` : `<button class="pick" data-act="pick" data-s="${b.id}" data-i="${i}">証拠を選ぶ<br>（番号を入れる）</button>`; };
+    const pick = (i) => { const c = pk[i]; return c ? `<button class="pick set" data-act="pick" data-s="${b.id}" data-i="${i}" ${won ? "disabled" : ""}>${codeTag(c)}<span>${esc(C.codes[c].name)}</span></button>` : `<button class="pick" data-act="pick" data-s="${b.id}" data-i="${i}">証拠を選ぶ</button>`; };
     return `<div class="slot ${won ? "won" : ""}">${won ? `<span class="won-tag">崩した！</span>` : ""}
       ${numTag(S.num, S.by)}<p class="st">社長「${esc(S.text)}」</p>
       <div class="pair">${pick(0)}<span class="plus">＋</span>${pick(1)}</div>
       ${won ? "" : `<button class="btn btn-red go" data-act="thrust" data-s="${b.id}" ${pk[0] && pk[1] ? "" : "disabled"}>社長にぶつける</button>`}</div>`;
   }
-  function numPad() {
-    let v = "";
-    const draw = (d) => { d.querySelectorAll(".digits output").forEach((o, i) => (o.textContent = v[i] || "")); d.querySelector('[data-x="ok"]').disabled = v.length < 2; };
-    sheet(`<h2>発言の番号を入れる</h2><p class="muted" style="font-size:13px;margin:0">社長の話を聞いた仲間に、メモの「発言○○」の番号を聞こう。</p>
-      <div class="digits"><output></output><output></output></div>
-      <div class="keypad">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((n) => `<button data-n="${n}">${n}</button>`).join("")}</div>
-      <div class="acts"><button class="btn btn-main" data-x="ok" disabled>この番号で開く</button><button class="btn btn-ghost" data-x="clr">消す</button></div>`, (d) => {
-      d.querySelectorAll("[data-n]").forEach((b) => (b.onclick = () => { if (v.length < 2) { v += b.dataset.n; SND.play("click"); draw(d); } }));
-      d.querySelector('[data-x="clr"]').onclick = () => { v = ""; draw(d); };
-      d.querySelector('[data-x="ok"]').onclick = () => {
-        const k = Object.keys(C.statements).find((x) => C.statements[x].num === v);
-        if (!k) { SND.play("wrong"); toast("その番号の発言はありません"); v = ""; draw(d); return; }
-        closeSheet();
-        if (st.a3.open.includes(k)) { toast(`発言${v} はもう出ています`); return; }
-        st.a3.open.push(k); st.a3.open.sort((a, b) => a.localeCompare(b)); save(); SND.play("paper"); render(); toast(`発言${v} を検討の板に出しました`);
-      };
-    });
-  }
-  function evPad(sid, idx) {
-    let role = null, dig = null;
-    const code = () => (role && dig !== null ? C.roles[role].mark + dig : "");
-    const draw = (d) => {
-      d.querySelectorAll("[data-r]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.r === role));
-      d.querySelectorAll("[data-n]").forEach((b) => { b.classList.toggle("on", String(dig) === b.dataset.n); b.style.setProperty("--c", role ? roleColor(role) : "#555"); });
-      const c = code(), ok = c && C.codes[c];
-      d.querySelector(".kp-show").innerHTML = c ? (ok ? `${codeTag(c)}<span>${esc(C.codes[c].name)}</span>` : `<span class="muted">${c}：その番号の証拠はありません</span>`) : `<span class="muted">担当の字 → 数字 の順に押す</span>`;
-      d.querySelector('[data-x="ok"]').disabled = !ok;
-    };
-    sheet(`<h2>証拠の番号を入れる</h2><p class="muted" style="font-size:13px;margin:0 0 10px">仲間に「証拠の番号」を聞こう（例：売3）。</p>
-      <div class="kp-roles">${ORDER.map((r) => `<button data-r="${r}" style="--c:${roleColor(r)}" aria-pressed="false">${C.roles[r].mark}</button>`).join("")}</div>
-      <div class="keypad">${[0, 1, 2, 3, 4].map((n) => `<button data-n="${n}">${n}</button>`).join("")}</div>
-      <div class="kp-show"></div>
-      <div class="acts"><button class="btn btn-main" data-x="ok" disabled>この証拠にする</button><button class="btn btn-ghost" data-x="no">やめる</button></div>`, (d) => {
-      d.querySelectorAll("[data-r]").forEach((b) => (b.onclick = () => { role = b.dataset.r; SND.play("click"); draw(d); }));
-      d.querySelectorAll("[data-n]").forEach((b) => (b.onclick = () => { dig = +b.dataset.n; SND.play("click"); draw(d); }));
+  // 証拠を一覧から選ぶ（担当ごとにまとめて表示）
+  function evPick(sid, idx) {
+    const pk = st.a3.picks[sid] || [], other = pk[1 - idx];
+    const item = (code, name, sub) => `<button class="mycode" data-c="${code}" ${code === other ? "disabled style=\"opacity:.35\"" : ""}>${codeTag(code)}<span class="tx">${esc(name)}<small>${esc(sub)}</small></span></button>`;
+    const groups = ORDER.map((r) => `<p class="eyebrow" style="margin:14px 0 6px;color:${roleColor(r)}">${C.roles[r].name}が調べた物</p><div class="mycodes">
+      ${item(C.prep[r].code, C.prep[r].title, "準備調査の資料")}${C.places[r].map((p) => item(p.code, p.name, p.where)).join("")}</div>`).join("");
+    sheet(`<h2>証拠を選ぶ</h2><p class="muted" style="font-size:13px;margin:0">仲間に「何を見つけた？」と聞いて選ぼう。</p>${groups}
+      <div class="acts"><button class="btn btn-ghost" data-x="no">やめる</button></div>`, (d) => {
       d.querySelector('[data-x="no"]').onclick = closeSheet;
-      d.querySelector('[data-x="ok"]').onclick = () => {
-        const c = code(), pk = (st.a3.picks[sid] = st.a3.picks[sid] || []), other = pk[1 - idx];
-        if (other === c) { toast("同じ証拠は2つ選べません"); return; }
-        pk[idx] = c; save(); closeSheet(); render();
-      };
-      draw(d);
+      d.querySelectorAll("[data-c]").forEach((btn) => (btn.onclick = () => {
+        const p2 = (st.a3.picks[sid] = st.a3.picks[sid] || []); p2[idx] = btn.dataset.c; SND.play("click"); save(); closeSheet(); render();
+      }));
     });
   }
   async function thrust(sid) {
@@ -511,7 +480,7 @@
       go("a2"); SND.play("door");
       await talk([{ who: null, text: "浜風珈琲。社長の白洲が、笑顔で出迎えた。" },
         { who: "boss", text: "税務署の方？ うちは赤字ですよ。何もやましいことはありません。", face: "boss_grin" },
-        { who: "mori", text: "社長の大事な発言は<b>番号つき</b>でメモに残る。証拠にも番号がある。あとで代表がそれをぶつけるんだ。" },
+        { who: "mori", text: "社長の大事な発言と、見つけた証拠は<b>メモ</b>に残る。あとで代表が、それを社長にぶつけるんだ。" },
         { who: "mori", text: "持ち時間は担当ごとに<b>" + C.TIME + "分</b>。質問は10分、資料を見るのは20分かかる。何から調べるか、よく考えて。" },
         { who: "mori", text: "それから、書類を見る・金庫を開けるときは、<b>必ず社長の承諾</b>をもらうこと。勝手に触ってはいけない。" }]);
     },
@@ -524,11 +493,10 @@
         go("a3"); SND.play("car");
         await talk([{ who: "mori", text: "署にもどった。ここからは<b>検討と説明</b>だ。" },
           { who: "mori", text: "社長の発言のうち、証拠で崩せるものを探す。崩すには<b>違う担当の証拠を2つ</b>組み合わせること。" },
-          { who: "mori", text: isLead() ? "社長に証拠を示せるのは<b>代表のあなただけ</b>。仲間から番号を聞き取って、組み立ててくれ。" : "社長に証拠を示せるのは<b>代表だけ</b>だ。あなたのメモの番号を、代表に伝えてくれ。" }]);
+          { who: "mori", text: isLead() ? "社長に証拠を示せるのは<b>代表のあなただけ</b>。仲間の話を聞き取って、組み立ててくれ。" : "社長に証拠を示せるのは<b>代表だけ</b>だ。あなたが見つけたことを、代表に伝えてくれ。" }]);
       });
     },
-    num() { numPad(); },
-    pick(el) { evPad(el.dataset.s, +el.dataset.i); },
+    pick(el) { evPick(el.dataset.s, +el.dataset.i); },
     thrust(el) { thrust(el.dataset.s); },
     "end-a3"() { confirmSheet("説明を終えますか", `崩した発言は ${st.a3.won.length} / ${C.board.length} です。終えると、ふりかえりの画面に進みます。`, "説明を終える", () => { st.ended = true; go("result"); }); },
     "to-result"() { confirmSheet("ふりかえりへ進みますか", "答えが出ます。<b>代表の説明が終わってから</b>進んでください。", "ふりかえりへ", () => go("result")); },

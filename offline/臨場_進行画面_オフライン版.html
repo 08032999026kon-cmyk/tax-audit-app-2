@@ -120,7 +120,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   <ol class="steps">
     <li><b>第1幕　準備調査（5分）</b>：自分の資料で気になる点をタップ → 班で読み上げ、仮説を選ぶ</li>
     <li><b>第2幕　臨場（12分）</b>：社長に質問し、<b>承諾をもらって</b>現場を見る。持ち時間に注意</li>
-    <li class="must"><b>第3幕　検討と説明（7分）</b>：発言と証拠の<b>番号</b>を代表に伝える。代表が<b>違う担当の証拠2つ</b>を社長にぶつける</li>
+    <li class="must"><b>第3幕　検討と説明（7分）</b>：見つけたことを代表に伝える。代表が<b>違う担当の証拠2つ</b>を選んで社長にぶつける</li>
   </ol>
 </section>
 
@@ -2727,8 +2727,8 @@ window.CASE = (function () {
   /* 答え */
   $("reveal").onclick=()=>{
     const C=window.CASE;
-    const nm=c=>`${c} ${C.codes[c].name}`;
-    $("answers").innerHTML=C.board.map(b=>{const S=C.statements[b.id];return `<div class="ans"><small>社長の発言（発言${S.num}・${C.roles[S.by].name}が聞いた）</small><div class="claim">「${S.text}」</div><small>崩した証拠（2つ）</small><div class="ev">${b.need[0].map(nm).join(" / ")}<br>＋ ${b.need[1].map(nm).join(" / ")}</div><p>${b.win}</p></div>`;}).join("")+`<div class="ans"><small>全体</small><div class="claim">売上除外 153万円 ＋ 架空経費 180万円</div><p>申告した所得 −57万円 → 正しい所得 276万円</p></div>`;
+    const nm=c=>C.codes[c].name;
+    $("answers").innerHTML=C.board.map(b=>{const S=C.statements[b.id];return `<div class="ans"><small>社長の発言（${C.roles[S.by].name}が聞いた）</small><div class="claim">「${S.text}」</div><small>崩した証拠（2つ）</small><div class="ev">${b.need[0].map(nm).join(" / ")}<br>＋ ${b.need[1].map(nm).join(" / ")}</div><p>${b.win}</p></div>`;}).join("")+`<div class="ans"><small>全体</small><div class="claim">売上除外 153万円 ＋ 架空経費 180万円</div><p>申告した所得 −57万円 → 正しい所得 276万円</p></div>`;
     $("answers").hidden=false;$("reveal").hidden=true;
   };
 
