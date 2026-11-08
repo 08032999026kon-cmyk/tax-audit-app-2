@@ -83,7 +83,7 @@ b{font-weight:700}
 .place small{font-size:10px;letter-spacing:.06em;color:var(--amber);white-space:nowrap;font-variant-numeric:tabular-nums}
 .place span{font-size:14px;font-weight:700;white-space:nowrap}
 .hud-tools{display:flex;gap:6px;flex:none}
-@media (max-width:380px){.icon-btn{padding:0 9px}.icon-btn svg{display:none}}
+@media (max-width:430px){.icon-btn{padding:0 10px}#b-book svg,#b-hint svg{display:none}#b-sound .t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}#b-sound{padding:0 12px}}
 .hud-mid{flex:1;pointer-events:none;position:relative}
 .hud-bottom{display:flex;flex-direction:column;gap:8px;max-width:34rem;width:100%;margin:0 auto}
 .claims{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
@@ -100,7 +100,8 @@ b{font-weight:700}
 
 /* 操作のお手本（指） */
 #coach{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none}
-#coach .hand{width:56px;height:56px;border-radius:50%;background:rgba(242,165,58,.25);border:2px solid var(--amber);animation:swipe 2.2s ease-in-out infinite}
+#coach .hand{width:56px;height:56px;display:grid;place-items:center;font-size:40px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.6));animation:swipe 2.2s ease-in-out infinite}
+#coach .hand::before{content:"👆"}
 #coach p{white-space:nowrap;font-size:12px!important;margin:0;padding:6px 12px;border-radius:999px;background:var(--panel);font-size:13px}
 @keyframes swipe{0%,100%{transform:translateX(-60px)}50%{transform:translateX(60px)}}
 
@@ -301,3 +302,96 @@ body.cinema #cine-t,body.cinema #cine-b{transform:none}
 .consent-actions{display:grid;gap:8px;margin-top:4px}
 .icon-btn.muted{color:var(--dim);border-style:dashed}
 .t-foot span{line-height:1.6}
+
+/* ================= イラスト版の画面（scene.js） ================= */
+.sc-view{position:absolute;inset:0;overflow:hidden;background:#05070d}
+.sc-cam{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+.sc-bg{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;-webkit-user-drag:none;pointer-events:none;
+  filter:saturate(1.08) contrast(1.06)}
+.sc-cam{transition:filter .5s ease}
+.sc-view.focus .sc-cam{filter:blur(2.5px) brightness(.5) saturate(.8)}
+.sc-tint{position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply}
+.sc-glow{position:absolute;inset:0;pointer-events:none}
+.sc-glow i{position:absolute;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--c) 55%,transparent) 0%,transparent 65%);mix-blend-mode:screen;opacity:.55;
+  animation:flicker 5s ease-in-out infinite}
+@keyframes flicker{0%,100%{opacity:.5}40%{opacity:.62}43%{opacity:.4}46%{opacity:.6}70%{opacity:.55}}
+#stage canvas.sc-fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.sc-grain{position:absolute;inset:-50%;pointer-events:none;opacity:.10;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain .6s steps(3) infinite}
+@keyframes grain{0%{transform:translate(0,0)}33%{transform:translate(-3%,2%)}66%{transform:translate(2%,-3%)}}
+.sc-sign{position:absolute;left:51%;top:10.6%;width:18%;height:14%;display:grid;place-items:center;
+  background:linear-gradient(180deg,#3a2414,#24150b);border:.35vmin solid #8a6136;border-radius:4px;box-shadow:inset 0 0 18px rgba(0,0,0,.6),0 0 30px rgba(255,190,110,.25);
+  font-family:var(--f-paper);color:#ffd99a;font-size:46px;letter-spacing:.18em;text-shadow:0 0 12px rgba(255,190,110,.75)}
+.sc-sign.v{left:38.9%;top:14.6%;width:4.2%;height:10.8%;font-size:26px;letter-spacing:.05em;writing-mode:vertical-rl;background:linear-gradient(90deg,#efe6d2,#d8ccb0);color:#3a2414;border-color:#6b5a44;text-shadow:none;box-shadow:inset 0 0 10px rgba(0,0,0,.35)}
+
+/* 調べる印 */
+.sc-marks{position:absolute;inset:0}
+.sc-mark{position:absolute;width:0;height:0;pointer-events:auto}
+.sc-mark .m{position:absolute;left:0;top:0;transform:scale(var(--inv,1));transform-origin:0 0}
+.sc-mark .ring{position:absolute;left:-26px;top:-26px;width:52px;height:52px;border-radius:50%;transform-origin:26px 26px;
+  border:3px solid var(--amber);background:radial-gradient(circle,rgba(242,165,58,.45) 0 22%,rgba(242,165,58,.12) 23% 100%);
+  box-shadow:0 0 0 2px rgba(0,0,0,.35),0 0 22px rgba(242,165,58,.7);animation:markPulse 1.6s ease-in-out infinite}
+.sc-mark .ring::after{content:"";position:absolute;inset:-12px;border-radius:50%;border:2px solid rgba(242,165,58,.6);animation:markWave 1.6s ease-out infinite}
+@keyframes markPulse{0%,100%{scale:1}50%{scale:1.1}}
+@keyframes markWave{from{opacity:1;scale:.7}to{opacity:0;scale:1.35}}
+.sc-mark .lab{position:absolute;left:0;top:30px;transform-origin:0 0;translate:-50% 0;white-space:nowrap;padding:3px 9px;border-radius:999px;
+  background:rgba(10,12,20,.82);border:1px solid rgba(242,165,58,.55);font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--ink)}
+.sc-mark[data-state="done"] .ring{border-color:rgba(243,234,216,.55);background:rgba(0,0,0,.35);box-shadow:none;animation:none}
+.sc-mark[data-state="done"] .ring::after{content:"✓";inset:0;border:0;display:grid;place-items:center;font-size:22px;font-weight:700;color:var(--ink);animation:none}
+.sc-mark[data-state="done"] .lab{opacity:.75;border-color:var(--line)}
+.sc-mark[data-state="lock"] .ring{border-color:#9fb4d8;box-shadow:0 0 18px rgba(159,180,216,.6)}
+.sc-mark[data-state="lock"] .ring::after{content:"🔒";inset:0;border:0;display:grid;place-items:center;font-size:18px;animation:none}
+.sc-mark.door .ring{border-color:#6fc3ff;background:radial-gradient(circle,rgba(111,195,255,.5) 0 22%,rgba(111,195,255,.12) 23% 100%);box-shadow:0 0 22px rgba(111,195,255,.7)}
+.sc-mark.door .ring::after{border-color:rgba(111,195,255,.6)}
+.sc-mark.door .lab{border-color:rgba(111,195,255,.6);color:#d6eeff}
+.sc-edge{position:absolute;top:calc(var(--top) + 64px);z-index:3;min-width:48px;height:44px;padding:0 12px;border-radius:999px;font-weight:700;font-size:14px;
+  background:rgba(242,165,58,.92);color:var(--amber-ink);box-shadow:0 6px 20px rgba(0,0,0,.4);animation:edgeNudge 1.4s ease-in-out infinite}
+.sc-edge.l{left:var(--gx)}.sc-edge.r{right:var(--gy)}
+@keyframes edgeNudge{0%,100%{transform:translateX(0)}50%{transform:translateX(var(--d,4px))}}
+.sc-edge.l{--d:-4px}
+.sc-pop{position:absolute;transform:scale(var(--inv,1)) translate(-50%,-50%);transform-origin:0 0;font-size:44px;filter:drop-shadow(0 0 14px rgba(255,210,120,.9));animation:popUp 1.1s ease forwards;pointer-events:none}
+@keyframes popUp{0%{opacity:0;translate:0 10px;scale:.4}25%{opacity:1;translate:0 -18px;scale:1.15}75%{opacity:1;translate:0 -30px;scale:1}100%{opacity:0;translate:0 -46px}}
+.sc-burst{position:absolute;width:0;height:0}
+.sc-burst::before{content:"";position:absolute;left:-90px;top:-90px;width:180px;height:180px;border-radius:50%;transform:scale(var(--inv,1));
+  background:radial-gradient(circle,color-mix(in srgb,var(--c,#ffd27a) 90%,transparent),transparent 65%);mix-blend-mode:screen;animation:burst .9s ease-out forwards}
+@keyframes burst{from{opacity:1;scale:.3}to{opacity:0;scale:1.6}}
+
+/* 立ち絵 */
+.sc-actors{position:absolute;inset:0;pointer-events:none}
+.sc-actor{position:absolute;bottom:0;height:min(86vh,980px);aspect-ratio:.64;transition:filter .3s ease,opacity .3s ease,translate .35s ease}
+.sc-actor .body{position:absolute;inset:0;transform-origin:50% 100%}
+.sc-actor img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%;
+  filter:drop-shadow(0 0 30px rgba(0,0,0,.65)) drop-shadow(0 18px 30px rgba(0,0,0,.55))}
+.sc-actor img.next{opacity:0}
+.sc-actor img.next.on{animation:xfade .18s ease forwards}
+@keyframes xfade{to{opacity:1}}
+.sc-actor.boss{right:max(-4vw,calc(50% - 46vh))}
+.sc-actor.mori{left:max(-4vw,calc(50% - 46vh))}
+.sc-actor.enter{animation:actorIn .45s cubic-bezier(.2,.9,.3,1)}
+.sc-actor.boss.enter{--from:60px}.sc-actor.mori.enter{--from:-60px}
+@keyframes actorIn{from{opacity:0;translate:var(--from) 0}}
+.sc-actor.out{opacity:0;translate:0 20px}
+.sc-actor.dim{filter:brightness(.42) saturate(.6)}
+.sc-actor.soft{filter:brightness(.7)}
+/* 縦長の画面：話している人だけを中央に大きく */
+@media (max-aspect-ratio:1/1){
+  .sc-actor{height:72vh}
+  .sc-actor.boss,.sc-actor.mori{left:50%;right:auto;margin-left:calc(-72vh * .32)}
+  .sc-actor.dim{opacity:0;translate:0 14px}
+}
+.sc-actors[data-mode="side"] .sc-actor{height:min(60vh,640px)}
+@media (max-aspect-ratio:1/1){
+  .sc-actors[data-mode="side"] .sc-actor{height:52vh;margin-left:calc(-52vh * .32)}
+  .sc-actors[data-mode="side"] .sc-actor.mori{left:max(calc(-52vh * .12),calc(50% - 52vh * .55));margin-left:0}
+}
+.r-shock{animation:rShock .5s cubic-bezier(.2,1.8,.4,1)}
+@keyframes rShock{0%{transform:scale(1)}30%{transform:scale(1.08) translateY(-12px)}100%{transform:scale(1)}}
+.r-smug{animation:rSmug .9s ease}
+@keyframes rSmug{0%,100%{transform:rotate(0)}25%{transform:rotate(-1.6deg)}50%{transform:rotate(1.4deg)}75%{transform:rotate(-.8deg)}}
+.r-sad{animation:rSad 1s ease forwards}
+@keyframes rSad{to{transform:translateY(16px) scale(.98)}}
+.r-talk{animation:rTalk .35s ease}
+@keyframes rTalk{50%{transform:translateY(-4px)}}
+.sc-view[data-room="ext"] .sc-bg{filter:saturate(1.1) contrast(1.08) brightness(.95)}

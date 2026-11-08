@@ -2617,7 +2617,7 @@ window.CASE = {
     }
   },
 
-  /* 3D空間で調べられる場所。gives に入っている証拠が手に入る */
+  /* 調べられる場所（画面上の位置は js/scene.js の SPOTS）。gives に入っている証拠が手に入る */
   spots: {
     register: { room: "shop", label: "レジ", gives: "register" },
     trash:    { room: "shop", label: "ゴミ箱", gives: "order" },
@@ -2637,7 +2637,7 @@ window.CASE = {
     { when: s => !s.solved.has("c1") && !s.got.has("register"), text: "社長は「売上は全部レジ」と言っていた。まずはレジの記録を見てみよう。" },
     { when: s => !s.solved.has("c1") && !s.got.has("order"), text: "レジは夜7時前に締められていた。夜の売上の手がかりが、捨てられていないかな？" },
     { when: s => !s.solved.has("c1"), text: "「手書きの注文票」はレジに記録されていない売上だ。相談タイムで「売上」の主張にぶつけよう。" },
-    { when: s => !s.visited.has("office"), text: "店の奥に事務室がある。カウンターの奥のドアをタップしてみよう。" },
+    { when: s => !s.visited.has("office"), text: "店の奥に「事務室」と書かれたドアがある。青い印をタップしてみよう。" },
     { when: s => !s.solved.has("c2") && !s.got.has("ledger"), text: "事務室のパソコンを調べてみよう。何かメモが貼ってあるかも。" },
     { when: s => !s.solved.has("c2") && !s.got.has("photo"), text: "金庫の番号は「お店の誕生日」。お店が開いた日が分かる物はないかな？" },
     { when: s => !s.solved.has("c2") && !s.got.has("envelope"), text: "開店の日は 10月15日。金庫に「1015」を入れてみよう。" },

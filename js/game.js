@@ -6,8 +6,8 @@
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const SAVE_KEY = "rinjo:v1";
 
-  if (!window.THREE || !window.WORLD) { $("loading").textContent = "3Dの読み込みに失敗しました。再読み込みしてください。"; return; }
-  const W = window.WORLD, V = W.V;
+  if (!window.SCENE || !window.ASSETS) { $("loading").textContent = "読み込みに失敗しました。再読み込みしてください。"; return; }
+  const W = window.SCENE;
 
   /* ---------- 状態 ---------- */
   const S = {
@@ -26,11 +26,7 @@
   function load() { try { return JSON.parse(localStorage.getItem(SAVE_KEY) || "null"); } catch (e) { return null; } }
   function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
 
-  const ROOMS = {
-    shop: { name: "店内", pos: V(0.2, 1.65, 3.2), look: V(-0.6, 1.2, -3) },
-    office: { name: "事務室", pos: V(1.7, 1.6, -4.6), look: V(1.7, 1.0, -8) }
-  };
-  const BOSS_VIEW = { pos: V(-1.3, 1.62, -1.45), look: V(-1.45, 1.72, -3.2) };
+  const ROOMS = { shop: { name: "店内" }, office: { name: "事務室" } };
   const NAMES = { boss: "社長　白洲 守（しらす まもる）", mori: "森 先輩（調査官）", you: "あなた（代表）", narr: "" };
   const ICONS = { receipt: "🧾", register: "🖨", order: "📝", calendar: "📅", menu: "📋", key: "🔑", pc: "💻", photo: "🖼", stock: "📦", envelope: "✉", blank: "📄" };
 
@@ -38,7 +34,7 @@
   const SPK_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
   const SPK_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
   function refreshSound() {
-    [$("b-sound"), $("t-sound")].forEach((b) => { b.innerHTML = (SND.on ? SPK_ON + "音あり" : SPK_OFF + "音なし"); b.setAttribute("aria-pressed", SND.on ? "true" : "false"); b.setAttribute("aria-label", SND.on ? "音を消す" : "音を出す"); b.classList.toggle("muted", !SND.on); });
+    [$("b-sound"), $("t-sound")].forEach((b) => { b.innerHTML = (SND.on ? SPK_ON + '<span class="t">音あり</span>' : SPK_OFF + '<span class="t">音なし</span>'); b.setAttribute("aria-pressed", SND.on ? "true" : "false"); b.setAttribute("aria-label", SND.on ? "音を消す" : "音を出す"); b.classList.toggle("muted", !SND.on); });
   }
   [$("b-sound"), $("t-sound")].forEach((b) => b.addEventListener("click", () => { const on = SND.toggle(); refreshSound(); if (on) { SND.play("tap"); if (S.phase !== "title") SND.bgm(S.phase === "confront" ? "tense" : "calm"); } else SND.bgm(null); toast(on ? "音を出します" : "音を消しました"); }));
   refreshSound();
@@ -46,15 +42,15 @@
   let toastTimer = null;
   function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; t.style.animation = "none"; void t.offsetWidth; t.style.animation = ""; clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 2600); }
 
-  function fade(on) { $("fade").classList.toggle("on", on); return wait(on ? 460 : 300); }
+  function fade(on) { $("fade").classList.toggle("on", on && !W.fast); return W.fast ? Promise.resolve() : wait(on ? 460 : 300); }
 
   /* 台詞 */
   let talkDone = null, typing = null;
   function talk(who, text, expr) {
     return new Promise((res) => {
       if (W.fast) { res(); return; }
-      if (who === "boss" && expr) W.people.boss.setFace(expr);
-      if (who === "mori") W.people.mori.setFace(expr || "normal");
+      if (who === "boss" || who === "mori") { W.actor(who, expr || (who === "boss" ? "normal" : "smile")); W.speaker(who); }
+      else W.speaker("none");
       const box = $("talk-box"); box.classList.toggle("no-face", who === "narr");
       if (who !== "narr") { const pc = W.portrait(who === "you" || who === "me" ? "you" : who, expr || (who === "boss" ? "normal" : "smile")); const g = $("talk-face").getContext("2d"); g.clearRect(0, 0, 160, 160); g.drawImage(pc, 0, 0); }
       $("talk-who").textContent = who === "me" ? "あなた（調査官）" : who === "you" ? (S.role === "leader" ? "あなた（代表）" : "代表") : NAMES[who];
@@ -92,58 +88,31 @@
     const exploring = p === "explore";
     $("hud").hidden = !(p === "explore");
     W.showMarkers(S.room, exploring);
-    if (exploring) renderHud();
+    if (exploring) { W.hideActors(); W.unfocus(); W.setMode("side"); renderHud(); }
   }
 
   /* ---------- 見回す・タップ ---------- */
-  const stage = $("stage");
-  let drag = null, vel = 0, velP = 0, coachShown = false;
-  stage.addEventListener("pointerdown", (e) => {
+  let coachShown = false;
+  W.canDrag = () => S.phase === "explore" && !S.busy;
+  W.onDrag = () => hideCoach();
+  W.onPick = (hit) => {
     if (S.phase !== "explore" || S.busy) return;
-    drag = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, moved: 0, t: performance.now() }; vel = velP = 0;
-    try { stage.setPointerCapture(e.pointerId); } catch (er) {}
-  });
-  stage.addEventListener("pointermove", (e) => {
-    if (!drag) return;
-    const dx = e.clientX - drag.lx, dy = e.clientY - drag.ly; drag.lx = e.clientX; drag.ly = e.clientY;
-    drag.moved = Math.max(drag.moved, Math.hypot(e.clientX - drag.x, e.clientY - drag.y));
-    const k = 0.0055 * (W.camera.fov / 70);
-    W.cam.yaw += dx * k; W.cam.pitch = Math.max(-0.95, Math.min(0.75, W.cam.pitch + dy * k * 0.8));
-    vel = dx * k; velP = dy * k * 0.8;
-    if (drag.moved > 20) hideCoach();
-  });
-  function endDrag(e) {
-    if (!drag) return; const d = drag; drag = null;
-    if (d.moved < 10 && performance.now() - d.t < 600) { vel = velP = 0; onTap(e.clientX, e.clientY); }
-  }
-  stage.addEventListener("pointerup", endDrag);
-  stage.addEventListener("pointercancel", () => { drag = null; });
-  W.onFrame.push(() => {
-    if (drag || S.phase !== "explore" || S.busy) { if (!drag) vel = velP = 0; return; }
-    if (Math.abs(vel) > 0.0001 || Math.abs(velP) > 0.0001) { W.cam.yaw += vel; W.cam.pitch = Math.max(-0.95, Math.min(0.75, W.cam.pitch + velP)); vel *= 0.9; velP *= 0.9; }
-  });
-  function showCoach() { if (coachShown) return; coachShown = true; $("coach").hidden = false; setTimeout(hideCoach, 7000); }
-  function hideCoach() { $("coach").hidden = true; }
-
-  function onTap(x, y) {
-    if (S.phase !== "explore" || S.busy) return;
-    const hit = W.pick(x, y); if (!hit) return;
     hideCoach();
     if (hit.door === "toOffice") goRoom("office");
-    else if (hit.door === "toShop") goRoom("shop");
     else if (hit.spot) inspect(hit.spot);
-  }
+  };
+  function showCoach() { if (coachShown) return; coachShown = true; $("coach").hidden = false; setTimeout(hideCoach, 7000); }
+  function hideCoach() { $("coach").hidden = true; }
 
   /* ---------- 部屋の移動 ---------- */
   async function goRoom(room) {
     if (S.busy) return; S.busy = true; SND.play("door");
     const first = room === "office" && !S.visited.has("office");
     W.showMarkers(S.room, false);
-    if (room === "office") { await W.flyTo(V(3.1, 1.6, -2.6), V(3.1, 1.4, -6), 600); await W.swingOffice(true); }
+    if (room === "office") await W.look(65.5, 45, 2.0, 650);
     await fade(true);
     S.room = room; S.visited.add(room);
-    W.place(ROOMS[room].pos, ROOMS[room].look);
-    if (room === "shop") W.doors.office.rotation.y = 0;
+    W.show(room);
     await fade(false);
     S.busy = false; save();
     if (first) {
@@ -168,9 +137,9 @@
 
   async function inspect(id) {
     if (S.busy) return; S.busy = true; hideCoach();
-    const sp = C.spots[id], ws = W.spots[id]; const back = W.snapshot();
-    W.showMarkers(S.room, false); $("hud").hidden = true; SND.play("tap");
-    await W.flyTo(ws.camPos, ws.focus, 850);
+    const sp = C.spots[id]; const back = W.snapshot();
+    W.showMarkers(S.room, false); $("hud").hidden = true; SND.play("tap"); setPhase("look");
+    await W.focusSpot(id, 1.7, 750);
 
     // 承諾：開ける・触れる前に、社長の「いいですよ」をもらう
     if (CONSENT[id] && !S.consent.has(id)) {
@@ -181,31 +150,32 @@
     // 鍵のかかった引き出し
     if (sp.lock === "key" && !S.unlocked.has(id)) {
       if (!S.got.has("key")) {
-        SND.play("lock"); await W.jiggleDrawer(); W.setMarker(id, "lock");
+        SND.play("lock"); W.shake(8); W.pop(id, "🔒"); await wait(500); W.setMarker(id, "lock");
         await talk("mori", "引き出しに<b>鍵がかかっている</b>。どこかに鍵がないか探してみよう。", "think");
         await W.restore(back, 700); S.busy = false; setPhase("explore"); return;
       }
-      SND.play("unlock"); toast("小さな鍵で開けた！"); await W.openDrawer(); S.unlocked.add(id);
+      SND.play("unlock"); toast("小さな鍵で開けた！"); W.flashSpot(id); await W.pop(id, "🔓"); S.unlocked.add(id);
     }
     // 金庫のダイヤル
     if (sp.lock === "dial" && !S.unlocked.has(id)) {
       const ok = await askDial(sp.code);
       if (!ok) { W.setMarker(id, "lock"); await W.restore(back, 700); S.busy = false; setPhase("explore"); return; }
-      SND.play("unlock"); await W.openSafe(); S.unlocked.add(id);
+      SND.play("unlock"); W.shake(6); W.flashSpot(id); await W.pop(id, "🔓"); S.unlocked.add(id);
     }
-    if (id === "register" && !S.seen.has(id)) { SND.play("click"); W.printTape(); }
-    if (id === "plant" && !S.got.has("key")) { await W.revealKey(); SND.play("item"); }
+    if (id === "register" && !S.seen.has(id)) { SND.play("click"); await W.pop(id, "🧾"); }
+    if (id === "plant" && !S.got.has("key")) { SND.play("item"); W.flashSpot(id); await W.pop(id, "🔑"); }
+    if (id === "trash" && !S.seen.has(id)) { W.flashSpot(id); await W.pop(id, "📝"); }
 
     const ev = sp.gives; const isNew = !S.got.has(ev);
     await showEvidence(ev, isNew);
     S.seen.add(id); W.setMarker(id, "done");
-    if (isNew) { S.got.add(ev); bumpBadge(); toast(`手帳に「${C.evidence[ev].name}」を追加`); if (id === "plant") W.keyMesh.visible = false; }
+    if (isNew) { S.got.add(ev); bumpBadge(); toast(`手帳に「${C.evidence[ev].name}」を追加`); }
     save();
     if (isNew && COMMENTS[ev]) await lines(COMMENTS[ev]);
     const shopSeen = [...S.seen].filter((k) => C.spots[k].room === "shop").length;
     if (S.room === "shop" && !S.visited.has("office") && shopSeen >= 3 && !S.toldDoor) {
       S.toldDoor = true;
-      await talk("mori", "カウンターの奥に<b>「事務室」のドア</b>があるね。青い矢印の印をタップすると入れるよ。", "smile");
+      await talk("mori", "奥に<b>「事務室」と書かれたドア</b>があるね。青い印をタップすると入れるよ。", "smile");
     }
     await W.restore(back, 750);
     S.busy = false; setPhase("explore");
@@ -234,7 +204,7 @@
         SND.play("tap"); $("consent").hidden = true; consentExplained = true;
         await talk("me", CONSENT[id][0]);
         await talk("boss", CONSENT[id][1], "smug");
-        S.consent.add(id); save(); toast("社長の承諾を得た"); res(true);
+        S.consent.add(id); save(); W.hideActors(); toast("社長の承諾を得た"); res(true);
       };
     });
   }
@@ -258,7 +228,6 @@
       $("wheels").innerHTML = digits.map((_, i) => `<div class="wheel"><button data-i="${i}" data-d="1" aria-label="${i + 1}けた目を増やす">▲</button><output id="dg${i}">0</output><button data-i="${i}" data-d="-1" aria-label="${i + 1}けた目を減らす">▼</button></div>`).join("");
       $("wheels").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
         const i = +b.dataset.i; digits[i] = (digits[i] + +b.dataset.d + 10) % 10; $("dg" + i).textContent = digits[i]; SND.play("click");
-        W.safeDial.rotation.y += +b.dataset.d * 0.6;
       }));
       $("dial").hidden = false;
       const done = (v) => { $("dial").hidden = true; $("dial-ok").onclick = $("dial-cancel").onclick = null; res(v); };
@@ -340,21 +309,19 @@
   /* ---------- 対決 ---------- */
   async function confront(cid, ev) {
     S.busy = true; setPhase("confront"); SND.bgm("tense"); S.tries++;
-    const c = C.claims.find((x) => x.id === cid), ok = ev === c.answer, boss = W.people.boss;
+    const c = C.claims.find((x) => x.id === cid), ok = ev === c.answer;
     const fromRoom = S.room;
-    if (S.room !== "shop") { await fade(true); S.room = "shop"; W.doors.office.rotation.y = 0; W.place(BOSS_VIEW.pos, BOSS_VIEW.look); await fade(false); }
-    else await W.flyTo(BOSS_VIEW.pos, BOSS_VIEW.look, 1000);
-    W.react("boss", "reset"); boss.setFace("normal");
-    await W.turnTo("boss", W.camera.position, 400);
+    await fade(true); W.show("shop", [50, 50, 1.25]); W.setMode("stage"); W.actor("boss", "normal"); W.speaker("boss"); await fade(false);
+    await wait(300);
     await talk("you", `社長。「${c.text.replace(/。$/, "")}」とおっしゃいましたね。`);
     await talk("you", `では、<b>これ</b>を見てください！`);
     const th = $("thrust"); th.innerHTML = `<small>証拠</small><strong>${C.evidence[ev].name}</strong>`; th.hidden = false;
     const sl = $("speedlines"); sl.classList.remove("on"); void sl.offsetWidth; sl.classList.add("on");
-    SND.play("slam"); W.shake = 0.03;
+    SND.play("slam"); W.shake(18);
     await wait(700);
     if (ok) {
       const f = $("flash"); f.style.transition = "none"; f.style.opacity = ".9"; requestAnimationFrame(() => { f.style.transition = "opacity .6s"; f.style.opacity = "0"; });
-      W.react("boss", "shock"); th.hidden = true; SND.play("shock");
+      W.actor("boss", "shock"); W.speaker("boss"); W.react("boss", "shock"); th.hidden = true; SND.play("shock");
       const bn = $("banner"); bn.innerHTML = `立証！<small>「${c.label}」の主張を崩した</small>`; bn.hidden = false; bn.classList.remove("show"); void bn.offsetWidth; bn.classList.add("show");
       SND.play("win");
       await wait(1500); bn.hidden = true; th.hidden = true;
@@ -366,28 +333,28 @@
       await talk("mori", `やった！ 「${c.label}」の主張を崩したよ。残りの主張はあと<b>${left}つ</b>。続けて調べよう。`, "smile");
     } else {
       SND.play("wrong"); th.hidden = true;
-      SND.play("laugh"); await W.react("boss", "smug");
+      SND.play("laugh"); W.actor("boss", "smug"); W.speaker("boss"); await W.react("boss", "smug");
       await talk("boss", (c.near && c.near[ev]) || c.wrong, "smug");
       const near = c.near && c.near[ev];
       await talk("mori", near ? "惜しい！ 方向は合っているよ。社長が言い逃れできない、<b>もっと決定的な証拠</b>がないか探そう。" : "その証拠では崩せないみたいだ。<b>間違えても減点はない</b>よ。主張と食い違う証拠を、もう一度考えよう。", "think");
     }
-    W.react("boss", "reset"); boss.setFace("normal"); W.turnTo("boss", ROOMS.shop.pos, 400);
     SND.bgm("calm");
-    await fade(true); S.room = fromRoom; W.place(ROOMS[fromRoom].pos, ROOMS[fromRoom].look); await fade(false);
+    await fade(true); W.hideActors(); W.unfocus(); S.room = fromRoom; W.show(fromRoom); await fade(false);
     S.busy = false; setPhase("explore");
   }
 
   /* ---------- 結末 ---------- */
   async function finale() {
     S.done = true; save();
-    await W.react("boss", "sad");
+    W.actor("boss", "sad"); W.speaker("boss"); await W.react("boss", "sad");
     await lines([
       ["boss", "……申し訳ありません。貸切パーティーの売上を隠して、買っていない豆の仕入れを経費にしていました。", "sad"],
       ["mori", "売上を隠したり、ありもしない経費を足したりすると、払う税金が少なくなる。それは、ほかの正直な人たちに不公平だよね。", "think"],
       ["mori", "みんな、見事な調査だったよ！", "smile"]
     ]);
     SND.bgm(null); SND.play("win");
-    await W.flyTo(V(2.6, 2.3, 2.8), V(-1, 1.1, -3), 2400);
+    await fade(true); W.hideActors(); W.unfocus(); W.show("shop", [50, 50, 1.3]); await fade(false);
+    W.look(50, 50, 1, 2400); await wait(1200);
     showResult();
   }
   function showResult() {
@@ -415,25 +382,25 @@
 
   /* ---------- オープニング ---------- */
   let skipping = false;
-  $("skip").addEventListener("click", () => { skipping = true; W.fast = true; W.finishAll(); if (talkDone) { talkDone(); talkDone && talkDone(); } $("skip").hidden = true; });
+  $("skip").addEventListener("click", () => { skipping = true; W.fast = true; W.finishAll(); $("namecard").hidden = true; if (talkDone) { talkDone(); talkDone && talkDone(); } $("skip").hidden = true; });
 
   async function opening() {
-    setPhase("intro"); $("skip").hidden = false; SND.bgm("calm");
-    W.place(V(6, 1.5, 15), V(0, 1.6, 4));
-    SND.play("car"); await W.driveIn();
+    setPhase("intro"); $("skip").hidden = false; SND.bgm("calm"); W.setMode("stage"); W.unfocus();
+    W.show("ext", [30, 50, 1.15]);
+    SND.play("car"); W.look(62, 55, 1.15, 5200);
     await talk("narr", "土曜日の夜。駅前の喫茶店「浜風珈琲」。");
+    W.setMode("stage");
     await talk("mori", "着いたね。今日はこのお店の<b>税務調査</b>だ。", "smile");
     await talk("mori", "税務調査は、お店が<b>税金を正しく計算しているか</b>を確かめる仕事だよ。", "normal");
-    await W.flyTo(V(0, 1.6, 7.2), V(0, 1.5, 4), 1400);
-    SND.play("door"); await W.openFront();
-    await W.flyTo(ROOMS.shop.pos, V(-1.45, 1.7, -3.2), 1800);
-    await W.turnTo("boss", ROOMS.shop.pos, 500);
-    SND.bgm("tense"); SND.play("slam");
-    const cam0 = W.snapshot();
-    await W.flyTo(V(-1.0, 1.75, -1.35), V(-1.45, 1.78, -3.2), 700);
+    W.hideActors(); W.unfocus();
+    await W.look(64, 58, 1.7, 1300);
+    SND.play("door"); await fade(true);
+    W.show("shop", [50, 52, 1.35]); await fade(false);
+    W.look(50, 52, 1, 1800); if (!W.fast) await wait(900);
+    SND.bgm("tense"); SND.play("slam"); W.setMode("stage"); W.actor("boss", "smug"); W.speaker("boss"); W.shake(10);
     if (!W.fast) { $("namecard").hidden = false; await wait(2300); $("namecard").hidden = true; }
     await talk("boss", "いらっしゃい。社長の白洲です。うちは小さな店ですが、税金のことは<b>きちんと</b>やってますよ。ククク……。", "smug");
-    SND.bgm("calm"); await W.restore(cam0, 900);
+    SND.bgm("calm");
     await talk("mori", "社長、まずはお店のお金のことを教えてください。", "normal");
     for (const c of C.claims) {
       await talk("boss", c.text, "smile");
@@ -454,9 +421,8 @@
     if (S.phase === "explore") return;
     W.fast = false; skipping = false; $("skip").hidden = true; $("talk").hidden = true; talkDone = null;
     S.got.add("receipt");
-    W.doors.frontL.position.x = -1.15; W.doors.frontR.position.x = 1.15; W.car.position.x = -1.5;
-    W.people.boss.group.rotation.y = Math.atan2(ROOMS.shop.pos.x + 1.45, ROOMS.shop.pos.z + 3.2); W.people.boss.setFace("normal");
-    S.room = "shop"; S.visited.add("shop"); W.place(ROOMS.shop.pos, ROOMS.shop.look);
+    W.hideActors(); W.unfocus();
+    S.room = "shop"; S.visited.add("shop"); W.show("shop");
     save(); setPhase("explore"); showCoach();
   }
 
@@ -469,11 +435,7 @@
       ["got", "seen", "solved", "visited", "unlocked", "consent"].forEach((k) => { S[k] = new Set(d[k] || []); });
       S.hints = d.hints || 0; S.tries = d.tries || 0; S.t0 = d.t0 || Date.now(); S.room = d.room || "shop";
       S.seen.forEach((id) => W.setMarker(id, "done"));
-      if (S.unlocked.has("safe")) W.safeDoor.rotation.y = -1.7;
-      if (S.unlocked.has("desk")) W.drawer.position.z = -6.8;
-      W.doors.frontL.position.x = -1.15; W.doors.frontR.position.x = 1.15; W.car.position.x = -1.5;
-      W.people.boss.group.rotation.y = Math.atan2(ROOMS.shop.pos.x + 1.45, ROOMS.shop.pos.z + 3.2);
-      SND.bgm("calm"); W.place(ROOMS[S.room].pos, ROOMS[S.room].look); setPhase("explore");
+      SND.bgm("calm"); W.show(S.room); setPhase("explore");
       if (S.solved.size >= C.claims.length) showResult();
       return;
     }
@@ -486,12 +448,14 @@
 
   document.addEventListener("pointerdown", () => SND.unlock(), { capture: true });
   /* ---------- 起動 ---------- */
-  try { W.init($("stage")); } catch (e) { $("loading").textContent = "この端末では3Dを表示できませんでした。別のブラウザーで開いてください。"; return; }
-  W.place(V(5, 1.5, 14), V(0, 1.6, 4)); W.showMarkers("shop", false);
-  const saved = load(); if (saved && saved.t0 && !saved.done) $("resume").hidden = false;
-  // タイトル中はカメラをゆっくり動かす
-  W.onFrame.push((dt, now) => { if (S.phase !== "title") return; const x = 5 + Math.sin(now / 5000) * 1.6; W.place(V(x, 1.5, 14), V(0, 1.7, 4)); });
-  $("loading").hidden = true; $("title").hidden = false;
-  if (/debug/.test(location.hash)) window.__rinjo = { S, inspect, goRoom, confront, openCouncil, openBook, finishOpening, showResult };
-  if (/[#&]member/.test(location.hash)) { $("as-member").classList.add("btn-main"); $("as-member").classList.remove("btn-ghost"); $("as-leader").classList.remove("btn-main"); $("as-leader").classList.add("btn-ghost"); }
+  W.init($("stage")).then(() => {
+    W.labels(Object.fromEntries(Object.entries(C.spots).map(([k, v]) => [k, v.label])));
+    W.show("ext", [40, 50, 1.1]);
+    const saved = load(); if (saved && saved.t0 && !saved.done) $("resume").hidden = false;
+    // タイトル中は、外の景色をゆっくり見回す
+    (async function drift() { let k = 0; while (S.phase === "title") { await W.look(k % 2 ? 36 : 64, 50, 1.1, 9000); k++; } })();
+    $("loading").hidden = true; $("title").hidden = false;
+    if (/debug/.test(location.hash)) window.__rinjo = { S, inspect, goRoom, confront, openCouncil, openBook, finishOpening, showResult, W };
+    if (/[#&]member/.test(location.hash)) { $("as-member").classList.add("btn-main"); $("as-member").classList.remove("btn-ghost"); $("as-leader").classList.remove("btn-main"); $("as-leader").classList.add("btn-ghost"); }
+  }).catch(() => { $("loading").textContent = "画像を読み込めませんでした。通信の良い所で再読み込みしてください。"; });
 })();
