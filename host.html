@@ -70,7 +70,7 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
 .boss-side img{height:min(62vh,34vw);filter:drop-shadow(0 20px 40px rgba(0,0,0,.6))}
 /* 進め方 */
 .steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1.6vh;counter-reset:s}
-.steps li{counter-increment:s;display:grid;grid-template-columns:auto 1fr auto;gap:1.4vw;align-items:center;font-size:clamp(18px,2.3vw,36px);line-height:1.5;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.6vh 1.6vw}
+.steps li{counter-increment:s;display:grid;grid-template-columns:auto 1fr auto;gap:1.4vw;align-items:center;font-size:clamp(16px,2vw,32px);line-height:1.45;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.1vh 1.6vw}
 .steps li::before{content:counter(s);font-family:var(--f-display);display:grid;place-items:center;width:1.8em;height:1.8em;border-radius:50%;background:var(--amber);color:#1b1206}
 .steps b{color:var(--amber)}
 .steps small{display:block;font-size:.62em;color:var(--dim);line-height:1.5}
@@ -179,8 +179,9 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
   <p class="kicker">HOW TO PLAY</p>
   <h2>この順で進めます</h2>
   <ol class="steps">
-    <li><span><b>自分で調べる</b><small>お店の11か所から、証拠がありそうな場所に<b>当たり</b>（見当）をつけて選ぶ。1人<b>4か所</b>まで。</small></span><span class="min">12分</span></li>
-    <li><span><b>班で相談する</b><small>見つけたことを伝え合い、<b>班長</b>が言い分ごとに決め手の証拠を1つ選んで、社長に示す。</small></span><span class="min">6分</span></li>
+    <li><span><b>作戦を立てる</b><small>お店には資料が<b>約30点</b>。見られるのは1人<b>6点</b>まで。どの資料を見れば確かめられるか、<b>当たり</b>（見当）の付け方を班で相談する。</small></span><span class="min">3分</span></li>
+    <li><span><b>調べる</b><small>相談しながら、各自のスマホで資料を見る。見つけたことはすぐ班に伝える。</small></span><span class="min">10分</span></li>
+    <li><span><b>班長が示す</b><small>見つけたことを持ち寄り、<b>班長</b>が言い分ごとに決め手の資料を1つ選んで、社長に示す。</small></span><span class="min">5分</span></li>
     <li><span><b>答え合わせ</b><small>この画面で、決め手になった証拠を確かめます。</small></span><span class="min">5分</span></li>
   </ol>
   <div class="consent"><p class="lead" style="font-size:clamp(16px,1.9vw,30px)">見るときは、まず社長に<b>お願いして承諾をもらいます</b>。<br><span class="note">これはゲームです。実際の税務調査でも、書類を見せてもらう・机や金庫を開けてもらうときは、必ず相手の<b>明示の承諾</b>を得ます。調査官が勝手に開けたり、お金に触れたりはしません。</span></p></div>
@@ -193,7 +194,7 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
   <div class="qrwrap">
     <div class="qr" id="qr"></div>
     <div style="display:flex;flex-direction:column;gap:2vh;min-width:0">
-      <p class="lead">開いたら<b>「はじめる」</b>を押します。</p>
+      <p class="lead">開いたら<b>「はじめる」</b>を押し、「お店に入る」まで進みます。</p>
       <p class="lead">音が出ます。消したいときは、画面右上の<b>音のボタン</b>を押してください。</p>
       <div class="url" id="url"></div>
     </div>
@@ -201,32 +202,45 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
 </section>
 
 <!-- 8 -->
-<section class="slide" data-title="自分で調べる" data-min="12">
-  <p class="kicker">1　INVESTIGATION</p>
-  <h2>自分で調べる（1人4か所まで）</h2>
+<section class="slide" data-title="作戦タイム" data-min="3">
+  <p class="kicker">1　STRATEGY</p>
+  <h2>作戦タイム：どの資料を見る？</h2>
   <div class="timer-wrap">
-    <div><div class="timer">12:00</div><div class="tbtns"></div></div>
-    <div class="card"><h3>社長の言い分</h3><div class="mini-claims"></div>
-      <p class="note">迷ったらスマホの<b>「ヒント」</b>へ。班で手分けすると、たくさん調べられます。</p></div>
+    <div><div class="timer">03:00</div><div class="tbtns"></div></div>
+    <div class="card"><h3>班で相談しよう</h3><ol class="big">
+      <li>スマホで<b>資料の一覧</b>をながめる（まだ見ない）</li>
+      <li>言い分ごとに「<b>どんな資料なら</b>確かめられる？」</li>
+      <li><b>だれが、どれを見るか</b>決める。気になる資料に★</li></ol></div>
   </div>
 </section>
 
 <!-- 9 -->
-<section class="slide" data-title="班で相談" data-min="6">
-  <p class="kicker">2　DISCUSSION</p>
-  <h2>班で相談して、班長が証拠を示す</h2>
+<section class="slide" data-title="調べる" data-min="10">
+  <p class="kicker">2　INVESTIGATION</p>
+  <h2>調べる（1人6点まで）</h2>
   <div class="timer-wrap">
-    <div><div class="timer">06:00</div><div class="tbtns"></div></div>
+    <div><div class="timer">10:00</div><div class="tbtns"></div></div>
+    <div class="card"><h3>社長の言い分</h3><div class="mini-claims"></div>
+      <p class="note">見つけたことは<b>すぐ班に伝えて</b>、次に見る資料を決め直そう。迷ったらスマホの<b>「ヒント」</b>へ。</p></div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-title="班長が示す" data-min="5">
+  <p class="kicker">3　DISCUSSION</p>
+  <h2>持ち寄って、班長が資料を示す</h2>
+  <div class="timer-wrap">
+    <div><div class="timer">05:00</div><div class="tbtns"></div></div>
     <div class="card"><h3>やること</h3><ol class="big">
       <li>1人ずつ、見つけたことを<b>読み上げる</b></li>
       <li><b>班長を1人</b>決める<br><span class="note">決まらなければ、誕生日がいちばん近い人</span></li>
-      <li>班長が言い分ごとに<b>証拠を1つ</b>選び、「社長に示す」</li></ol></div>
+      <li>班長が言い分ごとに<b>資料を1つ</b>選び、「社長に示す」</li></ol></div>
   </div>
 </section>
 
 <!-- 10 -->
 <section class="slide" data-title="答え合わせ">
-  <p class="kicker">3　ANSWER</p>
+  <p class="kicker">4　ANSWER</p>
   <h2>答え合わせ</h2>
   <div class="reveal-list" id="reveal"></div>
 </section>
@@ -253,7 +267,7 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
     <div class="card"><strong>当たり</strong><small>あたり</small><p class="lead">どこに証拠がありそうか<b>見当をつける</b></p></div>
     <div class="card"><strong>立証</strong><small>りっしょう</small><p class="lead">言い逃れできない<b>証拠で示す</b></p></div>
   </div>
-  <p class="lead">1人では見つけられない証拠も、<b>班で手分けして伝え合う</b>ことでつながりました。</p>
+  <p class="lead">たくさんの資料から、<b>当たりをつけて</b>見る資料をしぼり、<b>班で伝え合う</b>ことで証拠がつながりました。</p>
   <p class="note">実際の調査でも、書類を見せてもらうときは必ず相手の<b>明示の承諾</b>を得ます。</p>
 </section>
 
@@ -314,7 +328,7 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
 
   /* 答え合わせ（1つずつ開く） */
   $("reveal").innerHTML=C.claims.map(c=>`<div class="rv" data-c="${c.id}"><span class="cid">${c.id}</span><span class="claim-t">「${esc(c.text)}」</span><button>答えを見る</button>
-    <div class="ans"><span class="ev">決め手：${c.ok.map(id=>esc(C.place(id).name)).join(" ／ ")}</span><p class="why">${esc(c.why)}</p>
+    <div class="ans"><span class="ev">決め手：${c.ok.map(id=>esc(C.doc(id).name)).join(" ／ ")}</span><p class="why">${esc(c.why)}</p>
     <p class="boss"><img data-ch="boss_panic" alt="">「${esc(c.win)}」</p></div></div>`).join("");
   $("reveal").querySelectorAll(".rv").forEach(rv=>{const b=rv.querySelector("button");b.onclick=()=>{rv.classList.add("open");b.hidden=true;rv.scrollIntoView({block:"nearest",behavior:"smooth"});voice(`boss_win_${rv.dataset.c}`);};});
   document.querySelectorAll("#reveal [data-ch]").forEach(el=>{const c=A.ch[el.dataset.ch];if(c)el.src=c.src;});

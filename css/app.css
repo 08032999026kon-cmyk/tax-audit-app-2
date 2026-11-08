@@ -384,3 +384,53 @@ h2.q{font-size:17px;margin:22px 0 10px}
 .h-q .cid{width:24px;height:24px;font-size:12px;border-radius:7px}
 .h-a{margin:8px 0 0;padding-left:32px;font-size:14.5px;line-height:1.65;color:#ffd08a}
 .h-more{margin:8px 0 0 32px;padding:7px 14px;border-radius:999px;background:rgba(242,165,58,.16);border:1px solid rgba(242,165,58,.5);color:#ffd08a;font-size:13px;font-weight:700}
+
+/* ===================== v5：資料がたくさん ===================== */
+.mark-help{margin:-6px 0 14px;font-size:13px;color:var(--dim)}
+.star{font-style:normal;color:rgba(255,255,255,.3)}
+.star.on{color:var(--amber)}
+.area-head{border-radius:14px}
+.area{margin-bottom:20px}
+.spotbox{margin-top:12px}
+.sp-name{display:flex;align-items:center;gap:6px;margin:0 2px 8px;font-weight:700;font-size:15px}
+.sp-name svg{width:16px;height:16px;color:var(--amber)}
+.sp-name small{font-weight:400;font-size:12px;color:var(--dim);margin-left:4px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.tile{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:4px;min-height:58px;padding:9px 12px;text-align:left;border-radius:6px 12px 12px 12px;background:var(--paper);color:var(--paper-ink);box-shadow:0 8px 18px -12px rgba(0,0,0,.9);font-family:var(--f-doc)}
+.tile:nth-child(3n+2){transform:rotate(-.6deg)}
+.tile:nth-child(3n){transform:rotate(.5deg)}
+.tile .t-name{font-size:14.5px;font-weight:600;line-height:1.4}
+.tile .t-foot{display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-height:18px;font-family:var(--f-ui)}
+.tile .ok{display:inline-flex;align-items:center;gap:2px;font-style:normal;font-size:11px;font-weight:700;color:#2f7f76}
+.tile .ok svg{width:12px;height:12px}
+.tile .ctag{margin-left:0;background:#f3d6cf;color:#a8281c}
+.tile .ctag.none{background:#e6dfcf;color:var(--paper-dim)}
+.tile .star{position:absolute;top:4px;right:8px;font-size:15px}
+.tile.seen{background:#e9e2d2}
+.tile.marked{box-shadow:0 0 0 2px var(--amber),0 8px 18px -12px rgba(0,0,0,.9)}
+.tile.lock{opacity:.5}
+.closed-doc{display:flex;gap:14px;align-items:center;padding:18px 16px;border-radius:16px;background:var(--paper);color:var(--paper-ink);margin-bottom:6px}
+.closed-doc svg{flex:none;width:34px;height:34px;color:var(--paper-dim)}
+.closed-doc p{margin:0;font-family:var(--f-doc);font-size:18px;line-height:1.5}
+.closed-doc small{font-family:var(--f-ui);font-size:13px;color:var(--paper-dim)}
+.closed-doc b{color:#a8281c}
+.cta .star-btn{flex:0 0 auto;width:auto;padding:0 14px;font-size:14px}
+.cta .star-btn.on{color:var(--amber);border-color:rgba(242,165,58,.6)}
+/* 資料の見た目 */
+.cert{display:flex;flex-direction:column;gap:6px;padding:16px;border:3px double #b7a57e;text-align:center;background:#fffdf6}
+.cert b{font-size:18px;letter-spacing:.1em}
+.cert small{color:var(--paper-dim);font-family:var(--f-ui)}
+.poster{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px;background:#fff6d8;border:1px solid #e3d29a;transform:rotate(-1deg);font-family:var(--f-ui)}
+.poster b{font-size:20px;color:#a8281c}
+.poster .big{font-size:22px;font-weight:700}
+.poster small{color:var(--paper-dim)}
+.poster.plain{background:#fff;border-color:var(--paper-line);transform:none}
+.poster.plain b{color:var(--paper-ink);font-size:16px}
+.memo-note{display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:#fff9c4;box-shadow:2px 3px 0 rgba(0,0,0,.08);transform:rotate(1deg);font-size:17px;width:min(100%,280px);margin:0 auto}
+.memo-note b{color:#a8281c}
+.biz{display:flex;flex-direction:column;gap:4px;padding:16px 18px;background:#fff;border:1px solid var(--paper-line);width:min(100%,300px);margin:0 auto;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+.biz small{font-family:var(--f-ui);color:var(--paper-dim)}
+.biz b{font-size:18px}
+.biz span{font-size:13px}
+.bags{display:flex;gap:8px;justify-content:center}
+.bags span{display:grid;place-items:center;text-align:center;width:88px;height:110px;border-radius:10px 10px 6px 6px;background:#b08a5a;color:#fff7e6;font-family:var(--f-ui);font-size:12px;font-weight:700;line-height:1.4;box-shadow:inset 0 -10px 0 rgba(0,0,0,.12)}

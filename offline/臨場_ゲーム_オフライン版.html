@@ -397,6 +397,56 @@ h2.q{font-size:17px;margin:22px 0 10px}
 .h-a{margin:8px 0 0;padding-left:32px;font-size:14.5px;line-height:1.65;color:#ffd08a}
 .h-more{margin:8px 0 0 32px;padding:7px 14px;border-radius:999px;background:rgba(242,165,58,.16);border:1px solid rgba(242,165,58,.5);color:#ffd08a;font-size:13px;font-weight:700}
 
+/* ===================== v5：資料がたくさん ===================== */
+.mark-help{margin:-6px 0 14px;font-size:13px;color:var(--dim)}
+.star{font-style:normal;color:rgba(255,255,255,.3)}
+.star.on{color:var(--amber)}
+.area-head{border-radius:14px}
+.area{margin-bottom:20px}
+.spotbox{margin-top:12px}
+.sp-name{display:flex;align-items:center;gap:6px;margin:0 2px 8px;font-weight:700;font-size:15px}
+.sp-name svg{width:16px;height:16px;color:var(--amber)}
+.sp-name small{font-weight:400;font-size:12px;color:var(--dim);margin-left:4px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.tile{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:4px;min-height:58px;padding:9px 12px;text-align:left;border-radius:6px 12px 12px 12px;background:var(--paper);color:var(--paper-ink);box-shadow:0 8px 18px -12px rgba(0,0,0,.9);font-family:var(--f-doc)}
+.tile:nth-child(3n+2){transform:rotate(-.6deg)}
+.tile:nth-child(3n){transform:rotate(.5deg)}
+.tile .t-name{font-size:14.5px;font-weight:600;line-height:1.4}
+.tile .t-foot{display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-height:18px;font-family:var(--f-ui)}
+.tile .ok{display:inline-flex;align-items:center;gap:2px;font-style:normal;font-size:11px;font-weight:700;color:#2f7f76}
+.tile .ok svg{width:12px;height:12px}
+.tile .ctag{margin-left:0;background:#f3d6cf;color:#a8281c}
+.tile .ctag.none{background:#e6dfcf;color:var(--paper-dim)}
+.tile .star{position:absolute;top:4px;right:8px;font-size:15px}
+.tile.seen{background:#e9e2d2}
+.tile.marked{box-shadow:0 0 0 2px var(--amber),0 8px 18px -12px rgba(0,0,0,.9)}
+.tile.lock{opacity:.5}
+.closed-doc{display:flex;gap:14px;align-items:center;padding:18px 16px;border-radius:16px;background:var(--paper);color:var(--paper-ink);margin-bottom:6px}
+.closed-doc svg{flex:none;width:34px;height:34px;color:var(--paper-dim)}
+.closed-doc p{margin:0;font-family:var(--f-doc);font-size:18px;line-height:1.5}
+.closed-doc small{font-family:var(--f-ui);font-size:13px;color:var(--paper-dim)}
+.closed-doc b{color:#a8281c}
+.cta .star-btn{flex:0 0 auto;width:auto;padding:0 14px;font-size:14px}
+.cta .star-btn.on{color:var(--amber);border-color:rgba(242,165,58,.6)}
+/* 資料の見た目 */
+.cert{display:flex;flex-direction:column;gap:6px;padding:16px;border:3px double #b7a57e;text-align:center;background:#fffdf6}
+.cert b{font-size:18px;letter-spacing:.1em}
+.cert small{color:var(--paper-dim);font-family:var(--f-ui)}
+.poster{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px;background:#fff6d8;border:1px solid #e3d29a;transform:rotate(-1deg);font-family:var(--f-ui)}
+.poster b{font-size:20px;color:#a8281c}
+.poster .big{font-size:22px;font-weight:700}
+.poster small{color:var(--paper-dim)}
+.poster.plain{background:#fff;border-color:var(--paper-line);transform:none}
+.poster.plain b{color:var(--paper-ink);font-size:16px}
+.memo-note{display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:#fff9c4;box-shadow:2px 3px 0 rgba(0,0,0,.08);transform:rotate(1deg);font-size:17px;width:min(100%,280px);margin:0 auto}
+.memo-note b{color:#a8281c}
+.biz{display:flex;flex-direction:column;gap:4px;padding:16px 18px;background:#fff;border:1px solid var(--paper-line);width:min(100%,300px);margin:0 auto;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+.biz small{font-family:var(--f-ui);color:var(--paper-dim)}
+.biz b{font-size:18px}
+.biz span{font-size:13px}
+.bags{display:flex;gap:8px;justify-content:center}
+.bags span{display:grid;place-items:center;text-align:center;width:88px;height:110px;border-radius:10px 10px 6px 6px;background:#b08a5a;color:#fff7e6;font-family:var(--f-ui);font-size:12px;font-weight:700;line-height:1.4;box-shadow:inset 0 -10px 0 rgba(0,0,0,.12)}
+
 </style>
 </head>
 <body>
@@ -410,12 +460,12 @@ h2.q{font-size:17px;margin:22px 0 10px}
 /* 事件データ（すべて架空）　喫茶店「浜風珈琲」（株式会社浜風珈琲・社長 白洲 守）
  * 答え：①土曜夜の貸切パーティーの売上をレジに通さず金庫に隠した（売上除外 153万円＝18回）
  *       ②山海物産の白紙の領収書で、豆の仕入れ30万円×6回をでっち上げた（架空経費 180万円）
- * v4：司会がスクリーンで「端緒」と「社長の言い分」を説明 → 各自が当たりをつけて調べる場所を選ぶ
- *     → 班で相談し、班長が言い分ごとに決め手の証拠を1つ選ぶ。
+ * v5：お店の机・壁・棚に資料が33点。班で「どの資料を見れば確かめられるか」当たりの付け方を相談し、
+ *     各自が1人6点まで見る → 班で持ち寄り、班長が言い分ごとに決め手の資料を1つ選んで社長に示す。
  */
 window.CASE = (function () {
-  /* 1人が調べられる場所の数 */
-  const LIMIT = 4;
+  /* 1人が見られる資料の数 */
+  const LIMIT = 6;
 
   /* ---------- 端緒（たんちょ）：決算書などから気づく不審な点 ---------- */
   const tancho = [
@@ -436,97 +486,173 @@ window.CASE = (function () {
     <p class="cap">原価率＝売上に対する仕入れの割合。喫茶店ではふつう30%前後。</p>`;
 
   /* ---------- 社長の言い分（これを証拠でくずす） ---------- */
-  // ok：決め手になる場所。trap：社長の言い分と食い違わない（くずせない）場所への特別な返事
+  // ok：決め手になる資料。trap：社長の言い分と食い違わない資料への特別な返事
   const claims = [
     { id: "A", short: "夜は営業していない", text: "夜は営業していません。お店は夕方7時までです。",
-      ok: ["trash", "calendar", "shift"],
-      win: "……夜の予定まで。わ、分かりました。土曜の夜は、貸切パーティーをやっていました。",
+      ok: ["trash", "calendar", "poster", "memo", "shift", "payroll", "clean"],
+      win: "……夜のことまで。わ、分かりました。土曜の夜は、貸切パーティーをやっていました。",
       miss: "それが夜の営業と何の関係があるんです？",
-      trap: { register: "レジに夜の売上がないのは、夜は営業していないからですよ。" },
-      why: "ゴミ箱の注文票・予約カレンダー・シフト表のどれかで、土曜の夜に貸切をしていたことが分かる。",
-      hint: ["「夜」の予定や、夜のお客さんの記録が残っていそうな物は？", "店内の壁のカレンダーや、捨てられた紙を見てみよう。"] },
+      trap: { register: "レジに夜の売上がないのは、夜は営業していないからですよ。", permit: "許可証のどこに、夜やっているなんて書いてあります？", wine: "ワインは料理に使うんですよ。夜の営業とは関係ありません。" },
+      why: "夜の動きが残る資料ならどれでもくずせる：捨てられた注文票・予約カレンダー・求人の貼り紙・電話メモ・シフト表・給与台帳・清掃チェック表。",
+      hint: ["夜に人やお客さんが動いた跡が残っていそうな資料は？", "予定（カレンダー・メモ）や、人の働いた記録（シフト・給与）を探そう。"] },
     { id: "B", short: "売上は全部銀行へ", text: "売上は毎日、全部銀行に入れています。",
       ok: ["safe"],
       win: "……その封筒まで。はい、貸切の売上は銀行に入れずに、金庫にしまっていました。",
       miss: "ふふ、それで何が分かるんです？ 売上は全部銀行ですよ。",
-      trap: { bank: "通帳を見てください。毎日ちゃんと入金しているでしょう？", trash: "その注文票のお金も、ちゃんと銀行に入れましたよ。" },
+      trap: { bank: "通帳を見てください。毎日ちゃんと入金しているでしょう？", trash: "その注文票のお金も、ちゃんと銀行に入れましたよ。", change: "両替は釣り銭のためです。売上とは関係ありません。" },
       why: "金庫の「別」の封筒とノート。銀行に入れずに隠していた現金が、そのまま残っていた。",
       hint: ["銀行に入れなかったお金は、どこに置いておく？", "お金をしまっておけそうな場所を、社長に開けてもらおう。"] },
     { id: "C", short: "豆が値上がりした", text: "仕入れが増えたのは、豆が値上がりしたからです。",
-      ok: ["stock", "desk", "bank"],
+      ok: ["stock", "beans", "desk", "bank"],
       win: "……そこまで。豆は値上がりしていません。山海物産の領収書は、私が書きました。",
       miss: "豆の値段なんて、いろいろですからね。",
-      trap: { ledger: "ほら、領収書は全部そろっていますよ。ちゃんと払っています。" },
-      why: "豆の入荷記録（値段は去年と同じ）、机の白紙の領収書、通帳（山海物産へ払った跡がない）のどれでもくずせる。",
-      hint: ["豆が本当に値上がりしたのか、確かめられる記録は？", "倉庫の入荷記録や、事務室の机の中を見てみよう。"] }
+      trap: { ledger: "ほら、領収書は全部そろっていますよ。ちゃんと払っています。", bizcard: "山海物産さんの名刺ですよ。それが何か？" },
+      why: "豆の入荷記録（値段は去年と同じ）・倉庫の豆の袋（山海物産の豆が1つもない）・机の白紙の領収書・通帳（山海物産へ払った跡がない）のどれでもくずせる。",
+      hint: ["豆が本当に値上がりしたのか、山海物産から本当に買ったのか、確かめられる資料は？", "倉庫の豆や入荷の記録、お金の出入り、机の中を見てみよう。"] }
   ];
 
-  /* ---------- 調べられる場所 ---------- */
-  // ask：調査官のお願い。ok：社長の返事。open：社長に開けてもらう物（承諾が特に大事）
+  /* ---------- お店の中：場所（社長に承諾をもらう単位）と、そこにある資料 ---------- */
   const areas = [
     { id: "shop", name: "店内", bg: "shop" },
     { id: "office", name: "事務室", bg: "office" },
     { id: "back", name: "倉庫・厨房", bg: "shop" }
   ];
-  const places = [
-    { id: "register", area: "shop", name: "レジの記録", where: "店内のレジ",
-      ask: "レジの記録を見せていただけますか。", ok: "どうぞ。毎日きちんと締めていますよ。",
+  // open:true は社長に開けてもらう場所
+  const spots = [
+    { id: "reg", area: "shop", name: "レジまわり", ask: "レジまわりの書類を見せていただけますか。", ok: "どうぞ。毎日きちんと締めていますよ。" },
+    { id: "wall", area: "shop", name: "店内の壁", ask: "壁に貼ってあるものを拝見してもよろしいですか。", ok: "どうぞどうぞ。" },
+    { id: "under", area: "shop", name: "カウンターの下", ask: "カウンターの下と、ゴミ箱の中を確認させていただいてもよろしいですか。", ok: "ゴ、ゴミ箱？ ……まあ、どうぞ。" },
+    { id: "top", area: "office", name: "机の上", ask: "机の上の書類を見せていただけますか。", ok: "どうぞ。散らかっていますがね。" },
+    { id: "drawer", area: "office", name: "机の引き出し", open: true, ask: "机の引き出しを開けて、中を見せていただけますか。", ok: "……か、構いませんよ。（社長が鍵で引き出しを開ける）" },
+    { id: "owall", area: "office", name: "事務室の壁", ask: "事務室の壁のものを拝見してもよろしいですか。", ok: "……どうぞ。" },
+    { id: "shelf", area: "office", name: "本棚", ask: "本棚のファイルを見せていただけますか。", ok: "古いものばかりですよ。どうぞ。" },
+    { id: "safe", area: "office", name: "金庫", open: true, ask: "金庫を開けて、中を見せていただけますか。", ok: "……釣り銭と私物だけですよ。（社長がしぶしぶ金庫を開ける）" },
+    { id: "store", area: "back", name: "倉庫の棚", ask: "倉庫の棚を見せていただけますか。", ok: "豆と備品ですよ。どうぞ。" },
+    { id: "kitchen", area: "back", name: "厨房", ask: "厨房の記録を拝見してもよろしいですか。", ok: "どうぞ。衛生管理はきちんとしています。" }
+  ];
+
+  const L = (cap, rows, hl) => `<table class="ledger"><caption>${cap}</caption>${rows.map((r, i) => `<tr class="${hl === i ? "hl" : ""}">${r.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>`;
+  const docs = [
+    /* 店内：レジまわり */
+    { id: "register", spot: "reg", name: "レジの日計表",
       doc: `<div class="receipt-roll"><b>日計表 11/2（土）</b><span>ブレンド ×64</span><span>ランチ ×21</span><span>ケーキセット ×18</span><span>…</span><b>合計 ¥68,400</b><em>レジ締め 18:58</em></div>`,
       note: "レジは毎日<b>夕方6時58分</b>に締めている。夜の売上は入っていない。" },
-    { id: "menu", area: "shop", name: "メニュー表", where: "カウンター",
-      ask: "メニュー表を拝見してもよろしいですか。", ok: "どうぞどうぞ。",
-      doc: `<table class="ledger"><caption>メニュー</caption><tr><td>ブレンド</td><td>¥480</td></tr><tr><td>ランチセット</td><td>¥1,200</td></tr><tr><td>ケーキセット</td><td>¥950</td></tr></table>`,
-      note: "値段は去年と同じ。特に気になる点はない。" },
-    { id: "calendar", area: "shop", name: "壁のカレンダー", where: "店内の壁",
-      ask: "壁のカレンダーを拝見してもよろしいですか。", ok: "ただのカレンダーですよ。",
+    { id: "pointcard", spot: "reg", name: "ポイントカードの控え",
+      doc: L("ポイントカード発行数", [["9月", "41枚"], ["10月", "38枚"], ["11月", "12枚（途中）"]]),
+      note: "常連さんは毎月同じくらい。特に気になる点はない。" },
+    { id: "change", spot: "reg", name: "両替の記録",
+      doc: L("両替メモ", [["11/1", "千円札 20枚"], ["11/2", "千円札 20枚"], ["11/5", "百円玉 50枚"]]),
+      note: "釣り銭用の両替。特に気になる点はない。" },
+    /* 店内の壁 */
+    { id: "calendar", spot: "wall", name: "予約カレンダー",
       doc: `<div class="calendar"><b>11月</b><div class="cal">${Array.from({ length: 30 }, (_, i) => { const d = i + 1, sat = (d + 4) % 7 === 6; return `<span class="${sat ? "sat" : ""}">${d}${sat && d !== 30 ? "<i>貸切</i>" : ""}</span>`; }).join("")}</div><p class="hand">4月から 貸切 計18回</p></div>`,
       note: "土曜日ごとに<b>「貸切」</b>の書き込み。<b>4月から18回</b>と手書きのメモもある。" },
-    { id: "trash", area: "shop", name: "ゴミ箱の中", where: "カウンターの下",
-      ask: "ゴミ箱の中を確認させていただいてもよろしいですか。", ok: "ゴ、ゴミ箱？ ……まあ、どうぞ。", open: true,
+    { id: "menu", spot: "wall", name: "メニュー表",
+      doc: L("メニュー", [["ブレンド", "¥480"], ["ランチセット", "¥1,200"], ["ケーキセット", "¥950"]]),
+      note: "値段は去年と同じ。特に気になる点はない。" },
+    { id: "permit", spot: "wall", name: "営業許可証",
+      doc: `<div class="cert"><b>飲食店営業許可証</b><span>株式会社浜風珈琲</span><span>許可の期限 2029年3月31日</span><small>（保健所）</small></div>`,
+      note: "ふつうの営業許可証。営業時間は書かれていない。" },
+    { id: "poster", spot: "wall", name: "求人の貼り紙",
+      doc: `<div class="poster"><b>スタッフ募集！</b><span>ホール・キッチン</span><span class="big">土曜 19時〜23時</span><span>時給 1,300円</span><small>くわしくは店長まで</small></div>`,
+      note: "<b>土曜の夜7時〜11時</b>のスタッフを募集している。" },
+    /* カウンターの下 */
+    { id: "trash", spot: "under", name: "ゴミ箱の中の紙",
       doc: `<div class="order-slip hand"><div>11/2（土）19:30〜</div><div>貸切パーティー　山田様 20名</div><div>コース 4,250円 × 20名</div><div class="big">合計 ¥85,000</div><div>現金にて受領 <span class="hanko">済</span></div></div>`,
       note: "11月2日（土）の<b>夜7時半から</b>、20名の貸切で<b>85,000円</b>。現金で受け取り済み。" },
-    { id: "shift", area: "office", name: "アルバイトのシフト表", where: "事務室の壁",
-      ask: "壁のシフト表を見せていただけますか。", ok: "……どうぞ。",
-      doc: `<table class="ledger shift"><caption>11月 シフト表</caption><tr><th>日</th><th>佐藤</th><th>田中</th></tr>
-        <tr><td>11/1（金）</td><td>8–15</td><td>12–19</td></tr><tr class="hl"><td>11/2（土）</td><td>8–15</td><td><b>19–23</b></td></tr>
-        <tr><td>11/3（日）</td><td>8–15</td><td>12–19</td></tr><tr><td>…</td><td></td><td></td></tr>
-        <tr class="hl"><td>11/9（土）</td><td>12–19</td><td><b>19–23</b></td></tr></table>`,
-      note: "土曜日だけ、<b>夜7時〜11時</b>にアルバイトが入っている。" },
-    { id: "bank", area: "office", name: "預金通帳", where: "事務室の机の上",
-      ask: "預金通帳を見せていただけますか。", ok: "どうぞ。入金はきちんとしています。",
+    { id: "flyer", spot: "under", name: "業者のチラシ",
+      doc: `<div class="poster plain"><b>業務用コーヒーマシン</b><span>リース月々 9,800円〜</span><small>浜辺厨房機器</small></div>`,
+      note: "売り込みのチラシ。特に気になる点はない。" },
+    { id: "news", spot: "under", name: "古新聞",
+      doc: `<div class="poster plain"><b>浜辺新聞</b><span>商店街の夏祭り、来場者が過去最多</span></div>`,
+      note: "ただの古新聞。特に気になる点はない。" },
+    /* 事務室：机の上 */
+    { id: "bank", spot: "top", name: "預金通帳",
       doc: `<table class="ledger bank"><caption>普通預金　浜風珈琲</caption><tr><th>日付</th><th>摘要</th><th>出金</th><th>入金</th></tr>
         <tr><td>11/1</td><td>入金</td><td></td><td>61,200</td></tr><tr><td>11/2</td><td>入金</td><td></td><td>68,400</td></tr>
         <tr><td>11/5</td><td>振込 丸浜食品</td><td>264,000</td><td></td></tr><tr><td>11/5</td><td>振込 前川コーヒー</td><td>98,000</td><td></td></tr>
         <tr class="hl"><td colspan="4">1年分を見ても、山海物産への支払いも、30万円の引き出しも一度もない</td></tr></table>`,
       note: "入金はレジの合計と同じ額。<b>山海物産に払ったはずの30万円</b>は、通帳のどこからも出ていない。" },
-    { id: "safe", area: "office", name: "金庫の中", where: "事務室のすみ",
-      ask: "金庫を開けて、中を見せていただけますか。", ok: "……釣り銭と私物だけですよ。（社長がしぶしぶ金庫を開ける）", open: true,
+    { id: "ledger", spot: "top", name: "仕入帳と領収書",
+      doc: L("仕入帳（山海物産）", [["5/10", "豆", "300,000", "現金"], ["6/14", "豆", "300,000", "現金"], ["…", "", "", ""], ["6回", "計", "1,800,000", ""]], 3) + `<div class="receipt-mini hand">領収書　¥300,000-　山海物産<span class="hanko">山海</span></div>`,
+      note: "山海物産から豆を<b>30万円ずつ6回</b>。領収書は全部そろっている。" },
+    { id: "memo", spot: "top", name: "電話のメモ",
+      doc: `<div class="memo-note hand"><b>TEL</b><span>山田様　11/2（土）夜7時半〜</span><span>20名　コース</span><span>→ OK！</span></div>`,
+      note: "<b>11月2日の夜7時半から20名</b>の予約を受けたメモ。" },
+    { id: "utility", spot: "top", name: "電気代の請求書",
+      doc: L("電気料金のお知らせ", [["10月分", "48,200円"], ["前年同月", "47,900円"]]),
+      note: "去年とほぼ同じ。特に気になる点はない。" },
+    { id: "bizcard", spot: "top", name: "名刺の束",
+      doc: `<div class="biz"><small>山海物産株式会社</small><b>代表 海野 一郎</b><span>浜辺市潮見町3-4-5 潮見ハイツ201</span></div>`,
+      note: "山海物産の名刺。住所はアパートの一室だ。" },
+    /* 机の引き出し */
+    { id: "desk", spot: "drawer", name: "領収書の束",
+      doc: `<div class="receipt-blank"><b>領 収 書</b><span>　　　　様</span><span>¥　　　　　-</span><span>但</span><em>山海物産株式会社<span class="hanko">山海</span></em><small>× 14枚（使った跡あり）</small></div>`,
+      note: "山海物産のハンコが押された<b>白紙の領収書の束</b>。金額を好きに書けてしまう。" },
+    { id: "photo", spot: "drawer", name: "古い写真",
+      doc: `<div class="photo-print"><div class="ph"></div><p>祝 開店 2019.10.15</p></div>`,
+      note: "開店の日の記念写真。特に気になる点はない。" },
+    /* 事務室の壁 */
+    { id: "shift", spot: "owall", name: "アルバイトのシフト表",
+      doc: `<table class="ledger shift"><caption>11月 シフト表</caption><tr><th>日</th><th>佐藤</th><th>田中</th></tr>
+        <tr><td>11/1（金）</td><td>8–15</td><td>12–19</td></tr><tr class="hl"><td>11/2（土）</td><td>8–15</td><td><b>19–23</b></td></tr>
+        <tr><td>11/3（日）</td><td>8–15</td><td>12–19</td></tr><tr><td>…</td><td></td><td></td></tr>
+        <tr class="hl"><td>11/9（土）</td><td>12–19</td><td><b>19–23</b></td></tr></table>`,
+      note: "土曜日だけ、<b>夜7時〜11時</b>にアルバイトが入っている。" },
+    { id: "insure", spot: "owall", name: "火災保険の証書",
+      doc: `<div class="cert"><b>火災保険 証券</b><span>浜風珈琲 店舗一式</span><span>保険期間 1年</span></div>`,
+      note: "ふつうの保険の証書。特に気になる点はない。" },
+    { id: "contacts", spot: "owall", name: "業者の連絡先一覧",
+      doc: L("連絡先", [["丸浜食品", "0X-XXXX-1111"], ["前川コーヒー", "0X-XXXX-2222"], ["設備の修理", "0X-XXXX-3333"]]),
+      note: "取引先の電話番号。山海物産の番号は書かれていない。" },
+    /* 本棚 */
+    { id: "payroll", spot: "shelf", name: "給与の台帳",
+      doc: L("給与台帳 11月（田中）", [["ふつうの時間", "64時間"], ["夜10時以降（深夜）", "8時間"], ["支給額", "98,600円"]], 1),
+      note: "アルバイトの田中さんに、<b>夜10時以降の深夜手当</b>が出ている。" },
+    { id: "lease", spot: "shelf", name: "店舗の賃貸借契約書",
+      doc: L("賃貸借契約書（抜き書き）", [["家賃", "月 22万円"], ["契約期間", "2年ごとに更新"]]),
+      note: "店の借り方の契約。特に気になる点はない。" },
+    { id: "lastyear", spot: "shelf", name: "前期の帳簿",
+      doc: L("前期 仕入帳（豆）", [["前川コーヒー", "月 3袋", "1袋 15,000円"], ["山海物産", "取引なし", ""]]),
+      note: "前期は前川コーヒーだけ。山海物産とは取引がなかった。" },
+    { id: "manual", spot: "shelf", name: "機械の説明書",
+      doc: `<div class="poster plain"><b>エスプレッソマシン 取扱説明書</b><span>お手入れは毎日行ってください</span></div>`,
+      note: "ただの説明書。特に気になる点はない。" },
+    /* 金庫 */
+    { id: "safe", spot: "safe", name: "「別」と書いた封筒とノート",
       doc: `<div class="envelope"><span>別</span><small>裏に鉛筆で「11/2」</small><b>¥85,000</b></div>
         <table class="ledger hand small"><caption>小さなノート</caption><tr><td>4/6 貸切</td><td>78,000</td></tr><tr><td>4/20 貸切</td><td>91,000</td></tr><tr><td>…</td><td>…</td></tr><tr><td>11/2 貸切</td><td>85,000</td></tr><tr class="hl"><td>18回 計</td><td>1,530,000</td></tr></table>`,
       note: "「別」と書かれた封筒に<b>現金85,000円</b>（裏に11/2）。ノートには<b>貸切18回・計153万円</b>。" },
-    { id: "desk", area: "office", name: "机の引き出し", where: "事務室の机",
-      ask: "机の引き出しを開けて、中を見せていただけますか。", ok: "……か、構いませんよ。（社長が鍵で引き出しを開ける）", open: true,
-      doc: `<div class="receipt-blank"><b>領 収 書</b><span>　　　　様</span><span>¥　　　　　-</span><span>但</span><em>山海物産株式会社<span class="hanko">山海</span></em><small>× 14枚（使った跡あり）</small></div>`,
-      note: "山海物産のハンコが押された<b>白紙の領収書の束</b>。金額を好きに書けてしまう。" },
-    { id: "ledger", area: "office", name: "仕入れの帳簿と領収書", where: "事務室の本棚",
-      ask: "仕入れの帳簿と領収書を見せていただけますか。", ok: "どうぞ。領収書は全部そろっていますよ。",
-      doc: `<table class="ledger"><caption>仕入帳（山海物産）</caption><tr><td>5/10</td><td>豆</td><td>300,000</td><td>現金</td></tr><tr><td>6/14</td><td>豆</td><td>300,000</td><td>現金</td></tr><tr><td>…</td><td></td><td></td><td></td></tr><tr class="hl"><td>6回</td><td>計</td><td>1,800,000</td><td></td></tr></table>
-        <div class="receipt-mini hand">領収書　¥300,000-　山海物産<span class="hanko">山海</span></div>`,
-      note: "山海物産から豆を<b>30万円ずつ6回</b>。領収書は全部そろっている。" },
-    { id: "stock", area: "back", name: "豆の入荷記録", where: "倉庫の棚",
-      ask: "豆の入荷記録を見せていただけますか。", ok: "豆ですか？ どうぞ。",
-      doc: `<table class="ledger"><caption>豆の入荷記録</caption><tr><th></th><th>前期</th><th>今期</th></tr><tr><td>入荷量</td><td>月 3袋</td><td>月 3袋</td></tr><tr class="hl"><td>1袋の値段</td><td>15,000円</td><td>15,000円</td></tr><tr><td>届いた豆</td><td>前川コーヒー</td><td>前川コーヒーのみ</td></tr></table>`,
+    { id: "deed", spot: "safe", name: "登記の書類",
+      doc: `<div class="cert"><b>履歴事項全部証明書</b><span>株式会社浜風珈琲</span><span>代表取締役 白洲 守</span></div>`,
+      note: "会社の登記の書類。特に気になる点はない。" },
+    /* 倉庫の棚 */
+    { id: "stock", spot: "store", name: "豆の入荷記録",
+      doc: L("豆の入荷記録", [["", "前期", "今期"], ["入荷量", "月 3袋", "月 3袋"], ["1袋の値段", "15,000円", "15,000円"], ["届いた豆", "前川コーヒー", "前川コーヒーのみ"]], 2),
       note: "豆の量も<b>値段も去年と同じ</b>。届いているのは前川コーヒーの豆だけ。" },
-    { id: "fridge", area: "back", name: "冷蔵庫の中", where: "厨房",
-      ask: "冷蔵庫の中を拝見してもよろしいですか。", ok: "食材しかありませんよ。",
-      doc: `<table class="ledger"><caption>冷蔵庫</caption><tr><td>牛乳</td><td>12本</td></tr><tr><td>ケーキ</td><td>3種</td></tr><tr><td>サンドイッチの具</td><td>少し</td></tr></table>`,
-      note: "ふつうの食材。特に気になる点はない。" }
+    { id: "beans", spot: "store", name: "豆の袋",
+      doc: `<div class="bags"><span>前川コーヒー<br>ブレンド用</span><span>前川コーヒー<br>ブレンド用</span><span>前川コーヒー<br>深煎り</span></div><p class="cap">山海物産の袋は1つもない</p>`,
+      note: "棚の豆は<b>全部 前川コーヒー</b>。山海物産の豆は1袋もない。" },
+    { id: "wine", spot: "store", name: "酒屋の納品書",
+      doc: L("納品書　潮見酒店", [["10/31", "白ワイン", "12本"], ["10/31", "赤ワイン", "12本"], ["", "合計", "43,200円"]]),
+      note: "ワインを24本。昼の喫茶店で、こんなに使うだろうか。" },
+    /* 厨房 */
+    { id: "clean", spot: "kitchen", name: "清掃チェック表",
+      doc: L("清掃チェック 11月", [["11/1（金）", "19:10 済"], ["11/2（土）", "23:20 済"], ["11/3（日）", "19:05 済"]], 1),
+      note: "土曜日だけ、片づけが<b>夜11時20分</b>。" },
+    { id: "fridge", spot: "kitchen", name: "冷蔵庫の温度記録",
+      doc: L("冷蔵庫 温度", [["朝", "3℃"], ["夕方", "4℃"]]),
+      note: "毎日きちんと記録している。特に気になる点はない。" },
+    { id: "recipe", spot: "kitchen", name: "レシピノート",
+      doc: `<div class="memo-note hand"><b>ナポリタン</b><span>ケチャップ多め、最後にバター</span></div>`,
+      note: "料理のメモ。特に気になる点はない。" }
   ];
 
-  const place = (id) => places.find((p) => p.id === id);
+  const doc = (id) => docs.find((d) => d.id === id);
+  const spot = (id) => spots.find((s) => s.id === id);
   const result = { sales: 153, cost: 180, before: -57, after: 276 };
 
-  return { LIMIT, tancho, statement, claims, areas, places, place, result };
+  return { LIMIT, tancho, statement, claims, areas, spots, docs, doc, spot, result };
 })();
 
 </script>
@@ -756,7 +882,7 @@ window.ASSETS = {
 <script>
 /* 臨場 v4 ― 司会主導の説明会向け。
  *  スクリーン：司会が「端緒」と「社長の言い分」を説明する（host.html）
- *  スマホ：①調べる（自分で当たりをつけ、1人4か所まで）→ ②班で相談（班長が言い分ごとに証拠を1つ選ぶ）
+ *  スマホ：①お店の資料（約30点）から当たりをつけて1人6点まで見る → ②班で相談（班長が言い分ごとに資料を1つ選ぶ）
  *         → 社長に示す → 結果（答え合わせはスクリーンで）
  * 通信はしない。各自のスマホで遊び、見つけたことは口で伝え合う。
  * 保存は localStorage（"rinjo:v4"）。URL の末尾に #debug で window.__rinjo が使える。
@@ -766,7 +892,7 @@ window.ASSETS = {
   const C = window.CASE;
   const A = window.ASSETS || { bg: {}, ch: {} };
   const SND = window.SOUND || { play() {}, bgm() {}, unlock() {}, toggle() { return false; }, on: false };
-  const KEY = "rinjo:v4";
+  const KEY = "rinjo:v5";
   const app = document.getElementById("app");
   const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const strip = (h) => String(h).replace(/<[^>]+>/g, "");
@@ -774,12 +900,16 @@ window.ASSETS = {
   const claim = (id) => C.claims.find((c) => c.id === id);
 
   /* ---------- 状態 ---------- */
-  function fresh() { return { v: 4, screen: "title", seen: [], tags: {}, at: null, stage: "ask", leader: false, picks: {}, outcome: null, hints: {}, started: false }; }
+  function fresh() { return { v: 5, screen: "title", seen: [], allowed: [], marks: [], tags: {}, at: null, leader: false, picks: {}, outcome: null, hints: {}, started: false }; }
   let st = load();
-  function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 4) return s; } catch (e) {} return fresh(); }
+  function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 5) return s; } catch (e) {} return fresh(); }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
   const left = () => Math.max(0, C.LIMIT - st.seen.length);
   const seen = (id) => st.seen.includes(id);
+  const allowed = (spotId) => st.allowed.includes(spotId);
+  const marked = (id) => st.marks.includes(id);
+  const docName = (id) => C.doc(id).name;
+  const docWhere = (id) => { const d = C.doc(id), sp = C.spot(d.spot), a = C.areas.find((x) => x.id === sp.area); return `${a.name}・${sp.name}`; };
 
   /* ---------- 画像 ---------- */
   const bg = (k) => (A.bg[k] ? A.bg[k].src : "");
@@ -927,74 +1057,87 @@ window.ASSETS = {
         <ul class="tancho">${C.tancho.map((t) => `<li><b>${esc(t.big)}</b><span>${esc(t.text)}</span></li>`).join("")}</ul>
       </details>
       <div class="rules">
-        <div><span class="n">1</span><p>調べられるのは<b>1人${C.LIMIT}か所まで</b>。どこに証拠がありそうか、<b>当たり</b>（見当）をつけて選ぼう。</p></div>
-        <div><span class="n">2</span><p>見るときは、まず社長に<b>お願いして承諾をもらう</b>。</p></div>
-        <div><span class="n">3</span><p>班で手分けすると、たくさんの場所を調べられる。</p></div>
+        <div><span class="n">1</span><p>お店には<b>${C.docs.length}点</b>の資料がある。でも、見られるのは<b>1人${C.LIMIT}点まで</b>。</p></div>
+        <div><span class="n">2</span><p>どの資料を見れば言い分を確かめられるか、<b>当たり</b>（見当）をつけよう。その付け方を<b>班で相談</b>して、手分けしよう。</p></div>
+        <div><span class="n">3</span><p>見るときは、まず社長に<b>お願いして承諾をもらう</b>。</p></div>
       </div>
-    </div></section>${cta(`<button class="btn btn-main" data-act="to-map">お店を調べる</button>`)}`;
+    </div></section>${cta(`<button class="btn btn-main" data-act="to-map">お店に入る</button>`)}`;
   }
 
-  /* ---------- 地図：どこを調べる？ ---------- */
+  /* ---------- お店の中：どの資料を見る？ ---------- */
   function vMap() {
     const n = left();
     const dots = Array.from({ length: C.LIMIT }, (_, i) => `<i class="${i < st.seen.length ? "used" : ""}"></i>`).join("");
     return `<section class="screen"><div class="wrap">
-      ${mission(n ? "どこを調べる？ <em>当たり</em>をつけよう" : "調べ終わりました", n ? "「この言い分をくずす証拠は、ここにありそう」と思う場所を選ぼう。" : "下のボタンで、班の相談へ進もう。")}
-      <div class="left ${n ? "" : "zero"}"><div class="dots4">${dots}</div><p>調べられるのは あと <b>${n}</b> か所</p></div>
+      ${mission(n ? "どの資料を見る？ <em>当たり</em>をつけよう" : "見られる数を使い切りました", n ? `お店には${C.docs.length}点の資料。どれを見れば言い分を確かめられるか、班で相談しながら選ぼう。` : "下のボタンで、班の相談へ進もう。")}
+      <div class="left ${n ? "" : "zero"}"><div class="dots4">${dots}</div><p>見られるのは あと <b>${n}</b> 点</p></div>
+      <p class="mark-help"><span class="star on">★</span>＝当たりの印（見なくてもつけられます）。相談のメモにどうぞ。</p>
       ${C.areas.map((a) => `<div class="area">
         <div class="area-head" style="background-image:url('${bg(a.bg)}')"><span>${esc(a.name)}</span></div>
-        <div class="spots">${C.places.filter((p) => p.area === a.id).map(spot).join("")}</div></div>`).join("")}
-    </div></section>${cta(`<button class="btn ${n ? "btn-ghost" : "btn-main"}" data-act="to-share">${n ? "調べ終わったら：班の相談へ" : "班の相談へ進む"}</button>`)}`;
+        ${C.spots.filter((sp) => sp.area === a.id).map(spotBox).join("")}</div>`).join("")}
+    </div></section>${cta(`<button class="btn ${n ? "btn-ghost" : "btn-main"}" data-act="to-share">${n ? "見終わったら：班の相談へ" : "班の相談へ進む"}</button>`)}`;
   }
-  function spot(p) {
-    const s = seen(p.id), lock = !s && !left();
-    const tag = st.tags[p.id];
-    return `<button class="spot ${s ? "seen" : ""} ${lock ? "lock" : ""}" data-act="spot" data-p="${p.id}" ${lock ? 'aria-disabled="true"' : ""}>
-      <span class="ic">${s ? ICON.check : p.open ? ICON.lock : ICON.doc}</span>
-      <span class="tx"><b>${esc(p.name)}</b><small>${esc(p.where)}${s ? "　・調べた" : ""}</small></span>
-      ${s && tag ? claimTag(tag) : ""}</button>`;
+  function spotBox(sp) {
+    const ds = C.docs.filter((d) => d.spot === sp.id);
+    return `<div class="spotbox"><p class="sp-name">${sp.open ? ICON.lock : ""}${esc(sp.name)}<small>${ds.length}点${allowed(sp.id) ? "・承諾ずみ" : ""}</small></p>
+      <div class="tiles">${ds.map(tile).join("")}</div></div>`;
+  }
+  function tile(d) {
+    const s = seen(d.id), lock = !s && !left(), tag = st.tags[d.id];
+    return `<button class="tile ${s ? "seen" : ""} ${lock ? "lock" : ""} ${marked(d.id) ? "marked" : ""}" data-act="doc" data-d="${d.id}">
+      <span class="t-name">${esc(d.name)}</span>
+      <span class="t-foot">${s ? `<i class="ok">${ICON.check}見た</i>` : ""}${s && tag ? claimTag(tag) : ""}${marked(d.id) ? '<i class="star on">★</i>' : ""}</span></button>`;
   }
 
-  /* ---------- 1か所を調べる ---------- */
+  /* ---------- 1点を見る ---------- */
   function vPlace() {
-    const p = C.place(st.at); if (!p) return vMap();
-    const a = C.areas.find((x) => x.id === p.area);
-    if (st.stage === "ask") {
-      return `<section class="screen"><div class="wrap">
-        <button class="back" data-act="to-map">← 場所えらびにもどる</button>
-        ${mission(esc(p.name), esc(p.where))}
+    const d = C.doc(st.at); if (!d) return vMap();
+    const sp = C.spot(d.spot), a = C.areas.find((x) => x.id === sp.area);
+    const back = `<button class="back" data-act="to-map">← 資料えらびにもどる</button>`;
+    const star = `<button class="btn btn-ghost star-btn ${marked(d.id) ? "on" : ""}" data-act="mark">${marked(d.id) ? "★ 当たりの印をはずす" : "☆ 当たりの印をつける"}</button>`;
+    if (!allowed(sp.id)) {
+      return `<section class="screen"><div class="wrap">${back}
+        ${mission(esc(d.name), esc(docWhere(d.id)))}
         <div class="scene" style="background-image:url('${bg(a.bg)}')"><div class="boss" style="${faceCss("boss_grin", 1.9)}"></div><p>「何か見たいものでも？」<small>白洲社長</small></p></div>
         <div class="consent"><span class="tag">承諾をもらう</span>
-          <p>見せてもらう前に、社長にこうお願いします。</p>
-          <blockquote>「${esc(p.ask)}」</blockquote></div>
-        <p class="disclaim">${p.open ? "<b>これはゲームです。</b>実際の税務調査では、調査官が自分で机や金庫を開けたり、お金に触れたりはしません。必ず相手の<b>明示の承諾</b>を得て、開けて見せてもらいます。" : "実際の税務調査でも、書類は相手の<b>明示の承諾</b>を得てから見せてもらいます。"}</p>
-      </div></section>${cta(`<button class="btn btn-main" data-act="ask">社長にお願いする<small>調べられるのは あと ${left()} か所 → ${left() - 1} か所</small></button>`)}`;
+          <p>「${esc(sp.name)}」のものを見る前に、社長にこうお願いします。</p>
+          <blockquote>「${esc(sp.ask)}」</blockquote></div>
+        <p class="disclaim">${sp.open ? "<b>これはゲームです。</b>実際の税務調査では、調査官が自分で机や金庫を開けたり、お金に触れたりはしません。必ず相手の<b>明示の承諾</b>を得て、開けて見せてもらいます。" : "実際の税務調査でも、書類は相手の<b>明示の承諾</b>を得てから見せてもらいます。"}</p>
+      </div></section>${cta(`<button class="btn btn-main" data-act="ask">社長にお願いする<small>お願いするだけなら、見られる数は減りません</small></button>`)}`;
     }
-    const tag = st.tags[p.id];
-    return `<section class="screen"><div class="wrap">
-      <button class="back" data-act="to-map">← 場所えらびにもどる</button>
-      ${mission(esc(p.name), esc(p.where))}
-      <div class="paper">${p.doc}</div>
-      <div class="noticed"><small>気づいたこと</small><p>${p.note}</p></div>
+    if (!seen(d.id)) {
+      const others = C.docs.filter((x) => x.spot === sp.id);
+      return `<section class="screen"><div class="wrap">${back}
+        ${mission(esc(d.name), esc(docWhere(d.id)))}
+        <div class="closed-doc">${ICON.doc}<p>この資料を見ますか？<br><small>見られるのは あと <b>${left()}</b> 点です。</small></p></div>
+        <p class="grp">${esc(sp.name)}にある資料</p>
+        <div class="tiles">${others.map(tile).join("")}</div>
+      </div></section>${cta(`${star}<button class="btn btn-main" data-act="view" ${left() ? "" : "disabled"}>${left() ? `見る<small>あと ${left()} 点 → ${left() - 1} 点</small>` : "もう見られません"}</button>`)}`;
+    }
+    const tag = st.tags[d.id];
+    return `<section class="screen"><div class="wrap">${back}
+      ${mission(esc(d.name), esc(docWhere(d.id)))}
+      <div class="paper">${d.doc}</div>
+      <div class="noticed"><small>気づいたこと</small><p>${d.note}</p></div>
       <h2 class="q">この資料で、どの言い分をくずせそう？</h2>
       <div class="pickc">${C.claims.map((c) => `<button data-act="tag" data-t="${c.id}" aria-pressed="${tag === c.id}"><span class="cid">${c.id}</span><span>${esc(c.short)}</span></button>`).join("")}
         <button data-act="tag" data-t="none" aria-pressed="${tag === "none"}" class="none"><span class="cid">－</span><span>くずせなさそう</span></button></div>
       <p class="after">あなたの考えでかまいません。あとで班に伝えるときのメモになります。</p>
-    </div></section>${cta(`<button class="btn ${tag ? "btn-main" : "btn-ghost"}" data-act="to-map">場所えらびにもどる</button>`)}`;
+    </div></section>${cta(`<button class="btn ${tag ? "btn-main" : "btn-ghost"}" data-act="to-map">資料えらびにもどる</button>`)}`;
   }
 
   /* ---------- 班で相談 ---------- */
   function vShare() {
-    const list = st.seen.map(C.place);
+    const list = st.seen.map(C.doc);
     return `<section class="screen"><div class="wrap">
       <div class="talk-badge">${ICON.talk}班で相談</div>
       ${mission("見つけたことを、<em>班に伝えよう</em>", "1人ずつ、下のカードを読み上げよう。")}
-      ${list.length ? `<div class="tells">${list.map((p, i) => `<div class="tell"><span class="no">${i + 1}</span><div><small>${esc(p.name)}（${esc(p.where)}）${st.tags[p.id] ? claimTag(st.tags[p.id]) : ""}</small><p>${p.note}</p></div></div>`).join("")}</div>`
-        : `<p class="empty">まだどこも調べていません。</p>`}
-      ${left() ? `<button class="more" data-act="to-map">まだ ${left()} か所調べられます →</button>` : ""}
+      ${list.length ? `<div class="tells">${list.map((p, i) => `<div class="tell"><span class="no">${i + 1}</span><div><small>${esc(p.name)}（${esc(docWhere(p.id))}）${st.tags[p.id] ? claimTag(st.tags[p.id]) : ""}</small><p>${p.note}</p></div></div>`).join("")}</div>`
+        : `<p class="empty">まだ資料を見ていません。</p>`}
+      ${left() ? `<button class="more" data-act="to-map">まだ ${left()} 点見られます →</button>` : ""}
       <div class="leader-box">
         <h2>次に、<b>班長</b>を1人決めよう</h2>
-        <p>班長は、みんなの話を聞いて、言い分ごとに<b>決め手の証拠</b>を選び、社長に示します。決まらなければ、スクリーンの指示に従ってください。</p>
+        <p>班長は、みんなの話を聞いて、言い分ごとに<b>決め手の資料</b>を選び、社長に示します。決まらなければ、スクリーンの指示に従ってください。</p>
         <button class="btn btn-main" data-act="be-leader">私が班長（答えを入力する）</button>
         <p class="after">班長でない人は、このまま班長のスマホをいっしょに見よう。</p>
       </div>
@@ -1007,9 +1150,9 @@ window.ASSETS = {
     return `<section class="screen"><div class="wrap">
       <button class="back" data-act="to-share">← 班で相談にもどる</button>
       <div class="talk-badge lead">班長</div>
-      ${mission("言い分ごとに、<em>決め手の証拠</em>を1つ選ぼう", "みんなの話を聞いて選ぼう。あなたが調べていない場所も選べます。")}
+      ${mission("言い分ごとに、<em>決め手の証拠</em>を1つ選ぼう", "みんなの話を聞いて選ぼう。あなたが見ていない資料も選べます。")}
       <div class="answers">${C.claims.map((c) => {
-        const p = st.picks[c.id] && C.place(st.picks[c.id]);
+        const p = st.picks[c.id] && C.doc(st.picks[c.id]);
         return `<div class="ans-row">${quote(c)}
           <button class="pickbtn ${p ? "set" : ""}" data-act="choose" data-c="${c.id}">${p ? `<span>示す証拠</span><b>${esc(p.name)}</b><i>変える</i>` : `<span>示す証拠</span><b>＋ 証拠を選ぶ</b>`}</button></div>`;
       }).join("")}</div>
@@ -1017,9 +1160,9 @@ window.ASSETS = {
   }
   function chooseSheet(cid) {
     const c = claim(cid);
-    sheet(`<h2>どの証拠を示しますか</h2>${quote(c)}
-      ${C.areas.map((a) => `<p class="grp">${esc(a.name)}</p><div class="choices">${C.places.filter((p) => p.area === a.id).map((p) =>
-        `<button data-p="${p.id}" aria-pressed="${st.picks[cid] === p.id}"><b>${esc(p.name)}</b>${seen(p.id) ? `<small>あなたが調べた${st.tags[p.id] ? `・${st.tags[p.id] === "none" ? "くずせなさそう" : "言い分" + st.tags[p.id]}` : ""}</small>` : ""}</button>`).join("")}</div>`).join("")}`,
+    sheet(`<h2>どの資料を示しますか</h2>${quote(c)}
+      ${C.spots.map((sp) => `<p class="grp">${esc(C.areas.find((a) => a.id === sp.area).name)}・${esc(sp.name)}</p><div class="choices">${C.docs.filter((d) => d.spot === sp.id).map((d) =>
+        `<button data-p="${d.id}" aria-pressed="${st.picks[cid] === d.id}"><b>${esc(d.name)}</b>${seen(d.id) ? `<small>あなたが見た${st.tags[d.id] ? `・${st.tags[d.id] === "none" ? "くずせなさそう" : "言い分" + st.tags[d.id]}` : ""}</small>` : marked(d.id) ? "<small>★ 当たりの印</small>" : ""}</button>`).join("")}</div>`).join("")}`,
       (d) => d.querySelectorAll(".choices button").forEach((b) => b.onclick = () => { st.picks[cid] = b.dataset.p; SND.play("click"); save(); closeSheet(); render(); }));
   }
 
@@ -1032,7 +1175,7 @@ window.ASSETS = {
     const out = {};
     await talk([{ who: "boss", text: "それで、何か分かりましたか？ うちは赤字ですよ。", face: "boss_grin", v: "boss_start" }]);
     for (const c of C.claims) {
-      const pid = st.picks[c.id], p = C.place(pid), ok = c.ok.includes(pid);
+      const pid = st.picks[c.id], p = C.doc(pid), ok = c.ok.includes(pid);
       img.src = ch("boss_smug"); fo.classList.remove("shock", "smug");
       await talk([{ who: "boss", text: c.text, face: "boss_smug", sfx: "bossTick", v: `boss_claim_${c.id}` }]);
       const th = document.createElement("div"); th.className = "thrust";
@@ -1070,7 +1213,7 @@ window.ASSETS = {
     return `<section class="screen"><div class="wrap">
       <div class="r-hero"><span class="stamp">${n === 3 ? "立証" : "あと一歩"}</span>
         <p>社長の言い分を <b>${n} / 3</b> くずした</p></div>
-      <div class="res-list">${C.claims.map((c) => `<div class="${out[c.id] === "win" ? "win" : "miss"}"><span class="cid">${c.id}</span><p>「${esc(c.short)}」<small>示した証拠：${esc(C.place(st.picks[c.id]).name)}</small></p><b>${out[c.id] === "win" ? "くずした" : "くずせず"}</b></div>`).join("")}</div>
+      <div class="res-list">${C.claims.map((c) => `<div class="${out[c.id] === "win" ? "win" : "miss"}"><span class="cid">${c.id}</span><p>「${esc(c.short)}」<small>示した資料：${esc(docName(st.picks[c.id]))}</small></p><b>${out[c.id] === "win" ? "くずした" : "くずせず"}</b></div>`).join("")}</div>
       ${n === 3 ? `<div class="amounts"><div><small>売上除外（隠した売上）</small><strong class="hl">${R.sales}万円</strong></div><div><small>架空経費（ありもしない経費）</small><strong class="hl">${R.cost}万円</strong></div>
         <div><small>申告した所得</small><strong>${R.before}万円</strong></div><div><small>正しい所得</small><strong>${R.after}万円</strong></div></div>` : ""}
       <div class="look-up">${ICON.talk}<p><b>前のスクリーンを見てください。</b><br>これから答え合わせをします。</p></div>
@@ -1111,23 +1254,24 @@ window.ASSETS = {
       go("map");
       if (first) { SND.play("door"); await talk([{ who: "boss", text: "税務署の方？ うちは赤字ですよ。どうぞ、何でも見てください。", face: "boss_grin", v: "boss_hello" }]); }
     },
-    spot(el) {
-      const id = el.dataset.p;
-      if (!seen(id) && !left()) { toast("もう調べられません。班の相談へ進もう"); return; }
-      st.at = id; st.stage = seen(id) ? "doc" : "ask"; SND.play("tap"); go("place");
-    },
+    doc(el) { st.at = el.dataset.d; SND.play("tap"); go("place"); },
     async ask() {
-      const p = C.place(st.at); if (!p || seen(p.id)) return;
-      if (!left()) { toast("もう調べられません"); return; }
-      await talk([{ who: "you", text: p.ask }, { who: "boss", text: p.ok, face: p.open ? "boss_shock" : "boss_grin", sfx: p.open ? "unlock" : "open", v: `boss_ok_${p.id}` }]);
-      st.seen.push(p.id); st.stage = "doc"; SND.play("paper"); save(); render(); window.scrollTo(0, 0);
+      const d = C.doc(st.at); if (!d) return; const sp = C.spot(d.spot); if (allowed(sp.id)) return;
+      await talk([{ who: "you", text: sp.ask }, { who: "boss", text: sp.ok, face: sp.open ? "boss_shock" : "boss_grin", sfx: sp.open ? "unlock" : "open", v: `boss_ok_${sp.id}` }]);
+      st.allowed.push(sp.id); save(); render(); window.scrollTo(0, 0);
     },
+    view() {
+      const d = C.doc(st.at); if (!d || seen(d.id)) return;
+      if (!left()) { toast("もう見られません。班の相談へ進もう"); return; }
+      st.seen.push(d.id); SND.play("paper"); save(); render(); window.scrollTo(0, 0);
+    },
+    mark() { const id = st.at; st.marks = marked(id) ? st.marks.filter((x) => x !== id) : st.marks.concat(id); SND.play("click"); save(); render(); },
     tag(el) { st.tags[st.at] = el.dataset.t; SND.play("click"); save(); render(); },
     "to-share"() {
-      if (left() && st.screen === "map") { confirmSheet("班の相談へ進みますか", `まだ <b>${left()}か所</b> 調べられます。あとからもどって調べることもできます。`, "班の相談へ", () => go("share")); return; }
+      if (left() && st.screen === "map") { confirmSheet("班の相談へ進みますか", `まだ <b>${left()}点</b> 見られます。あとからもどって見ることもできます。`, "班の相談へ", () => go("share")); return; }
       go("share");
     },
-    "be-leader"() { st.leader = true; go("answer"); talk([{ who: "mori", text: "班長、たのむぞ。みんなの話を聞いて、言い分ごとに<b>決め手の証拠</b>を1つずつ選ぼう。", v: "mori_leader" }]); },
+    "be-leader"() { st.leader = true; go("answer"); talk([{ who: "mori", text: "班長、たのむぞ。みんなの話を聞いて、言い分ごとに<b>決め手の資料</b>を1つずつ選ぼう。", v: "mori_leader" }]); },
     choose(el) { chooseSheet(el.dataset.c); },
     show() {
       if (!C.claims.every((c) => st.picks[c.id])) return;

@@ -1,6 +1,6 @@
 /* 臨場 v4 ― 司会主導の説明会向け。
  *  スクリーン：司会が「端緒」と「社長の言い分」を説明する（host.html）
- *  スマホ：①調べる（自分で当たりをつけ、1人4か所まで）→ ②班で相談（班長が言い分ごとに証拠を1つ選ぶ）
+ *  スマホ：①お店の資料（約30点）から当たりをつけて1人6点まで見る → ②班で相談（班長が言い分ごとに資料を1つ選ぶ）
  *         → 社長に示す → 結果（答え合わせはスクリーンで）
  * 通信はしない。各自のスマホで遊び、見つけたことは口で伝え合う。
  * 保存は localStorage（"rinjo:v4"）。URL の末尾に #debug で window.__rinjo が使える。
@@ -10,7 +10,7 @@
   const C = window.CASE;
   const A = window.ASSETS || { bg: {}, ch: {} };
   const SND = window.SOUND || { play() {}, bgm() {}, unlock() {}, toggle() { return false; }, on: false };
-  const KEY = "rinjo:v4";
+  const KEY = "rinjo:v5";
   const app = document.getElementById("app");
   const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const strip = (h) => String(h).replace(/<[^>]+>/g, "");
@@ -18,12 +18,16 @@
   const claim = (id) => C.claims.find((c) => c.id === id);
 
   /* ---------- 状態 ---------- */
-  function fresh() { return { v: 4, screen: "title", seen: [], tags: {}, at: null, stage: "ask", leader: false, picks: {}, outcome: null, hints: {}, started: false }; }
+  function fresh() { return { v: 5, screen: "title", seen: [], allowed: [], marks: [], tags: {}, at: null, leader: false, picks: {}, outcome: null, hints: {}, started: false }; }
   let st = load();
-  function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 4) return s; } catch (e) {} return fresh(); }
+  function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 5) return s; } catch (e) {} return fresh(); }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
   const left = () => Math.max(0, C.LIMIT - st.seen.length);
   const seen = (id) => st.seen.includes(id);
+  const allowed = (spotId) => st.allowed.includes(spotId);
+  const marked = (id) => st.marks.includes(id);
+  const docName = (id) => C.doc(id).name;
+  const docWhere = (id) => { const d = C.doc(id), sp = C.spot(d.spot), a = C.areas.find((x) => x.id === sp.area); return `${a.name}・${sp.name}`; };
 
   /* ---------- 画像 ---------- */
   const bg = (k) => (A.bg[k] ? A.bg[k].src : "");
@@ -171,74 +175,87 @@
         <ul class="tancho">${C.tancho.map((t) => `<li><b>${esc(t.big)}</b><span>${esc(t.text)}</span></li>`).join("")}</ul>
       </details>
       <div class="rules">
-        <div><span class="n">1</span><p>調べられるのは<b>1人${C.LIMIT}か所まで</b>。どこに証拠がありそうか、<b>当たり</b>（見当）をつけて選ぼう。</p></div>
-        <div><span class="n">2</span><p>見るときは、まず社長に<b>お願いして承諾をもらう</b>。</p></div>
-        <div><span class="n">3</span><p>班で手分けすると、たくさんの場所を調べられる。</p></div>
+        <div><span class="n">1</span><p>お店には<b>${C.docs.length}点</b>の資料がある。でも、見られるのは<b>1人${C.LIMIT}点まで</b>。</p></div>
+        <div><span class="n">2</span><p>どの資料を見れば言い分を確かめられるか、<b>当たり</b>（見当）をつけよう。その付け方を<b>班で相談</b>して、手分けしよう。</p></div>
+        <div><span class="n">3</span><p>見るときは、まず社長に<b>お願いして承諾をもらう</b>。</p></div>
       </div>
-    </div></section>${cta(`<button class="btn btn-main" data-act="to-map">お店を調べる</button>`)}`;
+    </div></section>${cta(`<button class="btn btn-main" data-act="to-map">お店に入る</button>`)}`;
   }
 
-  /* ---------- 地図：どこを調べる？ ---------- */
+  /* ---------- お店の中：どの資料を見る？ ---------- */
   function vMap() {
     const n = left();
     const dots = Array.from({ length: C.LIMIT }, (_, i) => `<i class="${i < st.seen.length ? "used" : ""}"></i>`).join("");
     return `<section class="screen"><div class="wrap">
-      ${mission(n ? "どこを調べる？ <em>当たり</em>をつけよう" : "調べ終わりました", n ? "「この言い分をくずす証拠は、ここにありそう」と思う場所を選ぼう。" : "下のボタンで、班の相談へ進もう。")}
-      <div class="left ${n ? "" : "zero"}"><div class="dots4">${dots}</div><p>調べられるのは あと <b>${n}</b> か所</p></div>
+      ${mission(n ? "どの資料を見る？ <em>当たり</em>をつけよう" : "見られる数を使い切りました", n ? `お店には${C.docs.length}点の資料。どれを見れば言い分を確かめられるか、班で相談しながら選ぼう。` : "下のボタンで、班の相談へ進もう。")}
+      <div class="left ${n ? "" : "zero"}"><div class="dots4">${dots}</div><p>見られるのは あと <b>${n}</b> 点</p></div>
+      <p class="mark-help"><span class="star on">★</span>＝当たりの印（見なくてもつけられます）。相談のメモにどうぞ。</p>
       ${C.areas.map((a) => `<div class="area">
         <div class="area-head" style="background-image:url('${bg(a.bg)}')"><span>${esc(a.name)}</span></div>
-        <div class="spots">${C.places.filter((p) => p.area === a.id).map(spot).join("")}</div></div>`).join("")}
-    </div></section>${cta(`<button class="btn ${n ? "btn-ghost" : "btn-main"}" data-act="to-share">${n ? "調べ終わったら：班の相談へ" : "班の相談へ進む"}</button>`)}`;
+        ${C.spots.filter((sp) => sp.area === a.id).map(spotBox).join("")}</div>`).join("")}
+    </div></section>${cta(`<button class="btn ${n ? "btn-ghost" : "btn-main"}" data-act="to-share">${n ? "見終わったら：班の相談へ" : "班の相談へ進む"}</button>`)}`;
   }
-  function spot(p) {
-    const s = seen(p.id), lock = !s && !left();
-    const tag = st.tags[p.id];
-    return `<button class="spot ${s ? "seen" : ""} ${lock ? "lock" : ""}" data-act="spot" data-p="${p.id}" ${lock ? 'aria-disabled="true"' : ""}>
-      <span class="ic">${s ? ICON.check : p.open ? ICON.lock : ICON.doc}</span>
-      <span class="tx"><b>${esc(p.name)}</b><small>${esc(p.where)}${s ? "　・調べた" : ""}</small></span>
-      ${s && tag ? claimTag(tag) : ""}</button>`;
+  function spotBox(sp) {
+    const ds = C.docs.filter((d) => d.spot === sp.id);
+    return `<div class="spotbox"><p class="sp-name">${sp.open ? ICON.lock : ""}${esc(sp.name)}<small>${ds.length}点${allowed(sp.id) ? "・承諾ずみ" : ""}</small></p>
+      <div class="tiles">${ds.map(tile).join("")}</div></div>`;
+  }
+  function tile(d) {
+    const s = seen(d.id), lock = !s && !left(), tag = st.tags[d.id];
+    return `<button class="tile ${s ? "seen" : ""} ${lock ? "lock" : ""} ${marked(d.id) ? "marked" : ""}" data-act="doc" data-d="${d.id}">
+      <span class="t-name">${esc(d.name)}</span>
+      <span class="t-foot">${s ? `<i class="ok">${ICON.check}見た</i>` : ""}${s && tag ? claimTag(tag) : ""}${marked(d.id) ? '<i class="star on">★</i>' : ""}</span></button>`;
   }
 
-  /* ---------- 1か所を調べる ---------- */
+  /* ---------- 1点を見る ---------- */
   function vPlace() {
-    const p = C.place(st.at); if (!p) return vMap();
-    const a = C.areas.find((x) => x.id === p.area);
-    if (st.stage === "ask") {
-      return `<section class="screen"><div class="wrap">
-        <button class="back" data-act="to-map">← 場所えらびにもどる</button>
-        ${mission(esc(p.name), esc(p.where))}
+    const d = C.doc(st.at); if (!d) return vMap();
+    const sp = C.spot(d.spot), a = C.areas.find((x) => x.id === sp.area);
+    const back = `<button class="back" data-act="to-map">← 資料えらびにもどる</button>`;
+    const star = `<button class="btn btn-ghost star-btn ${marked(d.id) ? "on" : ""}" data-act="mark">${marked(d.id) ? "★ 当たりの印をはずす" : "☆ 当たりの印をつける"}</button>`;
+    if (!allowed(sp.id)) {
+      return `<section class="screen"><div class="wrap">${back}
+        ${mission(esc(d.name), esc(docWhere(d.id)))}
         <div class="scene" style="background-image:url('${bg(a.bg)}')"><div class="boss" style="${faceCss("boss_grin", 1.9)}"></div><p>「何か見たいものでも？」<small>白洲社長</small></p></div>
         <div class="consent"><span class="tag">承諾をもらう</span>
-          <p>見せてもらう前に、社長にこうお願いします。</p>
-          <blockquote>「${esc(p.ask)}」</blockquote></div>
-        <p class="disclaim">${p.open ? "<b>これはゲームです。</b>実際の税務調査では、調査官が自分で机や金庫を開けたり、お金に触れたりはしません。必ず相手の<b>明示の承諾</b>を得て、開けて見せてもらいます。" : "実際の税務調査でも、書類は相手の<b>明示の承諾</b>を得てから見せてもらいます。"}</p>
-      </div></section>${cta(`<button class="btn btn-main" data-act="ask">社長にお願いする<small>調べられるのは あと ${left()} か所 → ${left() - 1} か所</small></button>`)}`;
+          <p>「${esc(sp.name)}」のものを見る前に、社長にこうお願いします。</p>
+          <blockquote>「${esc(sp.ask)}」</blockquote></div>
+        <p class="disclaim">${sp.open ? "<b>これはゲームです。</b>実際の税務調査では、調査官が自分で机や金庫を開けたり、お金に触れたりはしません。必ず相手の<b>明示の承諾</b>を得て、開けて見せてもらいます。" : "実際の税務調査でも、書類は相手の<b>明示の承諾</b>を得てから見せてもらいます。"}</p>
+      </div></section>${cta(`<button class="btn btn-main" data-act="ask">社長にお願いする<small>お願いするだけなら、見られる数は減りません</small></button>`)}`;
     }
-    const tag = st.tags[p.id];
-    return `<section class="screen"><div class="wrap">
-      <button class="back" data-act="to-map">← 場所えらびにもどる</button>
-      ${mission(esc(p.name), esc(p.where))}
-      <div class="paper">${p.doc}</div>
-      <div class="noticed"><small>気づいたこと</small><p>${p.note}</p></div>
+    if (!seen(d.id)) {
+      const others = C.docs.filter((x) => x.spot === sp.id);
+      return `<section class="screen"><div class="wrap">${back}
+        ${mission(esc(d.name), esc(docWhere(d.id)))}
+        <div class="closed-doc">${ICON.doc}<p>この資料を見ますか？<br><small>見られるのは あと <b>${left()}</b> 点です。</small></p></div>
+        <p class="grp">${esc(sp.name)}にある資料</p>
+        <div class="tiles">${others.map(tile).join("")}</div>
+      </div></section>${cta(`${star}<button class="btn btn-main" data-act="view" ${left() ? "" : "disabled"}>${left() ? `見る<small>あと ${left()} 点 → ${left() - 1} 点</small>` : "もう見られません"}</button>`)}`;
+    }
+    const tag = st.tags[d.id];
+    return `<section class="screen"><div class="wrap">${back}
+      ${mission(esc(d.name), esc(docWhere(d.id)))}
+      <div class="paper">${d.doc}</div>
+      <div class="noticed"><small>気づいたこと</small><p>${d.note}</p></div>
       <h2 class="q">この資料で、どの言い分をくずせそう？</h2>
       <div class="pickc">${C.claims.map((c) => `<button data-act="tag" data-t="${c.id}" aria-pressed="${tag === c.id}"><span class="cid">${c.id}</span><span>${esc(c.short)}</span></button>`).join("")}
         <button data-act="tag" data-t="none" aria-pressed="${tag === "none"}" class="none"><span class="cid">－</span><span>くずせなさそう</span></button></div>
       <p class="after">あなたの考えでかまいません。あとで班に伝えるときのメモになります。</p>
-    </div></section>${cta(`<button class="btn ${tag ? "btn-main" : "btn-ghost"}" data-act="to-map">場所えらびにもどる</button>`)}`;
+    </div></section>${cta(`<button class="btn ${tag ? "btn-main" : "btn-ghost"}" data-act="to-map">資料えらびにもどる</button>`)}`;
   }
 
   /* ---------- 班で相談 ---------- */
   function vShare() {
-    const list = st.seen.map(C.place);
+    const list = st.seen.map(C.doc);
     return `<section class="screen"><div class="wrap">
       <div class="talk-badge">${ICON.talk}班で相談</div>
       ${mission("見つけたことを、<em>班に伝えよう</em>", "1人ずつ、下のカードを読み上げよう。")}
-      ${list.length ? `<div class="tells">${list.map((p, i) => `<div class="tell"><span class="no">${i + 1}</span><div><small>${esc(p.name)}（${esc(p.where)}）${st.tags[p.id] ? claimTag(st.tags[p.id]) : ""}</small><p>${p.note}</p></div></div>`).join("")}</div>`
-        : `<p class="empty">まだどこも調べていません。</p>`}
-      ${left() ? `<button class="more" data-act="to-map">まだ ${left()} か所調べられます →</button>` : ""}
+      ${list.length ? `<div class="tells">${list.map((p, i) => `<div class="tell"><span class="no">${i + 1}</span><div><small>${esc(p.name)}（${esc(docWhere(p.id))}）${st.tags[p.id] ? claimTag(st.tags[p.id]) : ""}</small><p>${p.note}</p></div></div>`).join("")}</div>`
+        : `<p class="empty">まだ資料を見ていません。</p>`}
+      ${left() ? `<button class="more" data-act="to-map">まだ ${left()} 点見られます →</button>` : ""}
       <div class="leader-box">
         <h2>次に、<b>班長</b>を1人決めよう</h2>
-        <p>班長は、みんなの話を聞いて、言い分ごとに<b>決め手の証拠</b>を選び、社長に示します。決まらなければ、スクリーンの指示に従ってください。</p>
+        <p>班長は、みんなの話を聞いて、言い分ごとに<b>決め手の資料</b>を選び、社長に示します。決まらなければ、スクリーンの指示に従ってください。</p>
         <button class="btn btn-main" data-act="be-leader">私が班長（答えを入力する）</button>
         <p class="after">班長でない人は、このまま班長のスマホをいっしょに見よう。</p>
       </div>
@@ -251,9 +268,9 @@
     return `<section class="screen"><div class="wrap">
       <button class="back" data-act="to-share">← 班で相談にもどる</button>
       <div class="talk-badge lead">班長</div>
-      ${mission("言い分ごとに、<em>決め手の証拠</em>を1つ選ぼう", "みんなの話を聞いて選ぼう。あなたが調べていない場所も選べます。")}
+      ${mission("言い分ごとに、<em>決め手の証拠</em>を1つ選ぼう", "みんなの話を聞いて選ぼう。あなたが見ていない資料も選べます。")}
       <div class="answers">${C.claims.map((c) => {
-        const p = st.picks[c.id] && C.place(st.picks[c.id]);
+        const p = st.picks[c.id] && C.doc(st.picks[c.id]);
         return `<div class="ans-row">${quote(c)}
           <button class="pickbtn ${p ? "set" : ""}" data-act="choose" data-c="${c.id}">${p ? `<span>示す証拠</span><b>${esc(p.name)}</b><i>変える</i>` : `<span>示す証拠</span><b>＋ 証拠を選ぶ</b>`}</button></div>`;
       }).join("")}</div>
@@ -261,9 +278,9 @@
   }
   function chooseSheet(cid) {
     const c = claim(cid);
-    sheet(`<h2>どの証拠を示しますか</h2>${quote(c)}
-      ${C.areas.map((a) => `<p class="grp">${esc(a.name)}</p><div class="choices">${C.places.filter((p) => p.area === a.id).map((p) =>
-        `<button data-p="${p.id}" aria-pressed="${st.picks[cid] === p.id}"><b>${esc(p.name)}</b>${seen(p.id) ? `<small>あなたが調べた${st.tags[p.id] ? `・${st.tags[p.id] === "none" ? "くずせなさそう" : "言い分" + st.tags[p.id]}` : ""}</small>` : ""}</button>`).join("")}</div>`).join("")}`,
+    sheet(`<h2>どの資料を示しますか</h2>${quote(c)}
+      ${C.spots.map((sp) => `<p class="grp">${esc(C.areas.find((a) => a.id === sp.area).name)}・${esc(sp.name)}</p><div class="choices">${C.docs.filter((d) => d.spot === sp.id).map((d) =>
+        `<button data-p="${d.id}" aria-pressed="${st.picks[cid] === d.id}"><b>${esc(d.name)}</b>${seen(d.id) ? `<small>あなたが見た${st.tags[d.id] ? `・${st.tags[d.id] === "none" ? "くずせなさそう" : "言い分" + st.tags[d.id]}` : ""}</small>` : marked(d.id) ? "<small>★ 当たりの印</small>" : ""}</button>`).join("")}</div>`).join("")}`,
       (d) => d.querySelectorAll(".choices button").forEach((b) => b.onclick = () => { st.picks[cid] = b.dataset.p; SND.play("click"); save(); closeSheet(); render(); }));
   }
 
@@ -276,7 +293,7 @@
     const out = {};
     await talk([{ who: "boss", text: "それで、何か分かりましたか？ うちは赤字ですよ。", face: "boss_grin", v: "boss_start" }]);
     for (const c of C.claims) {
-      const pid = st.picks[c.id], p = C.place(pid), ok = c.ok.includes(pid);
+      const pid = st.picks[c.id], p = C.doc(pid), ok = c.ok.includes(pid);
       img.src = ch("boss_smug"); fo.classList.remove("shock", "smug");
       await talk([{ who: "boss", text: c.text, face: "boss_smug", sfx: "bossTick", v: `boss_claim_${c.id}` }]);
       const th = document.createElement("div"); th.className = "thrust";
@@ -314,7 +331,7 @@
     return `<section class="screen"><div class="wrap">
       <div class="r-hero"><span class="stamp">${n === 3 ? "立証" : "あと一歩"}</span>
         <p>社長の言い分を <b>${n} / 3</b> くずした</p></div>
-      <div class="res-list">${C.claims.map((c) => `<div class="${out[c.id] === "win" ? "win" : "miss"}"><span class="cid">${c.id}</span><p>「${esc(c.short)}」<small>示した証拠：${esc(C.place(st.picks[c.id]).name)}</small></p><b>${out[c.id] === "win" ? "くずした" : "くずせず"}</b></div>`).join("")}</div>
+      <div class="res-list">${C.claims.map((c) => `<div class="${out[c.id] === "win" ? "win" : "miss"}"><span class="cid">${c.id}</span><p>「${esc(c.short)}」<small>示した資料：${esc(docName(st.picks[c.id]))}</small></p><b>${out[c.id] === "win" ? "くずした" : "くずせず"}</b></div>`).join("")}</div>
       ${n === 3 ? `<div class="amounts"><div><small>売上除外（隠した売上）</small><strong class="hl">${R.sales}万円</strong></div><div><small>架空経費（ありもしない経費）</small><strong class="hl">${R.cost}万円</strong></div>
         <div><small>申告した所得</small><strong>${R.before}万円</strong></div><div><small>正しい所得</small><strong>${R.after}万円</strong></div></div>` : ""}
       <div class="look-up">${ICON.talk}<p><b>前のスクリーンを見てください。</b><br>これから答え合わせをします。</p></div>
@@ -355,23 +372,24 @@
       go("map");
       if (first) { SND.play("door"); await talk([{ who: "boss", text: "税務署の方？ うちは赤字ですよ。どうぞ、何でも見てください。", face: "boss_grin", v: "boss_hello" }]); }
     },
-    spot(el) {
-      const id = el.dataset.p;
-      if (!seen(id) && !left()) { toast("もう調べられません。班の相談へ進もう"); return; }
-      st.at = id; st.stage = seen(id) ? "doc" : "ask"; SND.play("tap"); go("place");
-    },
+    doc(el) { st.at = el.dataset.d; SND.play("tap"); go("place"); },
     async ask() {
-      const p = C.place(st.at); if (!p || seen(p.id)) return;
-      if (!left()) { toast("もう調べられません"); return; }
-      await talk([{ who: "you", text: p.ask }, { who: "boss", text: p.ok, face: p.open ? "boss_shock" : "boss_grin", sfx: p.open ? "unlock" : "open", v: `boss_ok_${p.id}` }]);
-      st.seen.push(p.id); st.stage = "doc"; SND.play("paper"); save(); render(); window.scrollTo(0, 0);
+      const d = C.doc(st.at); if (!d) return; const sp = C.spot(d.spot); if (allowed(sp.id)) return;
+      await talk([{ who: "you", text: sp.ask }, { who: "boss", text: sp.ok, face: sp.open ? "boss_shock" : "boss_grin", sfx: sp.open ? "unlock" : "open", v: `boss_ok_${sp.id}` }]);
+      st.allowed.push(sp.id); save(); render(); window.scrollTo(0, 0);
     },
+    view() {
+      const d = C.doc(st.at); if (!d || seen(d.id)) return;
+      if (!left()) { toast("もう見られません。班の相談へ進もう"); return; }
+      st.seen.push(d.id); SND.play("paper"); save(); render(); window.scrollTo(0, 0);
+    },
+    mark() { const id = st.at; st.marks = marked(id) ? st.marks.filter((x) => x !== id) : st.marks.concat(id); SND.play("click"); save(); render(); },
     tag(el) { st.tags[st.at] = el.dataset.t; SND.play("click"); save(); render(); },
     "to-share"() {
-      if (left() && st.screen === "map") { confirmSheet("班の相談へ進みますか", `まだ <b>${left()}か所</b> 調べられます。あとからもどって調べることもできます。`, "班の相談へ", () => go("share")); return; }
+      if (left() && st.screen === "map") { confirmSheet("班の相談へ進みますか", `まだ <b>${left()}点</b> 見られます。あとからもどって見ることもできます。`, "班の相談へ", () => go("share")); return; }
       go("share");
     },
-    "be-leader"() { st.leader = true; go("answer"); talk([{ who: "mori", text: "班長、たのむぞ。みんなの話を聞いて、言い分ごとに<b>決め手の証拠</b>を1つずつ選ぼう。", v: "mori_leader" }]); },
+    "be-leader"() { st.leader = true; go("answer"); talk([{ who: "mori", text: "班長、たのむぞ。みんなの話を聞いて、言い分ごとに<b>決め手の資料</b>を1つずつ選ぼう。", v: "mori_leader" }]); },
     choose(el) { chooseSheet(el.dataset.c); },
     show() {
       if (!C.claims.every((c) => st.picks[c.id])) return;
