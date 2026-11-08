@@ -28,7 +28,8 @@
 | `js/assets.js` | 画像の一覧と顔の位置（`tools/make_assets.py` が自動で作る） |
 | `assets/` | 背景と人物の画像。元画像は `assets/src/` |
 | `js/audio.js` | 効果音とBGM（ファイルを使わず合成）。画面右上でいつでも消せる |
-| `js/vendor/` | qrcode.js（QR作成、MITライセンス） |
+| `js/vendor/` | qrcode.js（QR作成、MITライセンス）、three.min.js（3D表示 three.js r128、MITライセンス） |
+| `js/scene3d.js` | 場所ごとの3Dの机・棚・壁・金庫（角度ほぼ固定。左右になぞると少し見回せる） |
 
 サーバーは不要です。GitHub Pages でそのまま公開できます。進み具合は各スマホのブラウザーに保存されます（再読み込みしても「続きから」で戻れます）。
 

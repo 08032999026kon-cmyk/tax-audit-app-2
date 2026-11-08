@@ -18,7 +18,7 @@
   const claim = (id) => C.claims.find((c) => c.id === id);
 
   /* ---------- 状態 ---------- */
-  function fresh() { return { v: 5, screen: "title", seen: [], allowed: [], marks: [], tags: {}, at: null, leader: false, picks: {}, outcome: null, hints: {}, started: false }; }
+  function fresh() { return { v: 5, screen: "title", seen: [], allowed: [], marks: [], tags: {}, at: null, spotAt: null, leader: false, picks: {}, outcome: null, hints: {}, started: false }; }
   let st = load();
   function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 5) return s; } catch (e) {} return fresh(); }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
@@ -143,9 +143,11 @@
   let lastKey = null;
   function go(screen) { const t = document.getElementById("toast"); if (t) t.remove(); closeSheet(); st.screen = screen; save(); render(); window.scrollTo(0, 0); }
   function render() {
-    const f = { title: vTitle, brief: vBrief, map: vMap, place: vPlace, share: vShare, answer: vAnswer, result: vResult }[st.screen] || vTitle;
+    const f = { title: vTitle, brief: vBrief, map: vMap, spot: vSpot, place: vPlace, share: vShare, answer: vAnswer, result: vResult }[st.screen] || vTitle;
+    if (window.SCENE3D) SCENE3D.hide();
     app.innerHTML = f();
-    const key = st.screen + st.at + st.stage;
+    if (st.screen === "spot") mount3d();
+    const key = st.screen + st.at + st.spotAt + st.stage;
     const scr = app.querySelector(".screen,#title");
     if (scr && lastKey === key) scr.style.animation = "none";
     lastKey = key;
@@ -192,13 +194,54 @@
       <p class="mark-help"><span class="star on">★</span>＝当たりの印（見なくてもつけられます）。相談のメモにどうぞ。</p>
       ${C.areas.map((a) => `<div class="area">
         <div class="area-head" style="background-image:url('${bg(a.bg)}')"><span>${esc(a.name)}</span></div>
-        ${C.spots.filter((sp) => sp.area === a.id).map(spotBox).join("")}</div>`).join("")}
+        <div class="spots">${C.spots.filter((sp) => sp.area === a.id).map(spotCard).join("")}</div></div>`).join("")}
     </div></section>${cta(`<button class="btn ${n ? "btn-ghost" : "btn-main"}" data-act="to-share">${n ? "見終わったら：班の相談へ" : "班の相談へ進む"}</button>`)}`;
   }
-  function spotBox(sp) {
-    const ds = C.docs.filter((d) => d.spot === sp.id);
-    return `<div class="spotbox"><p class="sp-name">${sp.open ? ICON.lock : ""}${esc(sp.name)}<small>${ds.length}点${allowed(sp.id) ? "・承諾ずみ" : ""}</small></p>
-      <div class="tiles">${ds.map(tile).join("")}</div></div>`;
+  function spotCard(sp) {
+    const ds = C.docs.filter((d) => d.spot === sp.id), ns = ds.filter((d) => seen(d.id)).length, nm = ds.filter((d) => marked(d.id)).length;
+    return `<button class="spotcard ${ns ? "has" : ""}" data-act="spot" data-s="${sp.id}">
+      <span class="sc-name">${sp.open ? ICON.lock : ""}${esc(sp.name)}</span>
+      <span class="sc-sub">資料 ${ds.length}点${allowed(sp.id) ? "・承諾ずみ" : ""}${ns ? `・<b>${ns}点 見た</b>` : ""}${nm ? `・<i class="star on">★</i>${nm}` : ""}</span>
+      <span class="sc-go">›</span></button>`;
+  }
+  /* ---------- 場所（3Dの机や棚） ---------- */
+  const LAYOUT3D = { top: "desk", acct: "desk", drawer: "drawer", wall: "wall", rest: "wall", cabinet: "shelf", store: "shelf", safe: "safe", guest: "table" };
+  const KIND3D = { bank: "book", ledger: "book", receiptbook: "book", payroll: "book", invoices: "stack", blank: "stack", memo: "note", letter: "note", bizcard: "card",
+    news: ["paper", "news"], utility: "paper", deed: ["paper", "letter"], flyer: ["paper", "flyer"], magazine: ["paper", "news"], photo: "photo", board: "board", license: "frame",
+    calendar: "poster", safety: "poster", estimate: "binder", album: "binder", contracts: "binder", lastyear: "binder", car: "binder", delivery: "binder", tools: "binder", scrap: "binder",
+    nippou: "clip", attendance: "clip", bento: ["clip", "note"], safe: "envelope" };
+  function mount3d() {
+    const host = app.querySelector("#s3d-host"); if (!host || !window.SCENE3D || !SCENE3D.ok) return;
+    const sp = C.spot(st.spotAt); if (!sp) return;
+    const items = C.docs.filter((d) => d.spot === sp.id).map((d) => {
+      const k = [].concat(KIND3D[d.id] || "paper");
+      return { id: d.id, name: d.name, kind: k[0], style: k[1], seen: seen(d.id), marked: marked(d.id), lock: !seen(d.id) && !left() };
+    });
+    try { if (SCENE3D.show(host, LAYOUT3D[sp.id] || "desk", items, (id) => ACT.doc({ dataset: { d: id } }))) host.classList.add("on"); } catch (e) { console.warn(e); }
+  }
+  function vSpot() {
+    const sp = C.spot(st.spotAt); if (!sp) return vMap();
+    const a = C.areas.find((x) => x.id === sp.area), ds = C.docs.filter((d) => d.spot === sp.id);
+    const back = `<button class="back" data-act="to-map">← 場所えらびにもどる</button>`;
+    if (!allowed(sp.id)) {
+      return `<section class="screen"><div class="wrap">${back}
+        ${mission(esc(sp.name), `${esc(a.name)}・資料 ${ds.length}点`)}
+        <div class="scene" style="background-image:url('${bg(a.bg)}')"><div class="boss" style="${faceCss("boss_grin", 1.9)}"></div><p>「何か見たいものでも？」<small>白洲社長</small></p></div>
+        <div class="consent"><span class="tag">承諾をもらう</span>
+          <p>「${esc(sp.name)}」を見る前に、社長にこうお願いします。</p>
+          <blockquote>「${esc(sp.ask)}」</blockquote></div>
+        <p class="disclaim">${sp.open ? "<b>これはゲームです。</b>実際の税務調査では、調査官が自分で机や金庫を開けたり、お金に触れたりはしません。必ず相手の<b>明示の承諾</b>を得て、開けて見せてもらいます。" : "実際の税務調査でも、書類は相手の<b>明示の承諾</b>を得てから見せてもらいます。"}</p>
+      </div></section>${cta(`<button class="btn btn-main" data-act="ask">社長にお願いする<small>お願いするだけなら、見られる数は減りません</small></button>`)}`;
+    }
+    const n = left();
+    return `<section class="screen"><div class="wrap">${back}
+      ${mission(esc(sp.name), `気になる資料を<b>タップ</b>しよう。見られるのは あと <b>${n}</b> 点。`)}
+      <div id="s3d-host"></div>
+      <p class="s3d-hint">左右になぞると、少し見回せます</p>
+      <p class="grp">${esc(sp.name)}にある資料（${ds.length}点）</p>
+      <div class="tiles">${ds.map(tile).join("")}</div>
+      <p class="disclaim">${sp.open ? "<b>ゲームの表現です。</b>実際は社長の明示の承諾を得て、開けて見せてもらいます。" : "社長の承諾を得て見せてもらっています。"}</p>
+    </div></section>${cta(`<button class="btn btn-ghost" data-act="to-map">ほかの場所を見る</button>`)}`;
   }
   function tile(d) {
     const s = seen(d.id), lock = !s && !left(), tag = st.tags[d.id];
@@ -211,7 +254,7 @@
   function vPlace() {
     const d = C.doc(st.at); if (!d) return vMap();
     const sp = C.spot(d.spot), a = C.areas.find((x) => x.id === sp.area);
-    const back = `<button class="back" data-act="to-map">← 資料えらびにもどる</button>`;
+    const back = `<button class="back" data-act="to-spot">← ${esc(sp.name)}にもどる</button>`;
     const star = `<button class="btn btn-ghost star-btn ${marked(d.id) ? "on" : ""}" data-act="mark">${marked(d.id) ? "★ 当たりの印をはずす" : "☆ 当たりの印をつける"}</button>`;
     if (!allowed(sp.id)) {
       return `<section class="screen"><div class="wrap">${back}
@@ -241,7 +284,7 @@
       <div class="pickc">${C.claims.map((c) => `<button data-act="tag" data-t="${c.id}" aria-pressed="${tag === c.id}"><span class="cid">${c.id}</span><span>${esc(c.short)}</span></button>`).join("")}
         <button data-act="tag" data-t="none" aria-pressed="${tag === "none"}" class="none"><span class="cid">－</span><span>くずせなさそう</span></button></div>
       <p class="after">あなたの考えでかまいません。あとで班に伝えるときのメモになります。</p>
-    </div></section>${cta(`<button class="btn ${tag ? "btn-main" : "btn-ghost"}" data-act="to-map">資料えらびにもどる</button>`)}`;
+    </div></section>${cta(`<button class="btn ${tag ? "btn-main" : "btn-ghost"}" data-act="to-spot">${esc(sp.name)}にもどる</button>`)}`;
   }
 
   /* ---------- 班で相談 ---------- */
@@ -372,9 +415,11 @@
       go("map");
       if (first) { SND.play("door"); await talk([{ who: "boss", text: "税務署の方？ うちは赤字ですよ。どうぞ、何でも見てください。", face: "boss_grin", v: "boss_hello" }]); }
     },
-    doc(el) { st.at = el.dataset.d; SND.play("tap"); go("place"); },
+    doc(el) { const d = C.doc(el.dataset.d); if (!d) return; st.at = d.id; st.spotAt = d.spot; SND.play("tap"); go("place"); },
+    spot(el) { st.spotAt = el.dataset.s; SND.play("tap"); go("spot"); },
+    "to-spot"() { const d = C.doc(st.at); if (d) st.spotAt = d.spot; go(st.spotAt ? "spot" : "map"); },
     async ask() {
-      const d = C.doc(st.at); if (!d) return; const sp = C.spot(d.spot); if (allowed(sp.id)) return;
+      const sp = st.screen === "spot" ? C.spot(st.spotAt) : C.spot((C.doc(st.at) || {}).spot); if (!sp || allowed(sp.id)) return;
       await talk([{ who: "you", text: sp.ask }, { who: "boss", text: sp.ok, face: sp.open ? "boss_shock" : "boss_grin", sfx: sp.open ? "unlock" : "open", v: `boss_ok_${sp.id}` }]);
       st.allowed.push(sp.id); save(); render(); window.scrollTo(0, 0);
     },

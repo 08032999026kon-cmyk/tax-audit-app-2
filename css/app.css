@@ -434,3 +434,28 @@ h2.q{font-size:17px;margin:22px 0 10px}
 .biz span{font-size:13px}
 .bags{display:flex;gap:8px;justify-content:center}
 .bags span{display:grid;place-items:center;text-align:center;width:88px;height:110px;border-radius:10px 10px 6px 6px;background:#b08a5a;color:#fff7e6;font-family:var(--f-ui);font-size:12px;font-weight:700;line-height:1.4;box-shadow:inset 0 -10px 0 rgba(0,0,0,.12)}
+
+/* ===== v7：場所のカードと3Dの机・棚 ===== */
+.spots{display:grid;gap:8px;margin:8px 0 18px}
+.spotcard{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 10px;width:100%;text-align:left;padding:14px 14px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);font:inherit;cursor:pointer;min-height:64px}
+.spotcard.has{border-color:rgba(241,235,223,.35)}
+.spotcard .sc-name{font-weight:700;font-size:16px;display:flex;align-items:center;gap:6px}
+.spotcard .sc-name svg{width:16px;height:16px}
+.spotcard .sc-sub{grid-column:1;font-size:13px;color:var(--dim)}
+.spotcard .sc-sub b{color:var(--ink);font-weight:600}
+.spotcard .sc-go{grid-row:1/3;grid-column:2;font-size:26px;color:var(--dim)}
+#s3d-host{margin:4px calc(-1 * var(--gx)) 6px}
+#s3d-host:empty{display:none}
+.s3d{position:relative;width:100%;overflow:hidden;background:#1c1a17}
+.s3d canvas{display:block;width:100%!important;height:100%!important}
+.s3d-labels{position:absolute;inset:0;pointer-events:none}
+.s3d-label{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;display:inline-flex;align-items:center;gap:3px;max-width:min(46%,10em);padding:5px 9px;border-radius:14px;text-align:center;border:0;background:rgba(20,18,15,.82);color:#f7f2e6;font:600 12.5px/1.25 var(--f-ui);box-shadow:0 2px 8px rgba(0,0,0,.45);cursor:pointer}
+.s3d-label span{overflow:hidden;text-overflow:ellipsis}
+.s3d-label i{font-style:normal;color:#7fd39a}
+.s3d-label em{font-style:normal;color:#f2c14e}
+.s3d-label.seen{background:rgba(35,70,48,.9)}
+.s3d-label.lock{opacity:.55}
+#s3d-host.on + .grp{margin-top:14px}
+.s3d{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.s3d-hint{margin:6px 0 0;font-size:12px;color:var(--dim);text-align:center}
+#s3d-host:not(.on) + .s3d-hint{display:none}
