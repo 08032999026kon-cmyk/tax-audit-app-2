@@ -388,3 +388,11 @@ svg [data-hit]{fill:var(--red)}
 #toast{position:fixed;left:50%;top:calc(var(--top) + 76px);transform:translateX(-50%);z-index:70;padding:12px 18px;border-radius:999px;background:var(--amber);color:var(--amber-ink);font-size:14px;font-weight:700;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:toastIn 2.6s ease forwards}
 @keyframes toastIn{0%{opacity:0;transform:translate(-50%,-8px)}10%,85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* 登場人物 */
+.cast{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
+.cast>div{display:flex;gap:10px;align-items:center;padding:10px;border-radius:14px;background:var(--desk-2);border:1px solid var(--line)}
+.cast .pic{flex:none;width:46px;height:52px;border-radius:10px;background-color:#2a1b17;background-repeat:no-repeat}
+.cast .pic.team{display:grid;place-items:center;background:var(--amber);color:var(--amber-ink);font-weight:700;font-size:20px}
+.cast p{margin:0;font-size:14px;line-height:1.35}
+.cast small{display:block;font-size:11.5px;color:var(--dim);margin-top:2px}

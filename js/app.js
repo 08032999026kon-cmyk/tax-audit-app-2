@@ -1,6 +1,6 @@
 /* 臨場 v3 ― 1画面に1つのことだけ。STEP 1〜5 で進む。
  *  STEP1 資料を読む → STEP2 相談タイム（伝え合う・当たりをつける）→ STEP3 お店で調べる
- *  → STEP4 社長に説明する（代表は1問ずつ／ほかの人は代表に読み上げる）→ STEP5 ふりかえり
+ *  → STEP4 社長に説明する（班長は1問ずつ／ほかの人は班長に読み上げる）→ STEP5 ふりかえり
  * 通信はしない。各自のスマホで遊び、見つけたことは口で伝え合う。
  * 保存は localStorage（"rinjo:v3"）。URL の末尾に #debug で window.__rinjo が使える。
  */
@@ -205,7 +205,7 @@
 
   /* ---------- 担当えらび ---------- */
   const ROLE_JOB = {
-    lead: "最後に、仲間が見つけた証拠を<b>社長に示す</b>。",
+    lead: "調査官のまとめ役。最後に、仲間の証拠を<b>白洲社長に示す</b>。",
     sales: "レジや予約の記録など、<b>売上</b>を調べる。",
     cash: "通帳や金庫など、<b>お金の流れ</b>を調べる。",
     buy: "帳簿や在庫など、<b>仕入れ</b>を調べる。"
@@ -218,7 +218,7 @@
         <span class="mk">${R.mark}</span><strong>${R.name}</strong><span>${ROLE_JOB[r]}</span></button>`; }).join("")}</div>
       <div class="split-help">
         <p><b>人数が4人でないとき</b></p>
-        <ul><li>2〜3人：1人で2つ選ぶ（例：代表＋売上）</li><li>5〜6人：同じ担当を2人で選ぶ</li><li><b>代表は班に1人だけ</b></li></ul>
+        <ul><li>2〜3人：1人で2つ選ぶ（例：班長＋売上）</li><li>5〜6人：同じ担当を2人で選ぶ</li><li><b>班長は班に1人だけ</b></li></ul>
       </div>
     </div></section>
     ${cta(`<button class="btn btn-main" data-act="roles-ok" ${st.roles.length ? "" : "disabled"}>${st.roles.length ? myRoles().map((r) => C.roles[r].name).join("＋") + " で始める" : "担当をタップしてください"}</button>`)}`;
@@ -228,11 +228,15 @@
   function vIntro() {
     return `<section class="screen"><div class="wrap">
       ${mission("この順番で進みます", "全部で約25分。各STEPで、画面のいちばん上に「やること」が出ます。")}
+      <div class="cast">
+        <div><span class="pic" style="${faceCss("boss_grin", 1.9)}"></span><p><b>白洲社長</b><small>調べる相手。喫茶店「浜風珈琲」の社長</small></p></div>
+        <div><span class="pic team">班</span><p><b>班長</b><small>あなたたち調査官のまとめ役（班に1人）</small></p></div>
+      </div>
       <ol class="flow">
         <li><span class="n">1</span><div><b>資料を読む</b><p>自分の担当の資料から、気になる点を見つける。</p></div></li>
         <li class="talk"><span class="n">2</span><div><b>相談タイム</b><p>見つけたことを班で読み上げ、どこを調べるか決める。</p></div></li>
         <li><span class="n">3</span><div><b>お店で調べる</b><p>社長に質問し、<b>承諾をもらって</b>書類などを見せてもらう。</p></div></li>
-        <li class="talk"><span class="n">4</span><div><b>社長に説明する</b><p>見つけたことを代表に伝え、代表が証拠を社長に示す。</p></div></li>
+        <li class="talk"><span class="n">4</span><div><b>社長に説明する</b><p>見つけたことを班長に伝え、班長が証拠を社長に示す。</p></div></li>
         <li><span class="n">5</span><div><b>ふりかえり</b><p>本当は何があったのかを確かめる。</p></div></li>
       </ol>
       <details class="words"><summary>ことばの説明</summary>
@@ -257,7 +261,7 @@
       const cards = myRoles().flatMap((r) => goodHits(r).map((h) => ({ color: roleColor(r), kind: C.roles[r].name + "の資料", text: strip(C.prep[r].hits[h].text) })));
       return `<section class="screen"><div class="wrap">
         <div class="talk-badge">${ICON.talk}相談タイム</div>
-        ${mission("見つけたことを、順番に読み上げよう", "代表から順に、下のカードを声に出して読みます。")}
+        ${mission("見つけたことを、順番に読み上げよう", "班長から順に、下のカードを声に出して読みます。")}
         ${order()}
         ${tellCards(cards, "")}
         <p class="after">全員が読み終えたら、班で「どこがあやしい？」と話してから次へ。</p>
@@ -351,7 +355,7 @@
     return out;
   }
   function notes() {
-    sheet(`<h2>班に伝えること</h2><p class="lede" style="margin-bottom:10px">STEP 4で、この順に代表へ読み上げます。</p>${tellCards(myTells(), "まだありません。")}
+    sheet(`<h2>班に伝えること</h2><p class="lede" style="margin-bottom:10px">STEP 4で、この順に班長へ読み上げます。</p>${tellCards(myTells(), "まだありません。")}
       <div class="acts"><button class="btn btn-ghost" data-x="close">閉じる</button></div>`, (d) => { d.querySelector('[data-x="close"]').onclick = closeSheet; });
   }
 
@@ -362,12 +366,12 @@
     if (!isLead()) {
       return `<section class="screen"><div class="wrap">
         <div class="talk-badge">${ICON.talk}相談タイム</div>
-        ${mission("見つけたことを、代表に読み上げよう", "この順番で1人ずつ。代表に聞かれたら、もう一度読もう。")}
+        ${mission("見つけたことを、班長に読み上げよう", "この順番で1人ずつ。班長に聞かれたら、もう一度読もう。")}
         ${order()}
         ${tellCards(myTells(), "")}
-        <p class="after">読み終えたら、代表と一緒に「社長のどの発言と食い違う？」を考えよう。</p>
+        <p class="after">読み終えたら、班長と一緒に「社長のどの発言と食い違う？」を考えよう。</p>
       </div></section>
-      ${cta(`<button class="btn btn-ghost" data-act="to-result">STEP 5 ふりかえりへ<small>代表が説明を終えてから</small></button>`)}`;
+      ${cta(`<button class="btn btn-ghost" data-act="to-result">STEP 5 ふりかえりへ<small>班長が説明を終えてから</small></button>`)}`;
     }
     const b = curBoard();
     if (!b) return `<section class="screen"><div class="wrap">${mission("すべての発言を崩した！")}</div></section>`;
@@ -379,7 +383,7 @@
     const grid = ORDER.map((r) => `<div class="evg"><p style="color:${roleColor(r)}">${C.roles[r].name}</p><div>${[C.prep[r].code].concat(TASKS[r].filter((t) => t.startsWith("p:")).map((t) => t.slice(2))).map((c) => `<button class="ev ${pk.includes(c) ? "on" : ""}" style="--c:${roleColor(r)}" data-act="pick" data-c="${c}">${esc(evName(c))}</button>`).join("")}</div></div>`).join("");
     return `<section class="screen"><div class="wrap">
       <div class="q-head"><span>発言 ${done + 1} / ${total}</span>${unsolved().length > 1 ? `<button class="back" data-act="skip">あとにする ›</button>` : ""}</div>
-      <div class="quote"><div class="boss" style="${faceCss("boss_smug", 1.9)}"></div><div><small>社長はこう言った</small><p>「${esc(S.text)}」</p></div></div>
+      <div class="quote"><div class="boss" style="${faceCss("boss_smug", 1.9)}"></div><div><small>白洲社長はこう言った</small><p>「${esc(S.text)}」</p></div></div>
       ${mission("この発言と食い違う証拠を、2つ選ぼう", "<b>違う担当</b>の証拠を1つずつ。仲間の読み上げを思い出そう。")}
       <div class="slots2">${slot(0)}<span>＋</span>${slot(1)}</div>
       <div class="evgrid">${grid}</div>
@@ -403,7 +407,7 @@
     const S = C.statements[b.id];
     const fo = document.createElement("div"); fo.id = "face-off";
     fo.innerHTML = `<div class="speed"></div><img src="${ch("boss_smug")}" alt="白洲社長">
-      <div class="thrust"><small>代表が示した証拠</small><div>${codeTag(pk[0])}${esc(evName(pk[0]))}</div><div>${codeTag(pk[1])}${esc(evName(pk[1]))}</div></div>`;
+      <div class="thrust"><small>班長が示した証拠</small><div>${codeTag(pk[0])}${esc(evName(pk[0]))}</div><div>${codeTag(pk[1])}${esc(evName(pk[1]))}</div></div>`;
     document.body.appendChild(fo); SND.play("slam");
     await wait(1000);
     const img = fo.querySelector("img");
@@ -465,7 +469,7 @@
     if (st.screen === "a1") {
       const stg = st.a1.stage || "read";
       if (stg === "read") return say(`資料の<b>オレンジに光っている所</b>をタップしよう。${myRoles().length > 1 ? "全部見つけたら、上のボタンでほかの担当の資料に切り替えて。" : ""}`);
-      if (stg === "share") return say("代表から順番に、カードの文を<b>そのまま読み上げれば</b>いい。全員読み終えたら下のボタンだ。");
+      if (stg === "share") return say("班長から順番に、カードの文を<b>そのまま読み上げれば</b>いい。全員読み終えたら下のボタンだ。");
       return say("読み上げで出た「<b>夜の売上が0円</b>」「<b>現金払いの新しい仕入れ先</b>」が気になるな。それに合う仮説を選ぼう。");
     }
     if (st.screen === "a2") {
@@ -474,7 +478,7 @@
       return say(`次は、<b>光っている行</b>（${nx.startsWith("q:") ? "社長への質問" : esc(pOf(nx.slice(2)).name)}）をタップしよう。手がかりが出たら、すぐ班に読み上げて。`);
     }
     if (st.screen === "a3") {
-      if (!isLead()) return say("カードの文を、代表に読み上げよう。代表が迷っていたら、「この証拠は社長の○○という発言と食い違う」と一緒に考えて。");
+      if (!isLead()) return say("カードの文を、班長に読み上げよう。班長が迷っていたら、「この証拠は社長の○○という発言と食い違う」と一緒に考えて。");
       const b = curBoard(); if (!b) return;
       const lv = (st.a3.hints[b.id] = Math.min(2, (st.a3.hints[b.id] || 0) + 1)); save();
       const rolesOf = (g) => [...new Set(g.map((c) => C.roles[C.codes[c].role].name))].join("か");
@@ -493,7 +497,7 @@
     "roles-ok"() {
       if (!st.roles.length) return;
       const go2 = () => { st.cur = myRoles()[0]; go("intro"); talk([{ who: "mori", text: "指導役の森だ。今日の相手は喫茶店「<b>浜風珈琲</b>」。申告は赤字だが、数字に引っかかるところがある。" }, { who: "mori", text: "迷ったら、いつでも上の<b>「ヒント」</b>を押してくれ。" }]); };
-      if (!isLead()) confirmSheet("代表はいますか", "班の中に<b>代表が1人</b>必要です。ほかの人が代表を選んでいれば、このまま進めてください。", "このまま進む", go2);
+      if (!isLead()) confirmSheet("班長はいますか", "班の中に<b>班長が1人</b>必要です。ほかの人が班長を選んでいれば、このまま進めてください。", "このまま進む", go2);
       else go2();
     },
     "to-a1"() { st.a1.stage = "read"; go("a1"); },
@@ -517,7 +521,7 @@
     "end-a2"() {
       confirmSheet("署にもどりますか", "<b>班の全員</b>が調べ終わってから進みましょう。", "署にもどる", async () => {
         st.a3.idx = 0; go("a3"); SND.play("car");
-        await talk([{ who: "mori", text: isLead() ? "署にもどった。社長に証拠を示せるのは<b>代表のあなただけ</b>だ。まず仲間の読み上げを聞こう。" : "署にもどった。見つけたことを、<b>代表に読み上げて</b>くれ。" }]);
+        await talk([{ who: "mori", text: isLead() ? "署にもどった。社長に証拠を示せるのは<b>班長のあなただけ</b>だ。まず仲間の読み上げを聞こう。" : "署にもどった。見つけたことを、<b>班長に読み上げて</b>くれ。" }]);
       });
     },
     pick(el) {
@@ -530,7 +534,7 @@
     unpick(el) { const b = curBoard(); if (!b) return; const pk = st.a3.picks[b.id] || []; pk[+el.dataset.i] = null; save(); render(); },
     skip() { st.a3.idx++; save(); render(); window.scrollTo(0, 0); },
     thrust() { thrust(); },
-    "to-result"() { confirmSheet("ふりかえりへ進みますか", "答えが出ます。<b>代表が説明を終えてから</b>進んでください。", "ふりかえりへ", () => go("result")); },
+    "to-result"() { confirmSheet("ふりかえりへ進みますか", "答えが出ます。<b>班長が説明を終えてから</b>進んでください。", "ふりかえりへ", () => go("result")); },
     reset() { confirmSheet("最初からやり直しますか", "この端末の進み具合が消えます。", "やり直す", () => { st = fresh(); save(); go("title"); }); }
   };
 

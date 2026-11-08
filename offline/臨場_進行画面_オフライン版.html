@@ -92,12 +92,12 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   <p class="kicker">ROLE</p>
   <h2>班で担当を分けよう</h2>
   <div class="grid2">
-    <div class="card"><span class="tag" style="background:#f2a53a">代表　班に1人</span><p class="lead">決算書を読み、最後に<b>社長へ証拠を示す</b></p></div>
+    <div class="card"><span class="tag" style="background:#f2a53a">班長　班に1人</span><p class="lead">決算書を読み、最後に<b>社長へ証拠を示す</b></p></div>
     <div class="card"><span class="tag" style="background:#e2553f;color:#fff">売上担当</span><p class="lead">レジや予約の記録を調べる</p></div>
     <div class="card"><span class="tag" style="background:#4fb3a9">現金担当</span><p class="lead">通帳や金庫を調べる</p></div>
     <div class="card"><span class="tag" style="background:#8f8cf0">仕入れ担当</span><p class="lead">仕入れの帳簿や在庫を調べる</p></div>
   </div>
-  <p class="note">2〜3人の班：1人で2つ持つ（例：代表＋売上）。5〜6人の班：同じ担当を2人で持つ。担当ごとに見られる資料が違うので、<b style="color:var(--amber)">声に出して伝え合う</b>のがカギです。</p>
+  <p class="note">2〜3人の班：1人で2つ持つ（例：班長＋売上）。5〜6人の班：同じ担当を2人で持つ。担当ごとに見られる資料が違うので、<b style="color:var(--amber)">声に出して伝え合う</b>のがカギです。</p>
   <p class="note">これはゲームです。実際の税務調査では、書類を見せてもらう・机や金庫を開けてもらうときは、必ず相手の明示の承諾を得ます。</p>
 </section>
 
@@ -120,7 +120,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   <ol class="steps">
     <li><b>STEP 1・2　資料を読む → 相談タイム（約6分）</b>：光っている所をタップ → 班で読み上げ、仮説を選ぶ</li>
     <li><b>STEP 3　お店で調べる（約10分）</b>：社長に質問し、<b>承諾をもらって</b>書類を見せてもらう。見つけたらすぐ班に伝える</li>
-    <li class="must"><b>STEP 4　社長に説明する（約8分）</b>：みんなが代表に読み上げ、代表が<b>違う担当の証拠2つ</b>を社長にぶつける</li>
+    <li class="must"><b>STEP 4　社長に説明する（約8分）</b>：みんなが班長に読み上げ、班長が<b>違う担当の証拠2つ</b>を社長にぶつける</li>
   </ol>
 </section>
 
@@ -2480,14 +2480,14 @@ var qrcode = function() {
 /* 事件データ（すべて架空）　喫茶店「浜風珈琲」（株式会社浜風珈琲・社長 白洲 守）
  * 答え：①土曜夜の貸切パーティーの売上をレジに通さず金庫に隠した（売上除外 153万円＝18回）
  *       ②山海物産の白紙の領収書で、豆の仕入れ30万円×6回をでっち上げた（架空経費 180万円）
- * 担当（代表・売上・現金・仕入れ）ごとに見られる物が違う。証拠には「番号」があり、口で伝え合う。
+ * 担当（班長・売上・現金・仕入れ）ごとに見られる物が違う。証拠には「番号」があり、口で伝え合う。
  */
 window.CASE = (function () {
   const yen = (n) => n.toLocaleString("ja-JP");
 
   /* ---------- 担当 ---------- */
   const roles = {
-    lead: { name: "代表", sub: "調査の責任者", color: "#f2a53a", mark: "代",
+    lead: { name: "班長", sub: "調査の責任者", color: "#f2a53a", mark: "班",
       desc: "決算書の全体を見て、最後に社長へ説明する。仲間から証拠の番号を聞き取って組み立てる。" },
     sales: { name: "売上担当", sub: "売上を調べる", color: "#e2553f", mark: "売",
       desc: "レジや予約の記録を調べる。売上について社長に質問できる。" },
@@ -2591,7 +2591,7 @@ window.CASE = (function () {
   };
 
   const statements = {
-    // num は「発言の番号」。聞いた人が代表に口で伝え、代表が入力すると検討の板に出る
+    // num は「発言の番号」。聞いた人が班長に口で伝え、班長が入力すると検討の板に出る
     S1: { text: "夜は閉めています。", by: "sales", num: "31" },
     S2: { text: "毎日、全部銀行に入れています。", by: "cash", num: "58" },
     S3: { text: "現金で払って、その場で領収書をもらっています。", by: "buy", num: "74" },
@@ -2677,7 +2677,7 @@ window.CASE = (function () {
       miss: "豆の値段なんて、いろいろですからね。" }
   ];
 
-  // 番号 → 名前（第3幕で代表が入力したときに表示する）
+  // 番号 → 名前（第3幕で班長が入力したときに表示する）
   const codes = {};
   Object.keys(prep).forEach((r) => { codes[prep[r].code] = { name: prep[r].title, role: r }; });
   Object.keys(places).forEach((r) => places[r].forEach((p) => { codes[p.code] = { name: p.name, role: r }; }));

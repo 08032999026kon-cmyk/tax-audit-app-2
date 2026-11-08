@@ -1,14 +1,14 @@
 /* 事件データ（すべて架空）　喫茶店「浜風珈琲」（株式会社浜風珈琲・社長 白洲 守）
  * 答え：①土曜夜の貸切パーティーの売上をレジに通さず金庫に隠した（売上除外 153万円＝18回）
  *       ②山海物産の白紙の領収書で、豆の仕入れ30万円×6回をでっち上げた（架空経費 180万円）
- * 担当（代表・売上・現金・仕入れ）ごとに見られる物が違う。証拠には「番号」があり、口で伝え合う。
+ * 担当（班長・売上・現金・仕入れ）ごとに見られる物が違う。証拠には「番号」があり、口で伝え合う。
  */
 window.CASE = (function () {
   const yen = (n) => n.toLocaleString("ja-JP");
 
   /* ---------- 担当 ---------- */
   const roles = {
-    lead: { name: "代表", sub: "調査の責任者", color: "#f2a53a", mark: "代",
+    lead: { name: "班長", sub: "調査の責任者", color: "#f2a53a", mark: "班",
       desc: "決算書の全体を見て、最後に社長へ説明する。仲間から証拠の番号を聞き取って組み立てる。" },
     sales: { name: "売上担当", sub: "売上を調べる", color: "#e2553f", mark: "売",
       desc: "レジや予約の記録を調べる。売上について社長に質問できる。" },
@@ -112,7 +112,7 @@ window.CASE = (function () {
   };
 
   const statements = {
-    // num は「発言の番号」。聞いた人が代表に口で伝え、代表が入力すると検討の板に出る
+    // num は「発言の番号」。聞いた人が班長に口で伝え、班長が入力すると検討の板に出る
     S1: { text: "夜は閉めています。", by: "sales", num: "31" },
     S2: { text: "毎日、全部銀行に入れています。", by: "cash", num: "58" },
     S3: { text: "現金で払って、その場で領収書をもらっています。", by: "buy", num: "74" },
@@ -198,7 +198,7 @@ window.CASE = (function () {
       miss: "豆の値段なんて、いろいろですからね。" }
   ];
 
-  // 番号 → 名前（第3幕で代表が入力したときに表示する）
+  // 番号 → 名前（第3幕で班長が入力したときに表示する）
   const codes = {};
   Object.keys(prep).forEach((r) => { codes[prep[r].code] = { name: prep[r].title, role: r }; });
   Object.keys(places).forEach((r) => places[r].forEach((p) => { codes[p.code] = { name: p.name, role: r }; }));
