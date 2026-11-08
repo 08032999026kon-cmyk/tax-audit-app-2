@@ -31,6 +31,8 @@ def background(name):
         im = im.resize((tw, round(h * tw / w)), Image.LANCZOS)
         if tw > w * 1.4:
             im = im.filter(ImageFilter.UnsharpMask(radius=1.6, percent=70, threshold=2))
+    if name == "bg_ext":
+        im = repaint_signs(im)
     out = os.path.join(OUT, name + ".jpg")
     im.save(out, quality=84, optimize=True, progressive=True)
     return {"src": "assets/" + name + ".jpg", "w": im.size[0], "h": im.size[1]}
@@ -95,6 +97,56 @@ def character(name):
     fn = name + ".webp"
     out.save(os.path.join(OUT, fn), quality=88, method=6)
     return {"src": "assets/" + fn, "w": w, "h": h, "face": [round(cx / w, 4), round(cy / h, 4), round(size / w, 4)]}
+
+
+FONT = "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf"
+
+
+def _font(size):
+    from PIL import ImageFont
+    for f in (FONT, "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf", "/usr/share/fonts/truetype/ipafont-gothic/ipag.ttf"):
+        if os.path.exists(f):
+            return ImageFont.truetype(f, size)
+    raise SystemExit("日本語フォントが見つかりません（IPAゴシックを入れてください）")
+
+
+def repaint_signs(im):
+    """外観の絵の看板「カフェ臨場」「臨場 COFFEE」を「浜風珈琲」に描き直す。
+    位置は今の bg_ext（Gemini 版）に合わせた割合。外観の絵を替えたら調整すること。"""
+    from PIL import ImageDraw
+    W, H = im.size
+    rng = np.random.default_rng(3)
+
+    def board(box, fill, edge, text, color, size, sub=None):
+        x0, y0, x1, y1 = [round(v * (W if i % 2 == 0 else H)) for i, v in enumerate(box)]
+        bw, bh = x1 - x0, y1 - y0
+        tile = Image.new("RGB", (bw, bh), fill)
+        a = np.asarray(tile).astype(float)
+        a += rng.normal(0, 5, (bh, 1, 1)) + rng.normal(0, 3, (bh, bw, 1))  # 木目っぽいむら
+        yy = np.linspace(-1, 1, bh)[:, None, None]
+        a *= 1 - 0.18 * yy ** 2  # 上下を少し暗く
+        tile = Image.fromarray(np.clip(a, 0, 255).astype("uint8"))
+        d = ImageDraw.Draw(tile)
+        d.rectangle([0, 0, bw - 1, bh - 1], outline=edge, width=max(2, bw // 90))
+        f = _font(size)
+        tw = d.textlength(text, font=f)
+        ty = (bh - size) / 2 - (size * 0.18 if sub else 0) - size * 0.08
+        d.text(((bw - tw) / 2 + 1, ty + 2), text, font=f, fill=tuple(max(0, c - 120) for c in fill))
+        d.text(((bw - tw) / 2, ty), text, font=f, fill=color)
+        if sub:
+            fs = _font(max(8, size // 3))
+            sw = d.textlength(sub, font=fs)
+            d.text(((bw - sw) / 2, ty + size * 1.12), sub, font=fs, fill=color)
+        mask = Image.new("L", (bw, bh), 0)
+        ImageDraw.Draw(mask).rectangle([2, 2, bw - 3, bh - 3], fill=255)
+        mask = mask.filter(ImageFilter.GaussianBlur(1.2))
+        im.paste(tile, (x0, y0), mask)
+
+    # 正面の木の看板
+    board((0.512, 0.112, 0.690, 0.252), (104, 64, 30), (52, 30, 12), "浜風珈琲", (236, 214, 170), round(W * 0.034))
+    # 左の袖看板（白い箱）
+    board((0.373, 0.142, 0.430, 0.257), (226, 218, 196), (120, 110, 90), "浜風", (52, 36, 22), round(W * 0.019), "COFFEE")
+    return im
 
 
 def main():
