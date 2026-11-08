@@ -261,7 +261,7 @@
     const torso = new T.Group(); torso.position.y = 0.8; g.add(torso);
     const belly = sph(0.37, suit, 0, 0.3, 0.05, torso, 28, 20); belly.scale.set(1.02, 1.0, 0.95);
     const body = cyl(0.3, 0.36, 0.5, suit, 0, 0.56, 0, torso, 24);
-    [-1, 1].forEach(sd => { sph(0.14, suit, sd * 0.33, 0.7, 0, torso, 14, 10); const l = box(0.13, 0.44, 0.03, lapelM, sd * 0.13, 0.58, 0.345, torso); l.rotation.z = sd * 0.35; l.rotation.x = -0.15; });
+    [-1, 1].forEach(sd => { sph(0.14, suit, sd * 0.33, 0.7, 0, torso, 14, 10); });
     box(0.15, 0.36, 0.02, black, 0, 0.6, 0.33, torso).rotation.x = -0.12;
     box(0.06, 0.32, 0.02, gold, 0, 0.56, 0.345, torso).rotation.x = -0.15;
     [0.36, 0.2].forEach(y => [-1, 1].forEach(sd => sph(0.022, gold, sd * 0.1, y, 0.38, torso, 8, 6)));
