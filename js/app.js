@@ -350,6 +350,7 @@
     return `<div class="slot ${won ? "won" : ""}">${won ? `<span class="won-tag">崩した！</span>` : ""}
       ${numTag(S.num, S.by)}<p class="st">社長「${esc(S.text)}」</p>
       <div class="pair">${pick(0)}<span class="plus">＋</span>${pick(1)}</div>
+      ${won ? "" : `<p class="muted" style="font-size:12px;margin:6px 0 0">違う担当の証拠を1つずつ選ぶ</p>`}
       ${won ? "" : `<button class="btn btn-red go" data-act="thrust" data-s="${b.id}" ${pk[0] && pk[1] ? "" : "disabled"}>社長にぶつける</button>`}</div>`;
   }
   // 証拠を一覧から選ぶ（担当ごとにまとめて表示）
@@ -369,7 +370,11 @@
   async function thrust(sid) {
     const b = C.board.find((x) => x.id === sid), pk = st.a3.picks[sid] || [];
     if (!pk[0] || !pk[1]) return;
-    if (C.codes[pk[0]].role === C.codes[pk[1]].role) { toast("違う担当の証拠を組み合わせよう"); SND.play("wrong"); return; }
+    if (C.codes[pk[0]].role === C.codes[pk[1]].role) {
+      SND.play("wrong");
+      await talk([{ who: "mori", text: `待って。2つとも<b>${C.roles[C.codes[pk[0]].role].name}</b>の証拠だ。社長を認めさせるには、<b>違う担当の証拠</b>を1つずつ組み合わせよう。ほかの担当の人に「何を見つけた？」と聞いてみて。` }]);
+      return;
+    }
     const okA = (c) => b.need[0].includes(c), okB = (c) => b.need[1].includes(c);
     const win = (okA(pk[0]) && okB(pk[1])) || (okA(pk[1]) && okB(pk[0]));
     const half = !win && pk.some((c) => okA(c) || okB(c));
