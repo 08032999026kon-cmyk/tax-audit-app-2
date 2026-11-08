@@ -235,11 +235,12 @@
     }
     const n = left();
     return `<section class="screen"><div class="wrap">${back}
-      ${mission(esc(sp.name), `気になる資料を<b>タップ</b>しよう。見られるのは あと <b>${n}</b> 点。`)}
+      ${mission(esc(sp.name), `気になる資料を<b>タップ</b>すると、すぐ開きます。見られるのは あと <b>${n}</b> 点。`)}
       <div id="s3d-host"></div>
       <p class="s3d-hint">左右になぞると、少し見回せます</p>
       <p class="grp">${esc(sp.name)}にある資料（${ds.length}点）</p>
-      <div class="tiles">${ds.map(tile).join("")}</div>
+      <div class="tiles">${ds.map((d) => `<div class="tilew">${tile(d)}${seen(d.id) ? "" : `<button class="tstar ${marked(d.id) ? "on" : ""}" data-act="mark" data-d="${d.id}" aria-label="当たりの印">${marked(d.id) ? "★" : "☆"}</button>`}</div>`).join("")}</div>
+      <p class="tap-note">資料をタップすると、すぐに開きます（見られる数が1つ減ります）。☆で当たりの印だけつけることもできます。</p>
       <p class="disclaim">${sp.open ? "<b>ゲームの表現です。</b>実際は社長の明示の承諾を得て、開けて見せてもらいます。" : "社長の承諾を得て見せてもらっています。"}</p>
     </div></section>${cta(`<button class="btn btn-ghost" data-act="to-map">ほかの場所を見る</button>`)}`;
   }
@@ -415,7 +416,15 @@
       go("map");
       if (first) { SND.play("door"); await talk([{ who: "boss", text: "税務署の方？ うちは赤字ですよ。どうぞ、何でも見てください。", face: "boss_grin", v: "boss_hello" }]); }
     },
-    doc(el) { const d = C.doc(el.dataset.d); if (!d) return; st.at = d.id; st.spotAt = d.spot; SND.play("tap"); go("place"); },
+    doc(el) {
+      const d = C.doc(el.dataset.d); if (!d) return;
+      // 承諾ずみの場所なら、確認を挟まずにそのまま開く（見られる数が1つ減る）
+      if (allowed(d.spot) && !seen(d.id)) {
+        if (!left()) { toast("もう見られません。班の相談へ進もう"); return; }
+        st.seen.push(d.id); SND.play("paper");
+      } else SND.play("tap");
+      st.at = d.id; st.spotAt = d.spot; go("place");
+    },
     spot(el) { st.spotAt = el.dataset.s; SND.play("tap"); go("spot"); },
     "to-spot"() { const d = C.doc(st.at); if (d) st.spotAt = d.spot; go(st.spotAt ? "spot" : "map"); },
     async ask() {
@@ -428,7 +437,7 @@
       if (!left()) { toast("もう見られません。班の相談へ進もう"); return; }
       st.seen.push(d.id); SND.play("paper"); save(); render(); window.scrollTo(0, 0);
     },
-    mark() { const id = st.at; st.marks = marked(id) ? st.marks.filter((x) => x !== id) : st.marks.concat(id); SND.play("click"); save(); render(); },
+    mark(el) { const id = (el && el.dataset.d) || st.at; st.marks = marked(id) ? st.marks.filter((x) => x !== id) : st.marks.concat(id); SND.play("click"); save(); render(); },
     tag(el) { st.tags[st.at] = el.dataset.t; SND.play("click"); save(); render(); },
     "to-share"() {
       if (left() && st.screen === "map") { confirmSheet("班の相談へ進みますか", `まだ <b>${left()}点</b> 見られます。あとからもどって見ることもできます。`, "班の相談へ", () => go("share")); return; }
