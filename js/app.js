@@ -1,64 +1,29 @@
-/* 臨場 v3 ― 1画面に1つのことだけ。STEP 1〜5 で進む。
- *  STEP1 資料を読む → STEP2 相談タイム（伝え合う・当たりをつける）→ STEP3 お店で調べる
- *  → STEP4 社長に説明する（班長は1問ずつ／ほかの人は班長に読み上げる）→ STEP5 ふりかえり
+/* 臨場 v4 ― 司会主導の説明会向け。
+ *  スクリーン：司会が「端緒」と「社長の言い分」を説明する（host.html）
+ *  スマホ：①調べる（自分で当たりをつけ、1人4か所まで）→ ②班で相談（班長が言い分ごとに証拠を1つ選ぶ）
+ *         → 社長に示す → 結果（答え合わせはスクリーンで）
  * 通信はしない。各自のスマホで遊び、見つけたことは口で伝え合う。
- * 保存は localStorage（"rinjo:v3"）。URL の末尾に #debug で window.__rinjo が使える。
+ * 保存は localStorage（"rinjo:v4"）。URL の末尾に #debug で window.__rinjo が使える。
  */
 (function () {
   "use strict";
   const C = window.CASE;
   const A = window.ASSETS || { bg: {}, ch: {} };
   const SND = window.SOUND || { play() {}, bgm() {}, unlock() {}, toggle() { return false; }, on: false };
-  const KEY = "rinjo:v3";
-  const ORDER = ["lead", "sales", "cash", "buy"];
+  const KEY = "rinjo:v4";
   const app = document.getElementById("app");
   const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const strip = (h) => String(h).replace(/<[^>]+>/g, "");
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-
-  /* ---------- 担当ごとに調べること（はずれは入れない） ---------- */
-  const TASKS = {
-    lead: ["q:q-hours", "p:代1"],
-    sales: ["q:q-night", "p:売1", "p:売2", "p:売3"],
-    cash: ["q:q-deposit", "p:現1", "p:現2"],
-    buy: ["q:q-pay", "q:q-price", "p:仕1", "p:仕2", "p:仕3"]
-  };
-  // 読み上げ用の短い文
-  const TELL = {
-    "代0": "今期だけ赤字。原価率（売上に対する仕入れの割合）が31%から42%に上がっている。",
-    "売0": "4月から土曜の夜に貸切を始めたのに、夜の売上が0円。",
-    "現0": "山海物産にだけ、現金で180万円払っている。",
-    "仕0": "原価率が急に42%に。今期からの新しい仕入れ先・山海物産が180万円。",
-    "代1": "シフト表では、土曜の夜19時〜23時にアルバイトが入っている。",
-    "売1": "レジは毎日18時58分に締めている。夜の売上は入っていない。",
-    "売2": "予約カレンダーに、土曜の「貸切」が4月から18回。",
-    "売3": "ゴミ箱に、11月2日の夜の貸切 85,000円の注文票。現金で受け取り済み。",
-    "現1": "通帳の入金はレジの合計と同じ。山海物産に払った30万円が、どこからも出ていない。",
-    "現2": "金庫に「別」の封筒 85,000円（裏に11/2）と、貸切18回・計153万円のノート。",
-    "仕1": "山海物産に30万円×6回＝180万円。領収書はそろっている。",
-    "仕2": "豆の量も値段も去年と同じ。届いているのは前川コーヒーの豆だけ。",
-    "仕3": "机の引き出しに、山海物産のハンコを押した白紙の領収書の束。"
-  };
-  const SHORT = { "代0": "決算書（赤字・原価率42%）", "売0": "夜の売上0円の資料", "現0": "支払い方法の表", "仕0": "原価率のグラフ" };
-  const evName = (c) => SHORT[c] || C.codes[c].name;
-  const qOf = (id) => { for (const r of ORDER) { const q = C.questions[r].find((x) => x.id === id); if (q) return q; } return null; };
-  const pOf = (code) => C.places[C.codes[code].role].find((x) => x.code === code);
+  const claim = (id) => C.claims.find((c) => c.id === id);
 
   /* ---------- 状態 ---------- */
-  function fresh() {
-    return { v: 3, screen: "title", roles: [], cur: null,
-      a1: { found: [], hypo: [], stage: "read" },
-      a2: { done: [] },
-      a3: { idx: 0, picks: {}, won: [], tries: 0, miss: 0, hints: {} }, _last: null };
-  }
+  function fresh() { return { v: 4, screen: "title", seen: [], tags: {}, at: null, stage: "ask", leader: false, picks: {}, outcome: null, hints: {}, started: false }; }
   let st = load();
-  function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 3) return s; } catch (e) {} return fresh(); }
+  function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 4) return s; } catch (e) {} return fresh(); }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
-  const has = (r) => st.roles.includes(r);
-  const isLead = () => has("lead");
-  const myRoles = () => ORDER.filter(has);
-  const cur = () => (st.cur && has(st.cur) ? st.cur : myRoles()[0]);
-  const roleColor = (r) => C.roles[r].color;
+  const left = () => Math.max(0, C.LIMIT - st.seen.length);
+  const seen = (id) => st.seen.includes(id);
 
   /* ---------- 画像 ---------- */
   const bg = (k) => (A.bg[k] ? A.bg[k].src : "");
@@ -71,53 +36,40 @@
     const px = ((cx / s - 0.5) / (1 / s - 1)) * 100, py = ((cy * r - 0.5) / (r - 1)) * 100;
     return `background-image:url('${c.src}');background-size:${(100 / s).toFixed(1)}% auto;background-position:${px.toFixed(1)}% ${py.toFixed(1)}%`;
   }
-  const PEOPLE = { mori: { name: "森先輩（指導役）", face: "mori" }, boss: { name: "白洲社長", face: "boss_grin" }, you: { name: "あなた", face: null } };
+  const PEOPLE = { mori: { name: "森先輩（指導役）", face: "mori" }, boss: { name: "白洲社長", face: "boss_grin" }, you: { name: "あなた（調査官）", face: null } };
 
   /* ---------- 部品 ---------- */
   const ICON = {
     snd: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>',
     mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>',
     hint: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>',
-    memo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>',
-    talk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M19 9h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-3-3h-3"/></svg>',
+    say: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12.5h5"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
-    ask: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M10 9.5a2 2 0 1 1 2.8 1.8c-.5.3-.8.7-.8 1.2M12 14.5h.01"/></svg>',
     doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>',
-    lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>'
+    lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>',
+    talk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M19 9h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-3-3h-3"/></svg>'
   };
   const sndBtn = () => `<button class="ib ${SND.on ? "" : "off"}" data-act="sound" aria-label="音を${SND.on ? "消す" : "出す"}">${SND.on ? ICON.snd : ICON.mute}</button>`;
-  const roleTag = (r) => `<span class="rt" style="--c:${roleColor(r)}">${C.roles[r].mark}</span>`;
-  const codeTag = (code) => roleTag(C.codes[code] ? C.codes[code].role : "lead");
-  function toast(t) { const o = document.getElementById("toast"); if (o) o.remove(); const d = document.createElement("div"); d.id = "toast"; d.innerHTML = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); }
-  function flash() { const f = document.getElementById("flash"); f && f.animate([{ opacity: 0.85 }, { opacity: 0 }], { duration: 420, easing: "ease-out" }); }
-
-  /* ---------- STEP と見出し ---------- */
-  const STEPS = ["資料を読む", "相談タイム", "お店で調べる", "社長に説明する", "ふりかえり"];
-  function stepNo() {
-    if (st.screen === "a1") return (st.a1.stage || "read") === "read" ? 1 : 2;
-    return { a2: 3, a3: 4, result: 5 }[st.screen] || 0;
-  }
-  function bar() {
-    const b = document.getElementById("bar");
-    const n = stepNo();
-    if (!n && st.screen !== "intro") { b.hidden = true; return; }
-    b.hidden = false;
-    const tells = myTells().length;
-    b.innerHTML = `<div class="row">
-        <div class="where">${n ? `<span class="sn">STEP ${n}<i>/5</i></span><span class="nm">${STEPS[n - 1]}</span>` : `<span class="nm">はじめに</span>`}</div>
-        ${n && n < 5 ? `<button class="ib hint" data-act="hint">${ICON.hint}<span>ヒント</span></button>` : ""}
-        ${n >= 3 && n < 5 ? `<button class="ib" data-act="notes" aria-label="班に伝えることの一覧">${ICON.memo}${tells ? `<span class="badge">${tells}</span>` : ""}</button>` : ""}
-        ${sndBtn()}</div>
-      <div class="segs">${STEPS.map((_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</div>`;
-  }
-  // 画面の上の「いまやること」
   const mission = (title, sub) => `<div class="mission"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}</div>`;
   const cta = (inner) => `<div class="cta"><div class="in">${inner}</div></div>`;
-  // 読み上げの順番（自分の担当に印）
-  const order = () => `<div class="order" aria-label="読み上げる順番">${ORDER.map((r, i) => `${i ? "<i>›</i>" : ""}<span style="--c:${roleColor(r)}" class="${has(r) ? "me" : ""}">${C.roles[r].name.replace("担当", "")}${has(r) ? "<b>あなた</b>" : ""}</span>`).join("")}</div>`;
-  const tellCards = (list, empty) => list.length
-    ? `<div class="tells">${list.map((t, i) => `<div class="tell" style="--c:${t.color}"><span class="no">${i + 1}</span><div><small>${esc(t.kind)}</small><p>${esc(t.text)}</p></div></div>`).join("")}</div>`
-    : `<p class="empty">${empty}</p>`;
+  const claimTag = (id) => id === "none" ? `<span class="ctag none">くずせなさそう</span>` : `<span class="ctag">言い分${id}</span>`;
+  function toast(t) { const o = document.getElementById("toast"); if (o) o.remove(); const d = document.createElement("div"); d.id = "toast"; d.innerHTML = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); }
+  function flash() { const f = document.getElementById("flash"); f && f.animate && f.animate([{ opacity: 0.85 }, { opacity: 0 }], { duration: 420, easing: "ease-out" }); }
+  const quote = (c, small) => `<div class="claim-card"><span class="cid">${c.id}</span><div><small>${small || "社長の言い分"}</small><p>「${esc(c.text)}」</p></div></div>`;
+
+  /* ---------- 上のバー ---------- */
+  const PHASES = ["調べる", "班で相談", "社長に示す"];
+  function phase() { return { brief: 1, map: 1, place: 1, share: 2, answer: 2, result: 3 }[st.screen] || 0; }
+  function bar() {
+    const b = document.getElementById("bar"); const n = phase();
+    if (!n) { b.hidden = true; return; }
+    b.hidden = false;
+    b.innerHTML = `<div class="row">
+        <div class="where"><span class="sn">${n}<i>/3</i></span><span class="nm">${PHASES[n - 1]}</span></div>
+        ${n < 3 ? `<button class="ib" data-act="claims">${ICON.say}<span>言い分</span></button><button class="ib hint" data-act="hint">${ICON.hint}<span>ヒント</span></button>` : ""}
+        ${sndBtn()}</div>
+      <div class="segs s3">${PHASES.map((_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</div>`;
+  }
 
   /* ---------- 会話（タップで次へ） ---------- */
   let talking = null;
@@ -136,6 +88,7 @@
         box.hidden = false; dim.hidden = false;
         const say = box.querySelector(".say");
         if (L.sfx) SND.play(L.sfx);
+        voice(L.v);
         const html = L.text; let k = 0; clearInterval(typing);
         const plain = strip(html).length;
         if (plain < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) { say.innerHTML = html; typing = null; return; }
@@ -146,7 +99,7 @@
       };
       const next = () => {
         if (typing) { clearInterval(typing); typing = null; box.querySelector(".say").innerHTML = lines[i].text; return; }
-        SND.play("tap"); i++;
+        SND.play("tap"); i++; voice(null);
         if (i >= lines.length) { box.hidden = true; dim.hidden = true; box.onclick = dim.onclick = null; box.onkeydown = null; talking = null; done(); return; }
         show();
       };
@@ -156,412 +109,287 @@
       setTimeout(() => { const f = box.querySelector(".box"); f && f.focus({ preventScroll: true }); }, 30);
     });
   }
+  // 声：voice/<id>.mp3 があれば流す（なければ何もしない）。音を消しているときは流さない
+  let vEl = null;
+  function voice(id) {
+    if (vEl) { try { vEl.pause(); } catch (e) {} vEl = null; }
+    if (!id || !SND.on) return;
+    try { vEl = new Audio(`voice/${id}.mp3`); vEl.setAttribute("playsinline", ""); const p = vEl.play(); p && p.catch && p.catch(() => {}); } catch (e) {}
+  }
   function cut(html, n) { let out = "", c = 0; const re = /(<[^>]+>)|([^<])/g; let m; while ((m = re.exec(html)) && c < n) { if (m[1]) out += m[1]; else { out += m[2]; c++; } } return out; }
 
-  /* ---------- シート ---------- */
+  /* ---------- シート（下から出る紙） ---------- */
   function sheet(html, bind) {
     closeSheet();
     const d = document.createElement("div"); d.className = "sheet"; d.id = "sheet";
-    d.innerHTML = `<div class="in" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
-    d.addEventListener("click", (e) => { if (e.target === d) closeSheet(); });
+    d.innerHTML = `<div class="in" role="dialog" aria-modal="true"><div class="grab"></div>${html}<div class="acts"><button class="btn btn-ghost" data-x="close">閉じる</button></div></div>`;
+    d.addEventListener("click", (e) => { if (e.target === d || e.target.closest('[data-x="close"]')) closeSheet(); });
     document.body.appendChild(d); bind && bind(d);
     return d;
   }
   function closeSheet() { const s = document.getElementById("sheet"); if (s) s.remove(); }
   function confirmSheet(title, body, okLabel, fn) {
-    sheet(`<h2>${title}</h2><p class="lede">${body}</p><div class="acts"><button class="btn btn-main" data-x="ok">${okLabel}</button><button class="btn btn-ghost" data-x="no">もどる</button></div>`, (d) => {
-      d.querySelector('[data-x="no"]').onclick = closeSheet;
+    sheet(`<h2>${title}</h2><p class="lede">${body}</p><div class="acts"><button class="btn btn-main" data-x="ok">${okLabel}</button></div>`, (d) => {
+      d.querySelector('[data-x="close"]').textContent = "もどる";
       d.querySelector('[data-x="ok"]').onclick = () => { closeSheet(); fn(); };
     });
   }
 
   /* ---------- 画面の切り替え ---------- */
   let lastKey = null;
-  function go(screen) { const t = document.getElementById("toast"); if (t) t.remove(); st.screen = screen; if (["intro", "a1", "a2", "a3", "result"].includes(screen)) st._last = screen; save(); render(); window.scrollTo(0, 0); }
+  function go(screen) { const t = document.getElementById("toast"); if (t) t.remove(); closeSheet(); st.screen = screen; save(); render(); window.scrollTo(0, 0); }
   function render() {
-    const r = cur(); document.documentElement.style.setProperty("--role", r ? roleColor(r) : "#f2a53a");
-    const f = { title: vTitle, roles: vRoles, intro: vIntro, a1: vA1, a2: vA2, a3: vA3, result: vResult }[st.screen] || vTitle;
+    const f = { title: vTitle, brief: vBrief, map: vMap, place: vPlace, share: vShare, answer: vAnswer, result: vResult }[st.screen] || vTitle;
     app.innerHTML = f();
-    const key = st.screen + (st.a1.stage || "") + st.a3.idx;
+    const key = st.screen + st.at + st.stage;
     const scr = app.querySelector(".screen,#title");
     if (scr && lastKey === key) scr.style.animation = "none";
     lastKey = key;
     bar();
-    SND.bgm(st.screen === "a3" ? "tense" : st.screen === "title" || st.screen === "result" ? null : "calm");
+    SND.bgm(st.screen === "title" || st.screen === "result" ? null : st.screen === "answer" ? "tense" : "calm");
   }
 
   /* ---------- タイトル ---------- */
   function vTitle() {
-    const resumable = st.roles.length && st._last;
     return `<section id="title"><div class="bg" style="background-image:url('${bg("ext")}')"></div>
       <div class="wrap">
         <div class="file"><span class="stamp">調査中</span><p class="kick">税務調査 体験ゲーム</p><h1>臨場</h1><div class="case">喫茶店「浜風珈琲」の調査</div></div>
-        <p class="lead">あなたは税務署の調査官。<br>班で手分けして、社長の説明が本当かを確かめよう。</p>
-        <button class="btn btn-main" data-act="start">はじめる</button>
-        ${resumable ? `<button class="btn btn-ghost" data-act="resume">続きから</button>` : ""}
-        <div class="t-foot"><span>これはゲームです。会社・人物・資料はすべて架空です。</span>${sndBtn()}</div>
+        <p class="lead">あなたは税務署の調査官。<br>社長の言い分が本当か、お店で<b>証拠</b>を探して確かめよう。</p>
+        <div class="wait-note">${ICON.talk}<span><b>スクリーンの説明を聞いてから</b>、はじめてください。</span></div>
+        ${st.started ? `<button class="btn btn-main" data-act="resume">続きから</button><button class="btn btn-ghost" data-act="reset">最初からやり直す</button>` : `<button class="btn btn-main" data-act="start">はじめる</button>`}
+        <div class="t-foot"><span>登場する会社・人物・資料は、すべて架空です。<br>音は右の ${ICON.snd.replace("<svg", '<svg class="inl"')} でいつでも消せます。</span>${sndBtn()}</div>
       </div></section>`;
   }
 
-  /* ---------- 担当えらび ---------- */
-  const ROLE_JOB = {
-    lead: "調査官のまとめ役。最後に、仲間の証拠を<b>白洲社長に示す</b>。",
-    sales: "レジや予約の記録など、<b>売上</b>を調べる。",
-    cash: "通帳や金庫など、<b>お金の流れ</b>を調べる。",
-    buy: "帳簿や在庫など、<b>仕入れ</b>を調べる。"
-  };
-  function vRoles() {
-    return `<section class="screen plain"><div class="wrap">
-      <div class="top-row"><button class="back" data-act="home">‹ もどる</button>${sndBtn()}</div>
-      ${mission("自分の担当を選ぼう", "班で相談して、4つの担当を分けます。")}
-      <div class="role-grid">${ORDER.map((r) => { const R = C.roles[r]; return `<button class="role-card" style="--c:${R.color}" data-act="role" data-r="${r}" aria-pressed="${has(r)}">
-        <span class="mk">${R.mark}</span><strong>${R.name}</strong><span>${ROLE_JOB[r]}</span></button>`; }).join("")}</div>
-      <div class="split-help">
-        <p><b>人数が4人でないとき</b></p>
-        <ul><li>2〜3人：1人で2つ選ぶ（例：班長＋売上）</li><li>5〜6人：同じ担当を2人で選ぶ</li><li><b>班長は班に1人だけ</b></li></ul>
+  /* ---------- 言い分の確認 ---------- */
+  function vBrief() {
+    return `<section class="screen"><div class="wrap">
+      ${mission("社長の<em>言い分</em>を、証拠でくずそう", "スクリーンで見た3つの言い分です。お店で証拠を探して、本当かどうか確かめます。")}
+      <div class="claims">${C.claims.map((c) => quote(c)).join("")}</div>
+      <details class="words"><summary>スクリーンで見た「不審な点」（端緒）</summary>
+        <p class="words-lede"><b>端緒（たんちょ）</b>＝調べるきっかけになる、不審な点のこと。</p>
+        <ul class="tancho">${C.tancho.map((t) => `<li><b>${esc(t.big)}</b><span>${esc(t.text)}</span></li>`).join("")}</ul>
+      </details>
+      <div class="rules">
+        <div><span class="n">1</span><p>調べられるのは<b>1人${C.LIMIT}か所まで</b>。どこに証拠がありそうか、<b>当たり</b>（見当）をつけて選ぼう。</p></div>
+        <div><span class="n">2</span><p>見るときは、まず社長に<b>お願いして承諾をもらう</b>。</p></div>
+        <div><span class="n">3</span><p>班で手分けすると、たくさんの場所を調べられる。</p></div>
       </div>
-    </div></section>
-    ${cta(`<button class="btn btn-main" data-act="roles-ok" ${st.roles.length ? "" : "disabled"}>${st.roles.length ? myRoles().map((r) => C.roles[r].name).join("＋") + " で始める" : "担当をタップしてください"}</button>`)}`;
+    </div></section>${cta(`<button class="btn btn-main" data-act="to-map">お店を調べる</button>`)}`;
   }
 
-  /* ---------- はじめに ---------- */
-  function vIntro() {
+  /* ---------- 地図：どこを調べる？ ---------- */
+  function vMap() {
+    const n = left();
+    const dots = Array.from({ length: C.LIMIT }, (_, i) => `<i class="${i < st.seen.length ? "used" : ""}"></i>`).join("");
     return `<section class="screen"><div class="wrap">
-      ${mission("この順番で進みます", "全部で約25分。各STEPで、画面のいちばん上に「やること」が出ます。")}
-      <div class="cast">
-        <div><span class="pic" style="${faceCss("boss_grin", 1.9)}"></span><p><b>白洲社長</b><small>調べる相手。喫茶店「浜風珈琲」の社長</small></p></div>
-        <div><span class="pic team">班</span><p><b>班長</b><small>あなたたち調査官のまとめ役（班に1人）</small></p></div>
+      ${mission(n ? "どこを調べる？ <em>当たり</em>をつけよう" : "調べ終わりました", n ? "「この言い分をくずす証拠は、ここにありそう」と思う場所を選ぼう。" : "下のボタンで、班の相談へ進もう。")}
+      <div class="left ${n ? "" : "zero"}"><div class="dots4">${dots}</div><p>調べられるのは あと <b>${n}</b> か所</p></div>
+      ${C.areas.map((a) => `<div class="area">
+        <div class="area-head" style="background-image:url('${bg(a.bg)}')"><span>${esc(a.name)}</span></div>
+        <div class="spots">${C.places.filter((p) => p.area === a.id).map(spot).join("")}</div></div>`).join("")}
+    </div></section>${cta(`<button class="btn ${n ? "btn-ghost" : "btn-main"}" data-act="to-share">${n ? "調べ終わったら：班の相談へ" : "班の相談へ進む"}</button>`)}`;
+  }
+  function spot(p) {
+    const s = seen(p.id), lock = !s && !left();
+    const tag = st.tags[p.id];
+    return `<button class="spot ${s ? "seen" : ""} ${lock ? "lock" : ""}" data-act="spot" data-p="${p.id}" ${lock ? 'aria-disabled="true"' : ""}>
+      <span class="ic">${s ? ICON.check : p.open ? ICON.lock : ICON.doc}</span>
+      <span class="tx"><b>${esc(p.name)}</b><small>${esc(p.where)}${s ? "　・調べた" : ""}</small></span>
+      ${s && tag ? claimTag(tag) : ""}</button>`;
+  }
+
+  /* ---------- 1か所を調べる ---------- */
+  function vPlace() {
+    const p = C.place(st.at); if (!p) return vMap();
+    const a = C.areas.find((x) => x.id === p.area);
+    if (st.stage === "ask") {
+      return `<section class="screen"><div class="wrap">
+        <button class="back" data-act="to-map">← 場所えらびにもどる</button>
+        ${mission(esc(p.name), esc(p.where))}
+        <div class="scene" style="background-image:url('${bg(a.bg)}')"><div class="boss" style="${faceCss("boss_grin", 1.9)}"></div><p>「何か見たいものでも？」<small>白洲社長</small></p></div>
+        <div class="consent"><span class="tag">承諾をもらう</span>
+          <p>見せてもらう前に、社長にこうお願いします。</p>
+          <blockquote>「${esc(p.ask)}」</blockquote></div>
+        <p class="disclaim">${p.open ? "<b>これはゲームです。</b>実際の税務調査では、調査官が自分で机や金庫を開けたり、お金に触れたりはしません。必ず相手の<b>明示の承諾</b>を得て、開けて見せてもらいます。" : "実際の税務調査でも、書類は相手の<b>明示の承諾</b>を得てから見せてもらいます。"}</p>
+      </div></section>${cta(`<button class="btn btn-main" data-act="ask">社長にお願いする<small>調べられるのは あと ${left()} か所 → ${left() - 1} か所</small></button>`)}`;
+    }
+    const tag = st.tags[p.id];
+    return `<section class="screen"><div class="wrap">
+      <button class="back" data-act="to-map">← 場所えらびにもどる</button>
+      ${mission(esc(p.name), esc(p.where))}
+      <div class="paper">${p.doc}</div>
+      <div class="noticed"><small>気づいたこと</small><p>${p.note}</p></div>
+      <h2 class="q">この資料で、どの言い分をくずせそう？</h2>
+      <div class="pickc">${C.claims.map((c) => `<button data-act="tag" data-t="${c.id}" aria-pressed="${tag === c.id}"><span class="cid">${c.id}</span><span>${esc(c.short)}</span></button>`).join("")}
+        <button data-act="tag" data-t="none" aria-pressed="${tag === "none"}" class="none"><span class="cid">－</span><span>くずせなさそう</span></button></div>
+      <p class="after">あなたの考えでかまいません。あとで班に伝えるときのメモになります。</p>
+    </div></section>${cta(`<button class="btn ${tag ? "btn-main" : "btn-ghost"}" data-act="to-map">場所えらびにもどる</button>`)}`;
+  }
+
+  /* ---------- 班で相談 ---------- */
+  function vShare() {
+    const list = st.seen.map(C.place);
+    return `<section class="screen"><div class="wrap">
+      <div class="talk-badge">${ICON.talk}班で相談</div>
+      ${mission("見つけたことを、<em>班に伝えよう</em>", "1人ずつ、下のカードを読み上げよう。")}
+      ${list.length ? `<div class="tells">${list.map((p, i) => `<div class="tell"><span class="no">${i + 1}</span><div><small>${esc(p.name)}（${esc(p.where)}）${st.tags[p.id] ? claimTag(st.tags[p.id]) : ""}</small><p>${p.note}</p></div></div>`).join("")}</div>`
+        : `<p class="empty">まだどこも調べていません。</p>`}
+      ${left() ? `<button class="more" data-act="to-map">まだ ${left()} か所調べられます →</button>` : ""}
+      <div class="leader-box">
+        <h2>次に、<b>班長</b>を1人決めよう</h2>
+        <p>班長は、みんなの話を聞いて、言い分ごとに<b>決め手の証拠</b>を選び、社長に示します。決まらなければ、スクリーンの指示に従ってください。</p>
+        <button class="btn btn-main" data-act="be-leader">私が班長（答えを入力する）</button>
+        <p class="after">班長でない人は、このまま班長のスマホをいっしょに見よう。</p>
       </div>
-      <ol class="flow">
-        <li><span class="n">1</span><div><b>資料を読む</b><p>自分の担当の資料から、気になる点を見つける。</p></div></li>
-        <li class="talk"><span class="n">2</span><div><b>相談タイム</b><p>見つけたことを班で読み上げ、どこを調べるか決める。</p></div></li>
-        <li><span class="n">3</span><div><b>お店で調べる</b><p>社長に質問し、<b>承諾をもらって</b>書類などを見せてもらう。</p></div></li>
-        <li class="talk"><span class="n">4</span><div><b>社長に説明する</b><p>見つけたことを班長に伝え、班長が証拠を社長に示す。</p></div></li>
-        <li><span class="n">5</span><div><b>ふりかえり</b><p>本当は何があったのかを確かめる。</p></div></li>
-      </ol>
-      <details class="words"><summary>ことばの説明</summary>
-        <dl><dt>税務調査</dt><dd>申告（税金の届け出）が正しいかを、税務署が確かめること。</dd>
-        <dt>臨場（りんじょう）</dt><dd>調査官が会社やお店に出向いて調べること。</dd>
-        <dt>所得</dt><dd>もうけ。売上から経費を引いた残り。税金はここにかかる。</dd>
-        <dt>端緒（たんちょ）</dt><dd>調べるきっかけになる不審な点。</dd></dl></details>
-    </div></section>
-    ${cta(`<button class="btn btn-main" data-act="to-a1">STEP 1 へ</button>`)}`;
+    </div></section>`;
   }
 
-  /* ---------- STEP 1・2 ---------- */
-  function switcher() {
-    const rs = myRoles(); if (rs.length < 2) return "";
-    return `<div class="switch" role="group" aria-label="担当の切り替え">${rs.map((r) => `<button style="--c:${roleColor(r)}" data-act="cur" data-r="${r}" aria-pressed="${r === cur()}">${C.roles[r].name}</button>`).join("")}</div>`;
-  }
-  const goodHits = (r) => Object.entries(C.prep[r].hits).filter(([, H]) => H.good).map(([h]) => h);
-  const goodLeft = () => myRoles().reduce((n, r) => n + goodHits(r).filter((h) => !st.a1.found.includes(r + ":" + h)).length, 0);
-  function vA1() {
-    const stage = st.a1.stage || "read";
-    if (stage === "share") {
-      const cards = myRoles().flatMap((r) => goodHits(r).map((h) => ({ color: roleColor(r), kind: C.roles[r].name + "の資料", text: strip(C.prep[r].hits[h].text) })));
-      return `<section class="screen"><div class="wrap">
-        <div class="talk-badge">${ICON.talk}相談タイム</div>
-        ${mission("見つけたことを、順番に読み上げよう", "班長から順に、下のカードを声に出して読みます。")}
-        ${order()}
-        ${tellCards(cards, "")}
-        <p class="after">全員が読み終えたら、班で「どこがあやしい？」と話してから次へ。</p>
-      </div></section>
-      ${cta(`<button class="btn btn-main" data-act="a1-stage" data-s="hypo">全員読み終えた</button>`)}`;
-    }
-    if (stage === "hypo") {
-      return `<section class="screen"><div class="wrap">
-        <div class="talk-badge">${ICON.talk}相談タイム</div>
-        ${mission("班で話して、当たりをつけよう", "どこを調べるか決めるために、あやしいと思う<b>仮説</b>を選びます（2つまで）。")}
-        <div class="hypo">${C.hypotheses.map((h) => `<button data-act="hypo" data-h="${h.id}" aria-pressed="${st.a1.hypo.includes(h.id)}"><span class="bx">${ICON.check}</span><span>${h.text}</span></button>`).join("")}</div>
-      </div></section>
-      ${cta(`<button class="btn btn-ghost" data-act="a1-stage" data-s="share">もどる</button><button class="btn btn-main" data-act="to-a2" ${st.a1.hypo.length ? "" : "disabled"}>お店へ向かう</button>`)}`;
-    }
-    const r = cur(), P = C.prep[r], goods = goodHits(r);
-    const got = goods.filter((h) => st.a1.found.includes(r + ":" + h)).length;
-    const rest = goodLeft();
-    const lastK = [...st.a1.found].reverse().find((k) => k.startsWith(r + ":"));
-    const lastH = lastK ? P.hits[lastK.split(":")[1]] : null;
+  /* ---------- 班長：言い分ごとに証拠を選ぶ ---------- */
+  function vAnswer() {
+    const all = C.claims.every((c) => st.picks[c.id]);
     return `<section class="screen"><div class="wrap">
-      ${mission("資料の<em>光っている所</em>をタップしよう", `気になる点が<b>${goods.length}つ</b>あります。全部見つけたら次へ。`)}
-      ${switcher()}
-      <div class="dots" aria-label="見つけた数 ${got} / ${goods.length}">${goods.map((h) => `<i class="${st.a1.found.includes(r + ":" + h) ? "on" : ""}"></i>`).join("")}<span>${got} / ${goods.length}</span></div>
-      <div class="paper hit-mode" id="prepdoc"><p class="doc-kind">${C.roles[r].name}の資料</p><h3>${P.title}</h3>${P.html}</div>
-      ${lastH ? `<div class="found-say ${lastH.good ? "" : "meh"}">${lastH.good ? "気になる！" : "これは関係なさそう"}<p>${lastH.text}</p></div>` : ""}
-    </div></section>
-    ${cta(`<button class="btn btn-main" data-act="a1-stage" data-s="share" ${rest ? "disabled" : ""}>${rest ? `あと ${rest} つ` : "STEP 2 相談タイムへ"}</button>`)}`;
+      <button class="back" data-act="to-share">← 班で相談にもどる</button>
+      <div class="talk-badge lead">班長</div>
+      ${mission("言い分ごとに、<em>決め手の証拠</em>を1つ選ぼう", "みんなの話を聞いて選ぼう。あなたが調べていない場所も選べます。")}
+      <div class="answers">${C.claims.map((c) => {
+        const p = st.picks[c.id] && C.place(st.picks[c.id]);
+        return `<div class="ans-row">${quote(c)}
+          <button class="pickbtn ${p ? "set" : ""}" data-act="choose" data-c="${c.id}">${p ? `<span>示す証拠</span><b>${esc(p.name)}</b><i>変える</i>` : `<span>示す証拠</span><b>＋ 証拠を選ぶ</b>`}</button></div>`;
+      }).join("")}</div>
+    </div></section>${cta(`<button class="btn btn-red" data-act="show" ${all ? "" : "disabled"}>社長に証拠を示す${all ? "" : "<small>3つとも選ぶと押せます</small>"}</button>`)}`;
+  }
+  function chooseSheet(cid) {
+    const c = claim(cid);
+    sheet(`<h2>どの証拠を示しますか</h2>${quote(c)}
+      ${C.areas.map((a) => `<p class="grp">${esc(a.name)}</p><div class="choices">${C.places.filter((p) => p.area === a.id).map((p) =>
+        `<button data-p="${p.id}" aria-pressed="${st.picks[cid] === p.id}"><b>${esc(p.name)}</b>${seen(p.id) ? `<small>あなたが調べた${st.tags[p.id] ? `・${st.tags[p.id] === "none" ? "くずせなさそう" : "言い分" + st.tags[p.id]}` : ""}</small>` : ""}</button>`).join("")}</div>`).join("")}`,
+      (d) => d.querySelectorAll(".choices button").forEach((b) => b.onclick = () => { st.picks[cid] = b.dataset.p; SND.play("click"); save(); closeSheet(); render(); }));
   }
 
-  /* ---------- STEP 3 お店で調べる ---------- */
-  const SCENE = { lead: "office", sales: "shop", cash: "office", buy: "office" };
-  const taskDone = (t) => st.a2.done.includes(t);
-  const tasksLeft = () => myRoles().reduce((n, r) => n + TASKS[r].filter((t) => !taskDone(t)).length, 0);
-  function vA2() {
-    const r = cur(), list = TASKS[r];
-    const n = list.filter(taskDone).length, rest = tasksLeft();
-    const rows = list.map((t, i) => {
-      const [k, id] = t.split(":"), done = taskDone(t);
-      const next = !done && list.slice(0, i).every(taskDone);
-      if (k === "q") { const q = qOf(id); return `<button class="task ${done ? "done" : ""} ${next ? "next" : ""}" data-act="task" data-t="${t}"><span class="ic">${done ? ICON.check : ICON.ask}</span><span class="tx"><small>社長に聞く</small>「${esc(q.q)}」</span></button>`; }
-      const p = pOf(id);
-      return `<button class="task ${done ? "done" : ""} ${next ? "next" : ""}" data-act="task" data-t="${t}"><span class="ic">${done ? ICON.check : p.open ? ICON.lock : ICON.doc}</span><span class="tx"><small>${p.open ? "開けて見せてもらう" : "見せてもらう"}（${esc(p.where)}）</small>${esc(p.name)}</span></button>`;
-    }).join("");
-    return `<section class="screen"><div class="wrap">
-      ${mission("社長に聞いて、書類を見せてもらおう", "上から順にタップ。手がかりが出たら<b>その場で班に伝えよう</b>。")}
-      ${switcher()}
-      <div class="scene" style="background-image:url('${bg(SCENE[r])}')"><div class="boss" style="${faceCss("boss_grin", 1.9)}"></div><p>「どうぞ、何でも聞いてください」<small>白洲社長</small></p></div>
-      <div class="dots"><span style="margin-left:0">${C.roles[r].name}：${n} / ${list.length} 調べた</span></div>
-      <div class="tasks">${rows}</div>
-      <p class="disclaim">これはゲームです。実際の税務調査でも、書類を見せてもらう・金庫や机を開けてもらうときは、必ず相手の<b>明示の承諾</b>を得ます。</p>
-    </div></section>
-    ${cta(`<button class="btn btn-main" data-act="end-a2" ${rest ? "disabled" : ""}>${rest ? `あと ${rest} つ調べよう` : "STEP 4 署にもどる"}</button>`)}`;
-  }
-  async function doTask(t) {
-    const [k, id] = t.split(":");
-    if (k === "q") {
-      const q = qOf(id);
-      const lines = [{ who: "you", text: q.q }, { who: "boss", text: q.a, face: q.key ? "boss_smug" : "boss_grin", sfx: q.key ? "bossTick" : null }];
-      if (q.key && !taskDone(t)) lines.push({ who: null, text: `📣 <b>班にこう伝えよう</b><br>「社長は『${C.statements[q.key].text}』と言っていた」`, sfx: "paper" });
-      if (!taskDone(t)) { st.a2.done.push(t); save(); }
-      await talk(lines); render(); return;
-    }
-    const p = pOf(id);
-    if (taskDone(t)) { evidence(p); return; }
-    sheet(`<p class="eyebrow">${esc(p.where)}</p><h2>${esc(p.name)}</h2>
-      <div class="consent"><span class="tag">承諾をもらう</span><p>見る前に、社長にお願いします。</p><blockquote>「${esc(p.consent)}」</blockquote></div>
-      <p class="disclaim">実際の調査でも、見せてもらう・開けてもらうには相手の明示の承諾が必要です。</p>
-      <div class="acts"><button class="btn btn-main" data-x="ok">社長にお願いする</button><button class="btn btn-ghost" data-x="no">やめる</button></div>`, (d) => {
-      d.querySelector('[data-x="no"]').onclick = closeSheet;
-      d.querySelector('[data-x="ok"]').onclick = async () => {
-        closeSheet(); st.a2.done.push(t); save();
-        await talk([{ who: "you", text: p.consent }, { who: "boss", text: p.ok, face: p.open ? "boss_shock" : "boss_grin", sfx: p.open ? "unlock" : "open" }]);
-        render(); evidence(p, true);
-      };
-    });
-  }
-  function evidence(p, first) {
-    if (first) SND.play("item");
-    sheet(`<div class="ev-head">${codeTag(p.code)}<div><b>${esc(p.name)}</b><small>${esc(p.where)}</small></div></div>
-      <div class="paper">${p.doc()}</div>
-      <div class="tellbox"><small>📣 今すぐ班にこう伝えよう</small><p>「${esc(TELL[p.code])}」</p></div>
-      <div class="acts"><button class="btn btn-main" data-x="close">伝えた</button></div>`, (d) => { d.querySelector('[data-x="close"]').onclick = closeSheet; });
-  }
-
-  /* 自分が班に伝えられること（社長の発言 → 準備の資料 → お店で見た物） */
-  function myTells() {
-    const out = [];
-    st.a2.done.filter((t) => t.startsWith("q:")).forEach((t) => { const q = qOf(t.slice(2)); if (q.key) out.push({ color: roleColor(C.statements[q.key].by), kind: "社長の発言", text: `社長は「${C.statements[q.key].text}」と言っていた。` }); });
-    myRoles().forEach((r) => out.push({ color: roleColor(r), kind: C.prep[r].title, text: TELL[C.prep[r].code] }));
-    st.a2.done.filter((t) => t.startsWith("p:")).forEach((t) => { const c = t.slice(2); out.push({ color: roleColor(C.codes[c].role), kind: C.codes[c].name, text: TELL[c] }); });
-    return out;
-  }
-  function notes() {
-    sheet(`<h2>班に伝えること</h2><p class="lede" style="margin-bottom:10px">STEP 4で、この順に班長へ読み上げます。</p>${tellCards(myTells(), "まだありません。")}
-      <div class="acts"><button class="btn btn-ghost" data-x="close">閉じる</button></div>`, (d) => { d.querySelector('[data-x="close"]').onclick = closeSheet; });
-  }
-
-  /* ---------- STEP 4 社長に説明する ---------- */
-  const unsolved = () => C.board.filter((b) => !st.a3.won.includes(b.id));
-  function curBoard() { const u = unsolved(); if (!u.length) return null; return u[st.a3.idx % u.length]; }
-  function vA3() {
-    if (!isLead()) {
-      return `<section class="screen"><div class="wrap">
-        <div class="talk-badge">${ICON.talk}相談タイム</div>
-        ${mission("見つけたことを、班長に読み上げよう", "この順番で1人ずつ。班長に聞かれたら、もう一度読もう。")}
-        ${order()}
-        ${tellCards(myTells(), "")}
-        <p class="after">読み終えたら、班長と一緒に「社長のどの発言と食い違う？」を考えよう。</p>
-      </div></section>
-      ${cta(`<button class="btn btn-ghost" data-act="to-result">STEP 5 ふりかえりへ<small>班長が説明を終えてから</small></button>`)}`;
-    }
-    const b = curBoard();
-    if (!b) return `<section class="screen"><div class="wrap">${mission("すべての発言を崩した！")}</div></section>`;
-    const S = C.statements[b.id], pk = st.a3.picks[b.id] || [];
-    const done = st.a3.won.length, total = C.board.length;
-    const slot = (i) => pk[i]
-      ? `<button class="slot2 set" data-act="unpick" data-i="${i}" style="--c:${roleColor(C.codes[pk[i]].role)}">${codeTag(pk[i])}<span>${esc(evName(pk[i]))}</span><i>×</i></button>`
-      : `<div class="slot2">証拠 ${i + 1}</div>`;
-    const grid = ORDER.map((r) => `<div class="evg"><p style="color:${roleColor(r)}">${C.roles[r].name}</p><div>${[C.prep[r].code].concat(TASKS[r].filter((t) => t.startsWith("p:")).map((t) => t.slice(2))).map((c) => `<button class="ev ${pk.includes(c) ? "on" : ""}" style="--c:${roleColor(r)}" data-act="pick" data-c="${c}">${esc(evName(c))}</button>`).join("")}</div></div>`).join("");
-    return `<section class="screen"><div class="wrap">
-      <div class="q-head"><span>発言 ${done + 1} / ${total}</span>${unsolved().length > 1 ? `<button class="back" data-act="skip">あとにする ›</button>` : ""}</div>
-      <div class="quote"><div class="boss" style="${faceCss("boss_smug", 1.9)}"></div><div><small>白洲社長はこう言った</small><p>「${esc(S.text)}」</p></div></div>
-      ${mission("この発言と食い違う証拠を、2つ選ぼう", "<b>違う担当</b>の証拠を1つずつ。仲間の読み上げを思い出そう。")}
-      <div class="slots2">${slot(0)}<span>＋</span>${slot(1)}</div>
-      <div class="evgrid">${grid}</div>
-      <details class="words"><summary>読み上げの順番と、あなたの手がかり</summary>${order()}${tellCards(myTells(), "")}</details>
-    </div></section>
-    ${cta(`<button class="btn btn-red" data-act="thrust" ${pk[0] && pk[1] ? "" : "disabled"}>${pk[0] && pk[1] ? "社長にぶつける！" : "証拠を2つ選んでください"}</button>`)}`;
-  }
-  async function thrust() {
-    const b = curBoard(); if (!b) return;
-    const pk = st.a3.picks[b.id] || [];
-    if (!pk[0] || !pk[1]) return;
-    if (C.codes[pk[0]].role === C.codes[pk[1]].role) {
-      SND.play("wrong");
-      await talk([{ who: "mori", text: `2つとも<b>${C.roles[C.codes[pk[0]].role].name}</b>の証拠だ。<b>違う担当の証拠</b>を1つずつ選ぼう。` }]);
-      return;
-    }
-    const okA = (c) => b.need[0].includes(c), okB = (c) => b.need[1].includes(c);
-    const win = (okA(pk[0]) && okB(pk[1])) || (okA(pk[1]) && okB(pk[0]));
-    const half = !win && pk.some((c) => okA(c) || okB(c));
-    st.a3.tries++; if (!win) st.a3.miss++;
-    const S = C.statements[b.id];
+  /* ---------- 社長に示す ---------- */
+  async function showdown() {
     const fo = document.createElement("div"); fo.id = "face-off";
-    fo.innerHTML = `<div class="speed"></div><img src="${ch("boss_smug")}" alt="白洲社長">
-      <div class="thrust"><small>班長が示した証拠</small><div>${codeTag(pk[0])}${esc(evName(pk[0]))}</div><div>${codeTag(pk[1])}${esc(evName(pk[1]))}</div></div>`;
-    document.body.appendChild(fo); SND.play("slam");
-    await wait(1000);
+    fo.innerHTML = `<div class="speed"></div><img src="${ch("boss_grin")}" alt="白洲社長">`;
+    document.body.appendChild(fo);
     const img = fo.querySelector("img");
-    if (win) {
-      st.a3.won.push(b.id); st.a3.idx = 0; save();
-      flash(); fo.querySelector(".speed").classList.add("on"); img.src = ch("boss_shock"); fo.classList.add("shock"); SND.play("shock");
-      const bn = document.createElement("div"); bn.className = "banner"; bn.innerHTML = `崩した！<small>「${esc(S.text)}」</small>`; fo.appendChild(bn);
-      await wait(1300); bn.remove(); img.src = ch("boss_panic");
-      await talk([{ who: "boss", text: b.win, face: "boss_panic" }]);
+    const out = {};
+    await talk([{ who: "boss", text: "それで、何か分かりましたか？ うちは赤字ですよ。", face: "boss_grin", v: "boss_start" }]);
+    for (const c of C.claims) {
+      const pid = st.picks[c.id], p = C.place(pid), ok = c.ok.includes(pid);
+      img.src = ch("boss_smug"); fo.classList.remove("shock", "smug");
+      await talk([{ who: "boss", text: c.text, face: "boss_smug", sfx: "bossTick", v: `boss_claim_${c.id}` }]);
+      const th = document.createElement("div"); th.className = "thrust";
+      th.innerHTML = `<small>言い分${c.id}に示した証拠</small><div>${esc(p.name)}</div>`;
+      fo.appendChild(th); SND.play("slam");
+      await wait(900);
+      if (ok) {
+        out[c.id] = "win";
+        flash(); fo.querySelector(".speed").classList.add("on"); img.src = ch("boss_shock"); fo.classList.add("shock"); SND.play("shock");
+        const bn = document.createElement("div"); bn.className = "banner"; bn.innerHTML = `くずした！<small>言い分${c.id}「${esc(c.short)}」</small>`; fo.appendChild(bn);
+        await wait(1300); bn.remove(); img.src = ch("boss_panic");
+        await talk([{ who: "boss", text: c.win, face: "boss_panic", v: `boss_win_${c.id}` }]);
+      } else {
+        out[c.id] = "miss";
+        fo.classList.add("smug"); SND.play("laugh"); await wait(400);
+        await talk([{ who: "boss", text: (c.trap && c.trap[pid]) || c.miss, face: "boss_smug", v: c.trap && c.trap[pid] ? `boss_trap_${c.id}_${pid}` : `boss_miss_${c.id}` }]);
+      }
+      th.remove(); fo.querySelector(".speed").classList.remove("on");
+    }
+    const n = Object.values(out).filter((x) => x === "win").length;
+    if (n === 3) {
+      img.src = ch("boss_sad"); SND.play("win");
+      await talk([{ who: "boss", text: "……すべて、おっしゃるとおりです。申し訳ありませんでした。", face: "boss_sad", v: "boss_final" },
+        { who: "mori", text: "見事だ。班のみんなが別々に見つけた証拠が、ひとつにつながったな。", v: "mori_end_all" }]);
     } else {
-      fo.classList.add("smug"); SND.play("laugh"); await wait(400);
-      await talk([{ who: "boss", text: half ? b.half : b.miss, face: "boss_smug" },
-        { who: "mori", text: half ? "惜しい。<b>片方は効いている</b>。もう1つを入れ替えてみよう。" : "その組み合わせでは崩せない。迷ったら上の<b>「ヒント」</b>を押そう。" }]);
+      await talk([{ who: "mori", text: n ? `${n}つの言い分はくずせた。残りは、答え合わせで確かめよう。` : "今回はくずせなかった。どこに証拠があったのか、答え合わせで確かめよう。", v: n ? `mori_end_${n}` : "mori_end_0" }]);
     }
-    fo.remove(); render(); window.scrollTo(0, 0);
-    if (!unsolved().length) finale();
-  }
-  async function finale() {
-    const fo = document.createElement("div"); fo.id = "face-off"; fo.innerHTML = `<img src="${ch("boss_sad")}" alt="白洲社長">`; document.body.appendChild(fo);
-    SND.play("win");
-    await talk([{ who: "boss", text: "……すべて、おっしゃるとおりです。申し訳ありませんでした。", face: "boss_sad" },
-      { who: "mori", text: "よくやった。班で手分けして集めた証拠が、ひとつにつながったな。" }]);
-    fo.remove(); go("result");
+    fo.remove(); st.outcome = out; go("result");
   }
 
-  /* ---------- STEP 5 ふりかえり ---------- */
-  const stars = (n) => "★".repeat(n) + "☆".repeat(3 - n);
+  /* ---------- 結果 ---------- */
   function vResult() {
-    const hypoGood = st.a1.hypo.filter((h) => C.hypotheses.find((x) => x.id === h).good === true).length;
-    const s1 = hypoGood >= 2 ? 3 : hypoGood === 1 ? 2 : 1;
-    const w = st.a3.won.length, s3 = w >= 4 && st.a3.miss <= 2 ? 3 : w >= 3 ? 2 : 1;
+    const out = st.outcome || {}; const n = Object.values(out).filter((x) => x === "win").length;
+    const R = C.result;
     return `<section class="screen"><div class="wrap">
-      <div class="r-hero"><span class="stamp">調査完了</span>
-        ${isLead() ? `<p>崩した社長の発言　<b>${w} / ${C.board.length}</b></p>` : ""}</div>
-      <div class="paper"><h3>本当は何があったのか</h3>
-        <p>① 土曜の夜の<b>貸切パーティーの売上</b>をレジに通さず、金庫の「別」の封筒に隠していた（18回）。</p>
-        <p>② 白紙の領収書に自分で書き込み、<b>山海物産からの豆の仕入れ</b>をでっち上げていた（30万円×6回）。</p></div>
-      <div class="amounts"><div><small>売上除外（売上を帳簿から外す）</small><strong>153万円</strong></div><div><small>架空経費（ない経費を計上）</small><strong>180万円</strong></div>
-        <div><small>申告した所得</small><strong>−57万円</strong></div><div><small>正しい所得</small><strong class="hl">276万円</strong></div></div>
-      <div class="skills">
-        <div class="skill"><strong>当たりをつける力</strong><span class="stars">${stars(s1)}</span><p>資料の不審な点（端緒）から、調べる所を決める。</p></div>
-        ${isLead() ? `<div class="skill"><strong>立証する力</strong><span class="stars">${stars(s3)}</span><p>発言と証拠をつなげて、相手が認める説明をする。</p></div>` : ""}
-      </div>
-      <div class="learn"><h3>今日体験した、税務調査の流れ</h3><ol>
-        <li><b>準備調査</b>：資料を読み、端緒から当たりをつける。</li>
-        <li><b>臨場</b>：相手の承諾を得て、話を聞き、現物を確かめる。</li>
-        <li><b>検討と説明</b>：発言と証拠をつなげ、相手が納得できるように説明する。</li></ol>
-        <p class="cap">実際の調査も、チームで分担し、声をかけ合いながら進めることがあります。</p></div>
-      <p class="disclaim">これはゲームです。会社・人物・資料・金額はすべて架空です。実際の税務調査では、書類を見せてもらう・金庫や机を開けてもらうなどの際に、必ず相手の明示の承諾を得ます。</p>
-    </div></section>
-    ${cta(`<button class="btn btn-ghost" data-act="reset">最初からやり直す</button>`)}`;
+      <div class="r-hero"><span class="stamp">${n === 3 ? "立証" : "あと一歩"}</span>
+        <p>社長の言い分を <b>${n} / 3</b> くずした</p></div>
+      <div class="res-list">${C.claims.map((c) => `<div class="${out[c.id] === "win" ? "win" : "miss"}"><span class="cid">${c.id}</span><p>「${esc(c.short)}」<small>示した証拠：${esc(C.place(st.picks[c.id]).name)}</small></p><b>${out[c.id] === "win" ? "くずした" : "くずせず"}</b></div>`).join("")}</div>
+      ${n === 3 ? `<div class="amounts"><div><small>売上除外（隠した売上）</small><strong class="hl">${R.sales}万円</strong></div><div><small>架空経費（ありもしない経費）</small><strong class="hl">${R.cost}万円</strong></div>
+        <div><small>申告した所得</small><strong>${R.before}万円</strong></div><div><small>正しい所得</small><strong>${R.after}万円</strong></div></div>` : ""}
+      <div class="look-up">${ICON.talk}<p><b>前のスクリーンを見てください。</b><br>これから答え合わせをします。</p></div>
+      <button class="back" data-act="reset" style="margin-top:20px">最初からやり直す</button>
+    </div></section>`;
   }
 
-  /* ---------- ヒント（森先輩） ---------- */
-  function hint() {
-    const r = cur();
-    const say = (t) => talk((Array.isArray(t) ? t : [t]).map((x) => ({ who: "mori", text: x })));
-    if (st.screen === "intro") return say("下のボタンで STEP 1 へ進もう。");
-    if (st.screen === "a1") {
-      const stg = st.a1.stage || "read";
-      if (stg === "read") return say(`資料の<b>オレンジに光っている所</b>をタップしよう。${myRoles().length > 1 ? "全部見つけたら、上のボタンでほかの担当の資料に切り替えて。" : ""}`);
-      if (stg === "share") return say("班長から順番に、カードの文を<b>そのまま読み上げれば</b>いい。全員読み終えたら下のボタンだ。");
-      return say("読み上げで出た「<b>夜の売上が0円</b>」「<b>現金払いの新しい仕入れ先</b>」が気になるな。それに合う仮説を選ぼう。");
-    }
-    if (st.screen === "a2") {
-      const nx = TASKS[r].find((t) => !taskDone(t));
-      if (!nx) return say(tasksLeft() ? "この担当は調べ終わった。上のボタンで、もう1つの担当に切り替えよう。" : "全部調べた。下のボタンで署にもどろう。");
-      return say(`次は、<b>光っている行</b>（${nx.startsWith("q:") ? "社長への質問" : esc(pOf(nx.slice(2)).name)}）をタップしよう。手がかりが出たら、すぐ班に読み上げて。`);
-    }
-    if (st.screen === "a3") {
-      if (!isLead()) return say("カードの文を、班長に読み上げよう。班長が迷っていたら、「この証拠は社長の○○という発言と食い違う」と一緒に考えて。");
-      const b = curBoard(); if (!b) return;
-      const lv = (st.a3.hints[b.id] = Math.min(2, (st.a3.hints[b.id] || 0) + 1)); save();
-      const rolesOf = (g) => [...new Set(g.map((c) => C.roles[C.codes[c].role].name))].join("か");
-      const names = (g) => g.map(evName).join("」か「");
-      return say(lv === 1 ? `この発言には、<b>${rolesOf(b.need[0])}</b>の証拠と、<b>${rolesOf(b.need[1])}</b>の証拠を組み合わせよう。` : `使えるのは「<b>${names(b.need[0])}</b>」と、「<b>${names(b.need[1])}</b>」だ。`);
-    }
+  /* ---------- 言い分・ヒント ---------- */
+  function claimsSheet() {
+    sheet(`<h2>社長の言い分</h2><div class="claims">${C.claims.map((c) => quote(c)).join("")}</div>
+      <p class="grp">不審な点（端緒＝たんちょ）</p><ul class="tancho">${C.tancho.map((t) => `<li><b>${esc(t.big)}</b><span>${esc(t.text)}</span></li>`).join("")}</ul>`);
+  }
+  function hintSheet() {
+    const draw = (d) => {
+      d.querySelector(".hint-list").innerHTML = C.claims.map((c) => {
+        const lv = st.hints[c.id] || 0;
+        return `<div class="hint-row"><p class="h-q"><span class="cid">${c.id}</span>「${esc(c.short)}」をくずすには</p>
+          ${c.hint.slice(0, lv).map((h) => `<p class="h-a">${esc(h)}</p>`).join("")}
+          ${lv < c.hint.length ? `<button class="h-more" data-h="${c.id}">${lv ? "もっとヒント" : "ヒントを見る"}</button>` : ""}</div>`;
+      }).join("");
+      d.querySelectorAll(".h-more").forEach((b) => b.onclick = () => { st.hints[b.dataset.h] = (st.hints[b.dataset.h] || 0) + 1; SND.play("paper"); save(); draw(d); });
+    };
+    sheet(`<div class="mori-say"><span class="pic" style="${faceCss("mori", 1.6)}"></span><p><b>森先輩</b>どの言い分から考える？ 見たいものだけ開こう。</p></div><div class="hint-list"></div>`, draw);
   }
 
   /* ---------- 操作 ---------- */
   const ACT = {
-    sound() { SND.unlock(); SND.toggle(); render(); },
-    start() { if (st.roles.length && st._last) { confirmSheet("最初から始めますか", "この端末の進み具合は消えます。", "最初から始める", () => { st = fresh(); go("roles"); }); return; } st = fresh(); go("roles"); },
-    resume() { go(st._last || "intro"); },
-    home() { go("title"); },
-    role(el) { const r = el.dataset.r; st.roles = has(r) ? st.roles.filter((x) => x !== r) : st.roles.concat(r); SND.play("tap"); save(); render(); },
-    "roles-ok"() {
-      if (!st.roles.length) return;
-      const go2 = () => { st.cur = myRoles()[0]; go("intro"); talk([{ who: "mori", text: "指導役の森だ。今日の相手は喫茶店「<b>浜風珈琲</b>」。申告は赤字だが、数字に引っかかるところがある。" }, { who: "mori", text: "迷ったら、いつでも上の<b>「ヒント」</b>を押してくれ。" }]); };
-      if (!isLead()) confirmSheet("班長はいますか", "班の中に<b>班長が1人</b>必要です。ほかの人が班長を選んでいれば、このまま進めてください。", "このまま進む", go2);
-      else go2();
+    sound() { SND.unlock(); SND.toggle(); if (!SND.on) voice(null); render(); },
+    async start() {
+      st = fresh(); st.started = true; go("brief"); SND.play("paper");
+      await talk([{ who: "mori", text: "指導役の森だ。スクリーンで見たとおり、相手は喫茶店「<b>浜風珈琲</b>」の白洲社長。", v: "mori_start_1" },
+        { who: "mori", text: "社長の<b>3つの言い分</b>が本当か、お店で証拠を探して確かめよう。迷ったら上の<b>「ヒント」</b>を押してくれ。", v: "mori_start_2" }]);
     },
-    "to-a1"() { st.a1.stage = "read"; go("a1"); },
-    "a1-stage"(el) { st.a1.stage = el.dataset.s; SND.play("paper"); go("a1"); },
-    cur(el) { st.cur = el.dataset.r; SND.play("tap"); save(); render(); },
-    hint() { hint(); },
-    hypo(el) {
-      const h = el.dataset.h, on = st.a1.hypo.includes(h);
-      if (!on && st.a1.hypo.length >= 2) { toast("仮説は2つまで。外してから選ぼう"); return; }
-      st.a1.hypo = on ? st.a1.hypo.filter((x) => x !== h) : st.a1.hypo.concat(h); SND.play("paper"); save(); render();
+    resume() { go(resumeTo && resumeTo !== "title" ? resumeTo : "brief"); },
+    reset() { confirmSheet("最初からやり直しますか", "この端末の進み具合が消えます。", "やり直す", () => { st = fresh(); save(); go("title"); }); },
+    async "to-map"() {
+      const first = st.screen === "brief" && !st.seen.length;
+      go("map");
+      if (first) { SND.play("door"); await talk([{ who: "boss", text: "税務署の方？ うちは赤字ですよ。どうぞ、何でも見てください。", face: "boss_grin", v: "boss_hello" }]); }
     },
-    async "to-a2"() {
-      const good = st.a1.hypo.some((h) => C.hypotheses.find((x) => x.id === h).good === true);
-      await talk([{ who: "mori", text: good ? "いい当たりだ。お店で確かめよう。" : "仮説は現場で確かめるものだ。お店へ行こう。" }]);
-      st.cur = myRoles()[0]; go("a2"); SND.play("door");
-      await talk([{ who: "boss", text: "税務署の方？ うちは赤字ですよ。何もやましいことはありません。", face: "boss_grin" },
-        { who: "mori", text: "書類を見るときは、<b>必ず社長の承諾</b>をもらうこと。見つけたら、すぐ班に伝えよう。" }]);
+    spot(el) {
+      const id = el.dataset.p;
+      if (!seen(id) && !left()) { toast("もう調べられません。班の相談へ進もう"); return; }
+      st.at = id; st.stage = seen(id) ? "doc" : "ask"; SND.play("tap"); go("place");
     },
-    task(el) { doTask(el.dataset.t); },
-    notes() { notes(); },
-    "end-a2"() {
-      confirmSheet("署にもどりますか", "<b>班の全員</b>が調べ終わってから進みましょう。", "署にもどる", async () => {
-        st.a3.idx = 0; go("a3"); SND.play("car");
-        await talk([{ who: "mori", text: isLead() ? "署にもどった。社長に証拠を示せるのは<b>班長のあなただけ</b>だ。まず仲間の読み上げを聞こう。" : "署にもどった。見つけたことを、<b>班長に読み上げて</b>くれ。" }]);
-      });
+    async ask() {
+      const p = C.place(st.at); if (!p || seen(p.id)) return;
+      if (!left()) { toast("もう調べられません"); return; }
+      await talk([{ who: "you", text: p.ask }, { who: "boss", text: p.ok, face: p.open ? "boss_shock" : "boss_grin", sfx: p.open ? "unlock" : "open", v: `boss_ok_${p.id}` }]);
+      st.seen.push(p.id); st.stage = "doc"; SND.play("paper"); save(); render(); window.scrollTo(0, 0);
     },
-    pick(el) {
-      const b = curBoard(), c = el.dataset.c; if (!b) return;
-      const pk = (st.a3.picks[b.id] = st.a3.picks[b.id] || []);
-      const at = pk.indexOf(c);
-      if (at >= 0) pk[at] = null; else if (!pk[0]) pk[0] = c; else pk[1] = c;
-      SND.play("click"); save(); render();
+    tag(el) { st.tags[st.at] = el.dataset.t; SND.play("click"); save(); render(); },
+    "to-share"() {
+      if (left() && st.screen === "map") { confirmSheet("班の相談へ進みますか", `まだ <b>${left()}か所</b> 調べられます。あとからもどって調べることもできます。`, "班の相談へ", () => go("share")); return; }
+      go("share");
     },
-    unpick(el) { const b = curBoard(); if (!b) return; const pk = st.a3.picks[b.id] || []; pk[+el.dataset.i] = null; save(); render(); },
-    skip() { st.a3.idx++; save(); render(); window.scrollTo(0, 0); },
-    thrust() { thrust(); },
-    "to-result"() { confirmSheet("ふりかえりへ進みますか", "答えが出ます。<b>班長が説明を終えてから</b>進んでください。", "ふりかえりへ", () => go("result")); },
-    reset() { confirmSheet("最初からやり直しますか", "この端末の進み具合が消えます。", "やり直す", () => { st = fresh(); save(); go("title"); }); }
+    "be-leader"() { st.leader = true; go("answer"); talk([{ who: "mori", text: "班長、たのむぞ。みんなの話を聞いて、言い分ごとに<b>決め手の証拠</b>を1つずつ選ぼう。", v: "mori_leader" }]); },
+    choose(el) { chooseSheet(el.dataset.c); },
+    show() {
+      if (!C.claims.every((c) => st.picks[c.id])) return;
+      confirmSheet("社長に証拠を示しますか", "<b>やり直しはできません。</b>班のみんなと確認してから押してください。", "社長に示す", showdown);
+    },
+    claims() { claimsSheet(); },
+    hint() { hintSheet(); }
   };
 
   app.addEventListener("click", (e) => {
     SND.unlock();
-    const hit = e.target.closest("[data-hit]");
-    if (hit && st.screen === "a1") {
-      const r = cur(), k = r + ":" + hit.dataset.hit, H = C.prep[r].hits[hit.dataset.hit];
-      if (!st.a1.found.includes(k)) {
-        st.a1.found.push(k); save(); SND.play(H.good ? "item" : "paper"); render();
-        if (H.good && !goodHits(r).some((h) => !st.a1.found.includes(r + ":" + h)) && goodLeft()) toast("この担当は完了！上で次の担当へ");
-      }
-      return;
-    }
     const el = e.target.closest("[data-act]"); if (!el || el.disabled) return;
     const f = ACT[el.dataset.act]; if (f) f(el);
   });
-  document.getElementById("bar").addEventListener("click", (e) => { const el = e.target.closest("[data-act]"); if (el && ACT[el.dataset.act]) ACT[el.dataset.act](el); });
+  document.getElementById("bar").addEventListener("click", (e) => { SND.unlock(); const el = e.target.closest("[data-act]"); if (el && ACT[el.dataset.act]) ACT[el.dataset.act](el); });
 
-  // STEP 1：見つけた所に印をつける
-  new MutationObserver(() => {
-    if (st.screen !== "a1") return;
-    const r = cur();
-    app.querySelectorAll("[data-hit]").forEach((n) => { const k = r + ":" + n.dataset.hit; if (st.a1.found.includes(k)) { n.classList.add("found"); if (!C.prep[r].hits[n.dataset.hit].good) n.classList.add("meh"); } });
-  }).observe(app, { childList: true });
-
-  if (st.screen !== "title") st.screen = "title";
-  render();
+  // 開き直したときは、いったんタイトルを出して「続きから」で前の画面へもどす
+  let resumeTo = st.screen === "place" ? "map" : st.screen;
+  st.screen = "title"; render();
   if (location.hash === "#debug") window.__rinjo = { get st() { return st; }, set st(v) { st = v; }, go, render, talk, ACT, next: () => talking && talking() };
 })();

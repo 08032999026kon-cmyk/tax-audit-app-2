@@ -8,9 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&family=Zen+Old+Mincho:wght@600&display=swap">
 <style>
-/* 投影用。暗い1テーマに固定し、遠くからでも読める大きさにする */
+/* 投影用。司会がこの画面で全員に説明する。暗い1テーマに固定し、遠くからでも読める大きさにする */
 :root{
-  --night:#0b1020;--panel:#151b2b;--ink:#f3ead8;--dim:#aaa392;--amber:#f2a53a;--red:#e2553f;--paper:#f7f1e3;--paper-ink:#2b2620;--line:rgba(243,234,216,.16);
+  --night:#0b1020;--panel:#151b2b;--ink:#f3ead8;--dim:#aaa392;--amber:#f2a53a;--red:#e2553f;--teal:#4fb3a9;--paper:#f7f1e3;--paper-ink:#2b2620;--paper-dim:#776d5c;--paper-line:#d9cfba;--line:rgba(243,234,216,.16);
   --f-display:"Dela Gothic One","Hiragino Kaku Gothic StdN","Noto Sans JP",sans-serif;
   --f-body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
   --f-paper:"Zen Old Mincho","Hiragino Mincho ProN","Noto Serif JP",serif;
@@ -22,64 +22,117 @@ html,body{height:100%;margin:0}
 body{background:var(--night);color:var(--ink);font-family:var(--f-body);display:flex;flex-direction:column;overflow:hidden}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 button:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
-.slide{display:none;flex:1;min-height:0;padding:5vh max(5vw,16px) 3vh;overflow:auto;flex-direction:column;gap:3vh}
+.slide{display:none;flex:1;min-height:0;padding:4.5vh max(5vw,16px) 3vh;overflow:auto;flex-direction:column;gap:2.6vh;position:relative}
 .slide.on{display:flex}
 .kicker{font-size:clamp(12px,1.4vw,20px);letter-spacing:.28em;color:var(--amber);font-weight:700;margin:0}
 h1{font-family:var(--f-display);font-weight:400;font-size:clamp(64px,13vw,200px);line-height:.95;margin:0;letter-spacing:.02em;text-shadow:0 8px 60px rgba(242,165,58,.25)}
-h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px);line-height:1.15;margin:0;letter-spacing:.02em}
-.lead{font-size:clamp(18px,2.4vw,38px);line-height:1.6;margin:0}
+h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.4vw,68px);line-height:1.15;margin:0;letter-spacing:.02em}
+h2 em{font-style:normal;color:var(--amber)}
+.lead{font-size:clamp(18px,2.3vw,36px);line-height:1.6;margin:0}
 .lead b,.big b{color:var(--amber)}
 .center{justify-content:center}
-.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:2.4vw}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:2.4vw;display:flex;flex-direction:column;gap:1vw;min-width:0}
-.card h3{margin:0;font-size:clamp(20px,2.6vw,40px)}
-.tag{align-self:flex-start;padding:.25em .8em;border-radius:999px;font-size:clamp(14px,1.6vw,24px);font-weight:700;background:var(--ink);color:var(--night)}
-.tag.red{background:var(--red);color:#fff}
-.big{font-size:clamp(18px,2.3vw,36px);line-height:1.6;margin:0;padding-left:1.2em}
-.note{font-size:clamp(14px,1.5vw,22px);color:var(--dim);margin:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:2.2vw;display:flex;flex-direction:column;gap:1vw;min-width:0}
+.card h3{margin:0;font-size:clamp(20px,2.5vw,38px)}
+.big{font-size:clamp(18px,2.2vw,34px);line-height:1.6;margin:0;padding-left:1.2em}
+.note{font-size:clamp(14px,1.5vw,22px);color:var(--dim);margin:0;line-height:1.6}
+.note b{color:var(--ink)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:3vw;align-items:start;min-height:0}
+.fraud{display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+.fraud strong{font-family:var(--f-display);font-weight:400;font-size:clamp(24px,3.2vw,52px);color:var(--amber)}
+/* 舞台 */
+.stage{position:absolute;inset:0;background-size:cover;background-position:center 45%;filter:brightness(.42)}
+.over{position:relative;display:flex;flex-direction:column;gap:2.4vh;flex:1;justify-content:flex-end}
+.person{display:flex;gap:2vw;align-items:flex-end}
+.person img{height:min(54vh,40vw);filter:drop-shadow(0 20px 40px rgba(0,0,0,.6))}
+.person .card{flex:1;background:rgba(21,27,43,.9)}
+/* 決算書 */
+.paper{background:var(--paper);color:var(--paper-ink);border-radius:10px;padding:2vw;font-family:var(--f-paper)}
+table.fs{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:clamp(16px,1.9vw,30px)}
+table.fs th,table.fs td{padding:.45em .4em;border-bottom:1px solid var(--paper-line);text-align:right;white-space:nowrap}
+table.fs th:first-child{text-align:left;font-weight:600}
+table.fs thead th{font-size:.7em;color:var(--paper-dim);font-family:var(--f-body)}
+table.fs tr.sub th,table.fs tr.sub td{font-size:.85em;color:var(--paper-dim)}
+table.fs tr.total th,table.fs tr.total td{border-top:2px solid var(--paper-ink);border-bottom:0;font-weight:700}
+table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
+.cap{font-size:clamp(12px,1.2vw,18px);color:var(--paper-dim);font-family:var(--f-body);margin:.8em 0 0}
+.tancho{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1.4vh}
+.tancho li{padding:1.4vh 1.4vw;border-radius:14px;background:var(--panel);border-left:6px solid var(--amber);opacity:.18;transition:opacity .3s}
+.tancho li.on{opacity:1}
+.tancho b{display:block;font-size:clamp(18px,2.2vw,34px);color:var(--amber)}
+.tancho span{font-size:clamp(14px,1.5vw,22px);color:#d7cfbf;line-height:1.5}
+.step-btn{align-self:flex-start;padding:.6em 1.2em;border-radius:12px;background:var(--amber);color:#1b1206;font-weight:700;font-size:clamp(14px,1.5vw,22px)}
+/* 言い分 */
+.claims{display:flex;flex-direction:column;gap:1.8vh}
+.claim{display:flex;gap:1.4vw;align-items:center;padding:1.8vh 1.6vw;border-radius:18px;background:#2a1916;border:1px solid rgba(226,85,63,.5)}
+.cid{flex:none;display:grid;place-items:center;width:1.8em;height:1.8em;border-radius:.4em;background:var(--red);color:#fff;font-family:var(--f-display);font-size:clamp(20px,2.4vw,38px)}
+.claim p{margin:0;font-family:var(--f-paper);font-size:clamp(20px,2.6vw,42px);line-height:1.45}
+.boss-side{display:grid;grid-template-columns:auto 1fr;gap:3vw;align-items:end;flex:1;min-height:0}
+.boss-side img{height:min(62vh,34vw);filter:drop-shadow(0 20px 40px rgba(0,0,0,.6))}
+/* 進め方 */
 .steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1.6vh;counter-reset:s}
-.steps li{counter-increment:s;display:grid;grid-template-columns:auto 1fr;gap:1.4vw;align-items:center;font-size:clamp(18px,2.4vw,38px);line-height:1.5;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.6vh 1.6vw}
+.steps li{counter-increment:s;display:grid;grid-template-columns:auto 1fr auto;gap:1.4vw;align-items:center;font-size:clamp(18px,2.3vw,36px);line-height:1.5;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.6vh 1.6vw}
 .steps li::before{content:counter(s);font-family:var(--f-display);display:grid;place-items:center;width:1.8em;height:1.8em;border-radius:50%;background:var(--amber);color:#1b1206}
-.steps li.must{border-color:var(--red)}
 .steps b{color:var(--amber)}
+.steps small{display:block;font-size:.62em;color:var(--dim);line-height:1.5}
+.steps .min{font-family:var(--f-display);font-size:.8em;color:var(--dim)}
+.consent{display:flex;gap:1.4vw;align-items:center;padding:1.6vh 1.6vw;border-radius:16px;border:2px solid var(--teal);background:rgba(79,179,169,.1)}
+.consent b{color:#9fe3da}
+/* QR */
 .qrwrap{display:grid;grid-template-columns:auto 1fr;gap:4vw;align-items:center;flex:1;min-height:0}
 .qr{background:#fff;padding:1.4vw;border-radius:18px;width:min(46vh,40vw);aspect-ratio:1;max-width:100%}
 .qr svg{width:100%;height:100%;display:block}
 .url{font-family:ui-monospace,Menlo,monospace;font-size:clamp(12px,1.4vw,22px);color:var(--dim);word-break:break-all}
-.timer-wrap{display:grid;grid-template-columns:1.3fr 1fr;gap:3vw;align-items:center;flex:1}
-.timer{font-family:var(--f-display);font-size:clamp(80px,17vw,280px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+/* タイマー */
+.timer-wrap{display:grid;grid-template-columns:1.15fr 1fr;gap:3vw;align-items:center;flex:1;min-height:0}
+.timer{font-family:var(--f-display);font-size:clamp(80px,16vw,260px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .timer.low{color:var(--red)}
 .tbtns{display:flex;flex-wrap:wrap;gap:10px;margin-top:2vh}
 .tbtns button{padding:.6em 1.2em;border-radius:12px;background:var(--panel);border:1px solid var(--line);font-size:clamp(14px,1.5vw,22px);font-weight:700}
 .tbtns button.primary{background:var(--amber);color:#1b1206;border-color:var(--amber)}
-.answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:2vw}
-.ans{background:var(--paper);color:var(--paper-ink);border-radius:16px;padding:2vw;display:flex;flex-direction:column;gap:1vh}
-.ans small{font-size:clamp(12px,1.3vw,20px);font-weight:700;letter-spacing:.12em;color:#7a6e5c}
-.ans .claim{font-family:var(--f-paper);font-size:clamp(16px,1.9vw,30px);line-height:1.5}
-.ans .ev{font-size:clamp(18px,2.2vw,34px);font-weight:700;color:#b2321f}
-.ans p{margin:0;font-size:clamp(14px,1.5vw,22px);line-height:1.6}
-.reveal{align-self:flex-start;padding:.7em 1.4em;border-radius:14px;background:var(--red);color:#fff;font-size:clamp(16px,1.8vw,28px);font-weight:700}
-.fraud{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:2vw}
-.fraud .card strong{font-family:var(--f-display);font-weight:400;font-size:clamp(24px,3.2vw,52px);color:var(--amber)}
+.mini-claims{display:flex;flex-direction:column;gap:1.2vh}
+.mini-claims div{display:flex;gap:1vw;align-items:center;font-family:var(--f-paper);font-size:clamp(16px,1.8vw,28px);line-height:1.4}
+.mini-claims .cid{font-size:clamp(14px,1.5vw,24px)}
+/* 答え合わせ */
+.reveal-list{display:flex;flex-direction:column;gap:1.8vh}
+.rv{display:grid;grid-template-columns:auto 1fr auto;gap:1.4vw;align-items:center;padding:1.6vh 1.6vw;border-radius:18px;background:var(--panel);border:1px solid var(--line)}
+.rv .claim-t{font-family:var(--f-paper);font-size:clamp(18px,2.2vw,34px);line-height:1.4}
+.rv .ans{grid-column:2/-1;display:none;flex-direction:column;gap:.6vh}
+.rv.open .ans{display:flex}
+.rv.open{border-color:var(--amber)}
+.rv .ev{font-size:clamp(18px,2.2vw,34px);font-weight:700;color:var(--amber)}
+.rv .why{font-size:clamp(14px,1.6vw,24px);color:#d7cfbf;line-height:1.55;margin:0}
+.rv .boss{display:flex;gap:1vw;align-items:center;margin:0;font-family:var(--f-paper);font-size:clamp(14px,1.6vw,24px);color:#ffb3a6}
+.rv .boss img{width:3em;height:3em;border-radius:12px;object-fit:cover;object-position:50% 8%;background:#2a1b17}
+.rv button{padding:.5em 1.1em;border-radius:12px;background:var(--red);color:#fff;font-weight:700;font-size:clamp(14px,1.6vw,24px)}
+.sum{display:grid;grid-template-columns:repeat(2,1fr);gap:2vw}
+.sum .card strong{font-family:var(--f-display);font-weight:400;font-size:clamp(32px,5vw,80px);color:var(--amber);font-variant-numeric:tabular-nums}
+.sum .card small{font-size:clamp(14px,1.6vw,24px);color:var(--dim)}
+.flow3{display:grid;grid-template-columns:repeat(3,1fr);gap:2vw}
+.flow3 .card strong{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4vw,64px);color:var(--amber)}
+.flow3 .card small{font-size:clamp(14px,1.4vw,22px);color:var(--dim)}
+/* 下のバー */
 .bar{display:flex;align-items:center;gap:10px;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);background:#080c18}
 .bar button{padding:8px 16px;border-radius:10px;background:var(--panel);border:1px solid var(--line);font-weight:700}
 .bar .count{flex:1;text-align:center;color:var(--dim);font-size:14px;font-variant-numeric:tabular-nums}
 #cfg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:grid;place-items:center;padding:16px}
-#cfg div{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(36rem,100%);display:flex;flex-direction:column;gap:10px}
+#cfg>div{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(36rem,100%);display:flex;flex-direction:column;gap:10px}
 #cfg input{font:inherit;padding:10px;border-radius:8px;border:1px solid var(--line);background:#0b1020;color:var(--ink);width:100%}
-@media (max-width:760px){.qrwrap,.timer-wrap{grid-template-columns:1fr}.qr{width:min(70vw,320px)}}
+@media (max-width:760px){.qrwrap,.timer-wrap,.cols,.boss-side,.fraud,.sum,.flow3{grid-template-columns:1fr}.qr{width:min(70vw,320px)}.boss-side img,.person img{height:28vh}}
 </style>
 </head>
 <body>
-<section class="slide on center" data-title="タイトル">
+<!-- 1 -->
+<section class="slide center" data-title="タイトル">
   <p class="kicker">税務調査 体験ゲーム</p>
   <h1>臨場</h1>
-  <p class="lead">班で手分けして喫茶店「浜風珈琲」を調べ、社長の説明を<b>証拠</b>で確かめよう。</p>
+  <p class="lead">喫茶店「浜風珈琲」の社長の言い分を、<b>証拠</b>で確かめよう。</p>
+  <p class="note">臨場（りんじょう）＝調査官が、お店や会社に出向いて調べること。</p>
 </section>
 
-<section class="slide" data-title="今日やること">
+<!-- 2 -->
+<section class="slide" data-title="今日の仕事">
   <p class="kicker">MISSION</p>
-  <h2>あなたは税務署の調査官です</h2>
+  <h2>あなたは税務署の<em>調査官</em>です</h2>
   <p class="lead">お店のもうけ（<b>所得</b>）は「売上 − 経費」。もうけが大きいほど、税金も多くなります。<br>だから、こんなごまかしが起きることがあります。</p>
   <div class="fraud">
     <div class="card"><strong>売上除外</strong><p class="lead">売上を帳簿に書かずに隠す</p></div>
@@ -88,83 +141,132 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   <p class="note">これから出てくる会社・人物・資料は、すべて架空です。</p>
 </section>
 
-<section class="slide" data-title="担当">
-  <p class="kicker">ROLE</p>
-  <h2>班で担当を分けよう</h2>
-  <div class="grid2">
-    <div class="card"><span class="tag" style="background:#f2a53a">班長　班に1人</span><p class="lead">決算書を読み、最後に<b>社長へ証拠を示す</b></p></div>
-    <div class="card"><span class="tag" style="background:#e2553f;color:#fff">売上担当</span><p class="lead">レジや予約の記録を調べる</p></div>
-    <div class="card"><span class="tag" style="background:#4fb3a9">現金担当</span><p class="lead">通帳や金庫を調べる</p></div>
-    <div class="card"><span class="tag" style="background:#8f8cf0">仕入れ担当</span><p class="lead">仕入れの帳簿や在庫を調べる</p></div>
+<!-- 3 -->
+<section class="slide" data-title="今日のお店">
+  <div class="stage" data-bg="ext"></div>
+  <div class="over">
+    <p class="kicker">THE SHOP</p>
+    <div class="person"><img data-ch="boss_grin" alt="白洲社長">
+      <div class="card"><h3>喫茶店「浜風珈琲」　白洲 守 社長</h3>
+        <p class="lead">海沿いの小さな喫茶店。帳簿は<b>全部、社長が1人で</b>つけています。<br>今期の申告は「赤字」でした。</p></div></div>
   </div>
-  <p class="note">2〜3人の班：1人で2つ持つ（例：班長＋売上）。5〜6人の班：同じ担当を2人で持つ。担当ごとに見られる資料が違うので、<b style="color:var(--amber)">声に出して伝え合う</b>のがカギです。</p>
-  <p class="note">これはゲームです。実際の税務調査では、書類を見せてもらう・机や金庫を開けてもらうときは、必ず相手の明示の承諾を得ます。</p>
 </section>
 
+<!-- 4 -->
+<section class="slide" data-title="端緒（不審な点）">
+  <p class="kicker">STEP 0　端緒（たんちょ）</p>
+  <h2>決算書から見える<em>不審な点</em></h2>
+  <div class="cols">
+    <div class="paper" id="statement"></div>
+    <div style="display:flex;flex-direction:column;gap:1.6vh">
+      <ul class="tancho" id="tancho"></ul>
+      <button class="step-btn" id="tancho-next">次の点を見せる</button>
+    </div>
+  </div>
+  <p class="note"><b>端緒</b>＝調べるきっかけになる、不審な点のこと。ここから「どこを調べるか」を考えます。</p>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-title="社長の言い分">
+  <p class="kicker">THE CLAIMS</p>
+  <h2>社長の<em>言い分</em>はこの3つ</h2>
+  <div class="boss-side"><img data-ch="boss_smug" alt="白洲社長"><div class="claims" id="claims"></div></div>
+  <p class="note">この言い分を<b>証拠でくずす</b>のが、今日のミッションです。</p>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-title="進め方">
+  <p class="kicker">HOW TO PLAY</p>
+  <h2>この順で進めます</h2>
+  <ol class="steps">
+    <li><span><b>自分で調べる</b><small>お店の11か所から、証拠がありそうな場所に<b>当たり</b>（見当）をつけて選ぶ。1人<b>4か所</b>まで。</small></span><span class="min">12分</span></li>
+    <li><span><b>班で相談する</b><small>見つけたことを伝え合い、<b>班長</b>が言い分ごとに決め手の証拠を1つ選んで、社長に示す。</small></span><span class="min">6分</span></li>
+    <li><span><b>答え合わせ</b><small>この画面で、決め手になった証拠を確かめます。</small></span><span class="min">5分</span></li>
+  </ol>
+  <div class="consent"><p class="lead" style="font-size:clamp(16px,1.9vw,30px)">見るときは、まず社長に<b>お願いして承諾をもらいます</b>。<br><span class="note">これはゲームです。実際の税務調査でも、書類を見せてもらう・机や金庫を開けてもらうときは、必ず相手の<b>明示の承諾</b>を得ます。調査官が勝手に開けたり、お金に触れたりはしません。</span></p></div>
+</section>
+
+<!-- 7 -->
 <section class="slide" data-title="QRを読み取る">
   <p class="kicker">JOIN</p>
   <h2>スマホでQRを読み取ってください</h2>
   <div class="qrwrap">
     <div class="qr" id="qr"></div>
     <div style="display:flex;flex-direction:column;gap:2vh;min-width:0">
-      <p class="lead">開いたら「はじめる」を押し、<b>自分の担当</b>を選びます。</p>
-      <p class="lead">音が出ます。消したいときは、画面右上の<b>音のボタン</b>を押すと消えます。</p>
+      <p class="lead">開いたら<b>「はじめる」</b>を押します。</p>
+      <p class="lead">音が出ます。消したいときは、画面右上の<b>音のボタン</b>を押してください。</p>
       <div class="url" id="url"></div>
     </div>
   </div>
 </section>
 
-<section class="slide" data-title="進め方">
-  <p class="kicker">HOW TO PLAY</p>
-  <h2>この順で進めよう</h2>
-  <ol class="steps">
-    <li><b>STEP 1・2　資料を読む → 相談タイム（約6分）</b>：光っている所をタップ → 班で読み上げ、仮説を選ぶ</li>
-    <li><b>STEP 3　お店で調べる（約10分）</b>：社長に質問し、<b>承諾をもらって</b>書類を見せてもらう。見つけたらすぐ班に伝える</li>
-    <li class="must"><b>STEP 4　社長に説明する（約8分）</b>：みんなが班長に読み上げ、班長が<b>違う担当の証拠2つ</b>を社長にぶつける</li>
-  </ol>
-</section>
-
-<section class="slide" data-title="調査タイム">
-  <p class="kicker">INVESTIGATION</p>
-  <h2 id="phase">STEP 1・2　資料を読む・相談タイム</h2>
+<!-- 8 -->
+<section class="slide" data-title="自分で調べる" data-min="12">
+  <p class="kicker">1　INVESTIGATION</p>
+  <h2>自分で調べる（1人4か所まで）</h2>
   <div class="timer-wrap">
-    <div>
-      <div class="timer" id="timer">06:00</div>
-      <div class="tbtns"><button data-ph="6" data-n="STEP 1・2　資料を読む・相談タイム">STEP 1・2　6分</button><button data-ph="10" data-n="STEP 3　お店で調べる">STEP 3　10分</button><button data-ph="8" data-n="STEP 4　社長に説明する">STEP 4　8分</button></div>
-      <div class="tbtns"><button class="primary" id="t-start">スタート</button><button id="t-pause">一時停止</button><button id="t-plus">＋1分</button><button id="t-minus">−1分</button><button id="t-reset">リセット</button></div>
-    </div>
-    <div class="card"><h3>迷ったら</h3><ul class="big"><li>分かったことを<b>声に出して</b>班に伝える</li><li>森先輩の<b>ヒント</b>を読む</li><li>日付・金額を見比べる</li><li>手を挙げてスタッフへ</li></ul></div>
+    <div><div class="timer">12:00</div><div class="tbtns"></div></div>
+    <div class="card"><h3>社長の言い分</h3><div class="mini-claims"></div>
+      <p class="note">迷ったらスマホの<b>「ヒント」</b>へ。班で手分けすると、たくさん調べられます。</p></div>
   </div>
 </section>
 
-<section class="slide" data-title="ふりかえり">
-  <p class="kicker">REVIEW</p>
-  <h2>ふりかえり</h2>
-  <ol class="steps">
-    <li>最初に「あれ？」と感じた<b>不審な点</b>は？（端緒）</li>
-    <li>そこから、どこを調べようと<b>当たりをつけた</b>？</li>
-    <li>社長が言い逃れできない<b>決め手の証拠</b>は、どれだった？（立証）</li>
-    <li>ほかの担当から聞いて<b>つながった</b>のは、どの情報だった？</li>
-  </ol>
+<!-- 9 -->
+<section class="slide" data-title="班で相談" data-min="6">
+  <p class="kicker">2　DISCUSSION</p>
+  <h2>班で相談して、班長が証拠を示す</h2>
+  <div class="timer-wrap">
+    <div><div class="timer">06:00</div><div class="tbtns"></div></div>
+    <div class="card"><h3>やること</h3><ol class="big">
+      <li>1人ずつ、見つけたことを<b>読み上げる</b></li>
+      <li><b>班長を1人</b>決める<br><span class="note">決まらなければ、誕生日がいちばん近い人</span></li>
+      <li>班長が言い分ごとに<b>証拠を1つ</b>選び、「社長に示す」</li></ol></div>
+  </div>
 </section>
 
+<!-- 10 -->
 <section class="slide" data-title="答え合わせ">
-  <p class="kicker">ANSWER</p>
+  <p class="kicker">3　ANSWER</p>
   <h2>答え合わせ</h2>
-  <button class="reveal" id="reveal">答えを表示する</button>
-  <div class="answers" id="answers" hidden></div>
+  <div class="reveal-list" id="reveal"></div>
 </section>
 
-<section class="slide center" data-title="おわり">
+<!-- 11 -->
+<section class="slide" data-title="結果">
+  <p class="kicker">RESULT</p>
+  <h2>白洲社長が隠していたもの</h2>
+  <div class="sum">
+    <div class="card"><small>売上除外（土曜夜の貸切 18回）</small><strong>153万円</strong></div>
+    <div class="card"><small>架空経費（山海物産の白紙の領収書）</small><strong>180万円</strong></div>
+    <div class="card"><small>申告した所得</small><strong style="color:var(--ink)">−57万円</strong></div>
+    <div class="card"><small>正しい所得</small><strong>276万円</strong></div>
+  </div>
+  <p class="note">実際には、このあと正しい所得と税額を計算し直す手続きに進みます。</p>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-title="今日体験した仕事">
   <p class="kicker">OUR WORK</p>
-  <h2 style="font-size:clamp(36px,7vw,110px)">端緒 → 当たり → 立証</h2>
-  <p class="lead">不審な点に気づき、どこを調べるか当たりをつけ、<br>社長にぶつける証拠で立証する。それが、今日体験した仕事です。</p>
-  <p class="lead" style="margin-top:3vh">ありがとうございました</p>
+  <h2>今日体験した仕事</h2>
+  <div class="flow3">
+    <div class="card"><strong>端緒</strong><small>たんちょ</small><p class="lead">決算書から<b>不審な点</b>に気づく</p></div>
+    <div class="card"><strong>当たり</strong><small>あたり</small><p class="lead">どこに証拠がありそうか<b>見当をつける</b></p></div>
+    <div class="card"><strong>立証</strong><small>りっしょう</small><p class="lead">言い逃れできない<b>証拠で示す</b></p></div>
+  </div>
+  <p class="lead">1人では見つけられない証拠も、<b>班で手分けして伝え合う</b>ことでつながりました。</p>
+  <p class="note">実際の調査でも、書類を見せてもらうときは必ず相手の<b>明示の承諾</b>を得ます。</p>
+</section>
+
+<!-- 13 -->
+<section class="slide center" data-title="おわり">
+  <h2 style="font-size:clamp(36px,7vw,110px)">ありがとうございました</h2>
+  <p class="lead">登場した会社・人物・資料は、すべて架空です。</p>
 </section>
 
 <div class="bar">
   <button id="prev">← 前へ</button>
   <div class="count" id="count"></div>
+  <button id="voice">声：オン</button>
   <button id="cfg-open">設定</button>
   <button id="full">全画面</button>
   <button id="next">次へ →</button>
@@ -173,16 +275,51 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   <b>参加者が開くURL</b>
   <input id="cfg-url" type="url" inputmode="url">
   <p class="note">QRに使うURLです。ふつうは変える必要はありません。</p>
-  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="tb" id="cfg-cancel">やめる</button><button class="tb" id="cfg-save" style="color:var(--amber)">保存</button></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button id="cfg-cancel">やめる</button><button id="cfg-save" style="color:var(--amber)">保存</button></div>
 </div></div>
 
 <script src="js/vendor/qrcode.js"></script>
 <script src="js/case.js"></script>
+<script src="js/assets.js"></script>
 <script>
 (function(){
   "use strict";
   const $=id=>document.getElementById(id);
+  const C=window.CASE, A=window.ASSETS||{bg:{},ch:{}};
+  const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const strip=h=>String(h).replace(/<[^>]+>/g,"");
   const DEFAULT_URL="https://08032999026kon-cmyk.github.io/tax-audit-app-2/";
+
+  /* 画像 */
+  document.querySelectorAll("[data-bg]").forEach(el=>{const b=A.bg[el.dataset.bg];if(b)el.style.backgroundImage=`url('${b.src}')`;});
+  document.querySelectorAll("[data-ch]").forEach(el=>{const c=A.ch[el.dataset.ch];if(c)el.src=c.src;});
+
+  /* 声（voice/<id>.mp3 があれば流す） */
+  let voiceOn=true,vEl=null;
+  try{voiceOn=localStorage.getItem("rinjo-host:voice")!=="off";}catch(e){}
+  function voice(id){if(vEl){try{vEl.pause();}catch(e){}vEl=null;}if(!id||!voiceOn)return;try{vEl=new Audio(`voice/${id}.mp3`);const p=vEl.play();p&&p.catch&&p.catch(()=>{});}catch(e){}}
+  function paintVoice(){$("voice").textContent=voiceOn?"声：オン":"声：オフ";}
+  $("voice").onclick=()=>{voiceOn=!voiceOn;try{localStorage.setItem("rinjo-host:voice",voiceOn?"on":"off");}catch(e){}if(!voiceOn)voice(null);paintVoice();};
+  paintVoice();
+
+  /* 端緒・言い分 */
+  $("statement").innerHTML=C.statement;
+  $("tancho").innerHTML=C.tancho.map(t=>`<li><b>${esc(t.big)}</b><span>${esc(t.text)}</span></li>`).join("");
+  let tn=0;
+  function paintTancho(){[...$("tancho").children].forEach((li,i)=>li.classList.toggle("on",i<tn));$("tancho-next").hidden=tn>=C.tancho.length;}
+  $("tancho-next").onclick=()=>{tn++;paintTancho();};
+  paintTancho();
+  $("claims").innerHTML=C.claims.map(c=>`<div class="claim"><span class="cid">${c.id}</span><p>「${esc(c.text)}」</p></div>`).join("");
+  document.querySelectorAll(".mini-claims").forEach(el=>el.innerHTML=C.claims.map(c=>`<div><span class="cid">${c.id}</span>「${esc(c.short)}」</div>`).join(""));
+
+  /* 答え合わせ（1つずつ開く） */
+  $("reveal").innerHTML=C.claims.map(c=>`<div class="rv" data-c="${c.id}"><span class="cid">${c.id}</span><span class="claim-t">「${esc(c.text)}」</span><button>答えを見る</button>
+    <div class="ans"><span class="ev">決め手：${c.ok.map(id=>esc(C.place(id).name)).join(" ／ ")}</span><p class="why">${esc(c.why)}</p>
+    <p class="boss"><img data-ch="boss_panic" alt="">「${esc(c.win)}」</p></div></div>`).join("");
+  $("reveal").querySelectorAll(".rv").forEach(rv=>{const b=rv.querySelector("button");b.onclick=()=>{rv.classList.add("open");b.hidden=true;rv.scrollIntoView({block:"nearest",behavior:"smooth"});voice(`boss_win_${rv.dataset.c}`);};});
+  document.querySelectorAll("#reveal [data-ch]").forEach(el=>{const c=A.ch[el.dataset.ch];if(c)el.src=c.src;});
+
+  /* QR */
   function gameUrl(){
     try{const s=localStorage.getItem("rinjo-host:url");if(s)return s;}catch(e){}
     if(/^https?:/.test(location.protocol)&&!/claude/.test(location.host)) return new URL("index.html",location.href).href.replace(/index\.html$/,"");
@@ -195,34 +332,28 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   }
   drawQr();
 
+  /* タイマー（スライドごと） */
+  const fmt=s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+  document.querySelectorAll("[data-min]").forEach(sl=>{
+    const total=+sl.dataset.min*60;let left=total,tid=null;
+    const tEl=sl.querySelector(".timer"),bx=sl.querySelector(".tbtns");
+    bx.innerHTML=`<button class="primary" data-t="start">スタート</button><button data-t="pause">一時停止</button><button data-t="plus">＋1分</button><button data-t="minus">−1分</button><button data-t="reset">リセット</button>`;
+    const paint=()=>{tEl.textContent=fmt(left);tEl.classList.toggle("low",left<=60);};
+    const stop=()=>{clearInterval(tid);tid=null;};
+    const act={start(){if(tid)return;tid=setInterval(()=>{left=Math.max(0,left-1);paint();if(!left)stop();},1000);},pause:stop,plus(){left+=60;paint();},minus(){left=Math.max(0,left-60);paint();},reset(){stop();left=total;paint();}};
+    bx.addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b)act[b.dataset.t]();});
+    paint();
+  });
+
+  /* スライド */
   const slides=[...document.querySelectorAll(".slide")];let at=0;
   try{at=Math.min(slides.length-1,Math.max(0,+sessionStorage.getItem("rinjo-host:at")||0));}catch(e){}
-  function show(n){at=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,i)=>s.classList.toggle("on",i===at));
+  function show(n){at=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,i)=>s.classList.toggle("on",i===at));voice(null);
     $("count").textContent=`${at+1} / ${slides.length}　${slides[at].dataset.title}`;try{sessionStorage.setItem("rinjo-host:at",at);}catch(e){}}
   show(at);
   $("prev").onclick=()=>show(at-1);$("next").onclick=()=>show(at+1);
   addEventListener("keydown",e=>{if(e.target.tagName==="INPUT")return;if(["ArrowRight","PageDown"].includes(e.key)){show(at+1);e.preventDefault();}if(["ArrowLeft","PageUp"].includes(e.key)){show(at-1);e.preventDefault();}});
   $("full").onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}catch(e){}};
-
-  /* タイマー */
-  let total=6*60,left=total,tid=null;
-  const fmt=s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
-  function paint(){$("timer").textContent=fmt(left);$("timer").classList.toggle("low",left<=60);}
-  $("t-start").onclick=()=>{if(tid)return;tid=setInterval(()=>{left=Math.max(0,left-1);paint();if(!left){clearInterval(tid);tid=null;}},1000);};
-  $("t-pause").onclick=()=>{clearInterval(tid);tid=null;};
-  $("t-plus").onclick=()=>{left+=60;paint();};
-  $("t-minus").onclick=()=>{left=Math.max(0,left-60);paint();};
-  $("t-reset").onclick=()=>{clearInterval(tid);tid=null;left=total;paint();};
-  document.querySelectorAll("[data-ph]").forEach(b=>b.onclick=()=>{clearInterval(tid);tid=null;total=+b.dataset.ph*60;left=total;$("phase").textContent=b.dataset.n;paint();});
-  paint();
-
-  /* 答え */
-  $("reveal").onclick=()=>{
-    const C=window.CASE;
-    const nm=c=>C.codes[c].name;
-    $("answers").innerHTML=C.board.map(b=>{const S=C.statements[b.id];return `<div class="ans"><small>社長の発言（${C.roles[S.by].name}が聞いた）</small><div class="claim">「${S.text}」</div><small>崩した証拠（2つ）</small><div class="ev">${b.need[0].map(nm).join(" / ")}<br>＋ ${b.need[1].map(nm).join(" / ")}</div><p>${b.win}</p></div>`;}).join("")+`<div class="ans"><small>全体</small><div class="claim">売上除外 153万円 ＋ 架空経費 180万円</div><p>申告した所得 −57万円 → 正しい所得 276万円</p></div>`;
-    $("answers").hidden=false;$("reveal").hidden=true;
-  };
 
   /* 設定 */
   $("cfg-open").onclick=()=>{$("cfg-url").value=gameUrl();$("cfg").hidden=false;};
