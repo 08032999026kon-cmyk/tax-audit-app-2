@@ -118,19 +118,19 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vw,72px)
   <p class="kicker">HOW TO PLAY</p>
   <h2>この順で進めよう</h2>
   <ol class="steps">
-    <li><b>第1幕　準備調査（5分）</b>：自分の資料で気になる点をタップ → 班で読み上げ、仮説を選ぶ</li>
-    <li><b>第2幕　臨場（12分）</b>：社長に質問し、<b>承諾をもらって</b>現場を見る。持ち時間に注意</li>
-    <li class="must"><b>第3幕　検討と説明（7分）</b>：見つけたことを代表に伝える。代表が<b>違う担当の証拠2つ</b>を選んで社長にぶつける</li>
+    <li><b>STEP 1・2　資料を読む → 相談タイム（約6分）</b>：光っている所をタップ → 班で読み上げ、仮説を選ぶ</li>
+    <li><b>STEP 3　お店で調べる（約10分）</b>：社長に質問し、<b>承諾をもらって</b>書類を見せてもらう。見つけたらすぐ班に伝える</li>
+    <li class="must"><b>STEP 4　社長に説明する（約8分）</b>：みんなが代表に読み上げ、代表が<b>違う担当の証拠2つ</b>を社長にぶつける</li>
   </ol>
 </section>
 
 <section class="slide" data-title="調査タイム">
   <p class="kicker">INVESTIGATION</p>
-  <h2 id="phase">第1幕　準備調査</h2>
+  <h2 id="phase">STEP 1・2　資料を読む・相談タイム</h2>
   <div class="timer-wrap">
     <div>
-      <div class="timer" id="timer">05:00</div>
-      <div class="tbtns"><button data-ph="5" data-n="第1幕　準備調査">第1幕 5分</button><button data-ph="12" data-n="第2幕　臨場">第2幕 12分</button><button data-ph="7" data-n="第3幕　検討と説明">第3幕 7分</button></div>
+      <div class="timer" id="timer">06:00</div>
+      <div class="tbtns"><button data-ph="6" data-n="STEP 1・2　資料を読む・相談タイム">STEP 1・2　6分</button><button data-ph="10" data-n="STEP 3　お店で調べる">STEP 3　10分</button><button data-ph="8" data-n="STEP 4　社長に説明する">STEP 4　8分</button></div>
       <div class="tbtns"><button class="primary" id="t-start">スタート</button><button id="t-pause">一時停止</button><button id="t-plus">＋1分</button><button id="t-minus">−1分</button><button id="t-reset">リセット</button></div>
     </div>
     <div class="card"><h3>迷ったら</h3><ul class="big"><li>分かったことを<b>声に出して</b>班に伝える</li><li>森先輩の<b>ヒント</b>を読む</li><li>日付・金額を見比べる</li><li>手を挙げてスタッフへ</li></ul></div>
@@ -2713,7 +2713,7 @@ window.CASE = (function () {
   $("full").onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}catch(e){}};
 
   /* タイマー */
-  let total=5*60,left=total,tid=null;
+  let total=6*60,left=total,tid=null;
   const fmt=s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
   function paint(){$("timer").textContent=fmt(left);$("timer").classList.toggle("low",left<=60);}
   $("t-start").onclick=()=>{if(tid)return;tid=setInterval(()=>{left=Math.max(0,left-1);paint();if(!left){clearInterval(tid);tid=null;}},1000);};
