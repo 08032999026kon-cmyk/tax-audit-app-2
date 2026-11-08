@@ -478,6 +478,25 @@ h2.q{font-size:17px;margin:22px 0 10px}
 .tap-note{margin:8px 0 0;font-size:12.5px;color:var(--dim)}
 #s3d-host.on ~ .mark-help{margin-top:8px}
 
+/* ===== 何ページもある資料 ===== */
+.book{position:relative;perspective:1200px}
+.book .page{min-height:220px;touch-action:pan-y;box-shadow:3px 3px 0 -1px var(--paper-2),6px 6px 0 -2px var(--paper-line),0 14px 30px -18px rgba(0,0,0,.9)}
+.book .pg-no{position:absolute;right:12px;bottom:6px;font:600 11px var(--f-ui);color:var(--paper-dim)}
+.page.turn-next{animation:turnNext .32s ease-out;transform-origin:left center}
+.page.turn-prev{animation:turnPrev .32s ease-out;transform-origin:right center}
+@keyframes turnNext{from{transform:rotateY(-24deg) translateX(18px);opacity:.4}to{transform:none;opacity:1}}
+@keyframes turnPrev{from{transform:rotateY(24deg) translateX(-18px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.page.turn-next,.page.turn-prev{animation:none}}
+.pg-bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin-top:12px}
+.pg-bar span{font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+.pg-btn{min-height:44px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);font:600 14px var(--f-ui);cursor:pointer}
+.pg-btn:last-child{border-color:var(--amber);color:var(--amber)}
+.pg-btn:disabled{opacity:.3;border-color:var(--line);color:var(--dim)}
+.pg-help{margin:6px 0 0;text-align:center;font-size:12px;color:var(--dim)}
+.noticed.wait p{color:var(--dim)}
+.pg-note{margin-top:10px;font-size:13px;font-family:var(--f-ui);color:var(--paper-dim)}
+.receipt-mini + .receipt-mini{margin-top:8px}
+
 </style>
 </head>
 <body>
@@ -492,7 +511,7 @@ h2.q{font-size:17px;margin:22px 0 10px}
  * 答え：①現金でもらった工事代（6件・180万円）を帳簿に載せず、金庫に隠した（売上除外）
  *       ②「海野工業」への外注費 30万円×8回＝240万円をでっち上げ、家族名義の口座に振り込んだ（架空経費）
  * v6：事務所の机・棚・壁などに資料31点。班で「どの資料を見れば確かめられるか」当たりの付け方を相談し、
- *     各自が1人6点まで見る → 班で持ち寄り、班長が言い分ごとに決め手の資料を1つ選んで社長に示す。
+ *     各自が1人6点まで見る → 班で持ち寄り、代表が言い分ごとに決め手の資料を1つ選んで社長に示す。
  */
 window.CASE = (function () {
   /* 1人が見られる資料の数 */
@@ -673,6 +692,56 @@ window.CASE = (function () {
       doc: L("弁当の注文", [["月", "3個"], ["火", "3個"], ["水", "4個"]]),
       note: "ただの注文表。特に気になる点はない。" }
   ];
+
+
+  /* ---------- 何ページもある資料（めくって探す）。key＝決め手が載っているページ（0から数える） ---------- */
+  const B = (cap, rows, hl) => `<table class="ledger bank"><caption>${cap}</caption><tr><th>日付</th><th>摘要</th><th>出金</th><th>入金</th></tr>${rows.map((r) => `<tr class="${hl && hl.includes(r[1]) ? "hl" : ""}">${r.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>`;
+  const RC = (to, amt, what, date) => `<div class="receipt-blank"><b>領収書（控え）</b><span>${to} 様</span><span>¥${amt}-</span><span>但　${what}</span><em>白洲リフォーム<span class="hanko">白洲</span></em><small>${date}</small></div>`;
+  const PH = (cap) => `<div class="photo-print"><div class="ph"></div><p>${cap}</p></div>`;
+  const PAGES = {
+    bank: { key: 3, pages: [
+      B("普通預金　4月〜5月", [["4/10", "振込入金 小川様", "", "540,000"], ["4/25", "給与振込", "1,260,000", ""], ["4/30", "振込 シラス ミチコ", "300,000", ""], ["5/31", "振込 シラス ミチコ", "300,000", ""], ["5/31", "振込 浜辺建材", "388,000", ""]]),
+      B("普通預金　6月〜7月", [["6/15", "振込入金 中村様", "", "1,120,000"], ["6/30", "振込 シラス ミチコ", "300,000", ""], ["7/25", "給与振込", "1,260,000", ""], ["7/31", "振込 シラス ミチコ", "300,000", ""]]),
+      B("普通預金　8月〜9月", [["8/20", "振込入金 井上様", "", "760,000"], ["8/31", "振込 シラス ミチコ", "300,000", ""], ["9/10", "電気料金", "27,900", ""], ["9/30", "振込 シラス ミチコ", "300,000", ""]]),
+      B("普通預金　10月〜11月", [["10/31", "振込入金 佐藤様", "", "860,000"], ["10/31", "振込 シラス ミチコ", "300,000", ""], ["11/5", "振込 シラス ミチコ", "300,000", ""], ["11/5", "振込 浜辺建材", "412,000", ""]], ["振込 シラス ミチコ"])] },
+    invoices: { key: 2, pages: [
+      `<div class="receipt-mini">請求書　¥300,000-　海野工業　4月分<span class="hanko">海野</span></div><div class="receipt-mini">請求書　¥300,000-　海野工業　5月分<span class="hanko">海野</span></div><div class="receipt-mini">請求書　¥300,000-　海野工業　6月分<span class="hanko">海野</span></div><div class="receipt-mini">請求書　¥300,000-　海野工業　7月分<span class="hanko">海野</span></div>`,
+      `<div class="receipt-mini">請求書　¥300,000-　海野工業　8月分<span class="hanko">海野</span></div><div class="receipt-mini">請求書　¥300,000-　海野工業　9月分<span class="hanko">海野</span></div><div class="receipt-mini">請求書　¥300,000-　海野工業　10月分<span class="hanko">海野</span></div>`,
+      `<div class="receipt-mini">請求書　¥300,000-　海野工業　11月分<span class="hanko">海野</span></div>` + L("つづりの最後の集計（経理）", [["海野工業", "8回", "2,400,000"]], 0)] },
+    ledger: { key: 3, pages: [
+      L("工事台帳 7月", [["小川様", "外壁補修", "540,000"], ["高橋様", "トイレ交換", "290,000"]]),
+      L("工事台帳 8月", [["井上様", "浴室改修", "760,000"], ["松本様", "床張り替え", "420,000"]]),
+      L("工事台帳 9月", [["中島様", "屋根塗装", "680,000"], ["木村様", "キッチン", "1,080,000"]]),
+      L("工事台帳 10月", [["佐藤様", "外壁塗装", "860,000"], ["田村様", "キッチン", "1,240,000"], ["鈴木様", "屋根修理", "380,000"]])] },
+    receiptbook: { key: 2, pages: [
+      RC("小川", "540,000", "外壁補修工事代", "7/18"), RC("井上", "760,000", "浴室改修工事代", "8/22"),
+      RC("山田", "320,000", "浴室改修工事代　現金にて", "10/24")] },
+    payroll: { key: 1, pages: [
+      L("給与台帳 9月", [["職人 3名", "計 1,050,000"], ["事務 1名", "210,000"]]),
+      L("給与台帳 10月", [["職人 3名", "計 1,050,000"], ["事務 1名", "210,000"]])] },
+    estimate: { key: 1, pages: [
+      L("見積書（控え）佐藤様", [["外壁塗装一式", "860,000"], ["合計", "860,000"]]),
+      L("見積書（控え）山田様", [["浴室改修一式", "336,000"], ["現金払い 5%引き", "−16,000"], ["合計", "320,000"]], 2),
+      L("見積書（控え）鈴木様", [["屋根修理一式", "380,000"], ["合計", "380,000"]])] },
+    album: { key: 2, pages: [PH("9/30 木村様邸 キッチン 完成"), PH("10/15 田村様邸 キッチン 完成"), PH("10/24 山田様邸 浴室 完成")] },
+    contracts: { key: 0, pages: [
+      L("工事請負契約書　佐藤様", [["外壁塗装", "860,000"]]), L("工事請負契約書　田村様", [["キッチン", "1,240,000"]]), L("工事請負契約書　鈴木様", [["屋根修理", "380,000"]])] },
+    lastyear: { key: 1, pages: [
+      L("前期 売上", [["工事 42件", "52,400,000"]]),
+      L("前期 外注費", [["浜辺設備", "520,000"], ["潮見電工", "410,000"], ["海野工業", "取引なし"]], 2)] },
+    safe: { key: 1, pages: [
+      `<div class="envelope"><span>現金</span><small>「現金工事」　裏に鉛筆で「山田」</small><b>¥320,000</b></div>`,
+      `<table class="ledger hand small"><caption>小さなノート</caption><tr><td>4月 小林様</td><td>280,000</td></tr><tr><td>5月 青木様</td><td>260,000</td></tr><tr><td>6月 森田様</td><td>350,000</td></tr><tr><td>8月 石井様</td><td>310,000</td></tr><tr><td>9月 岡田様</td><td>260,000</td></tr><tr><td>10月 山田様</td><td>320,000</td></tr><tr class="hl"><td>6件 計</td><td>1,800,000</td></tr></table>`] },
+    nippou: { key: 2, pages: [
+      L("作業日報 9月", [["木村様 キッチン", "職人A・B"], ["中島様 屋根", "職人C"]]),
+      L("作業日報 10月", [["田村様 キッチン", "職人A・B"], ["山田様 浴室", "職人C"], ["鈴木様 屋根", "職人A・C"]]),
+      L("作業日報（今期・まとめ）", [["現場に来た人", "白洲リフォームの職人 3名のみ"], ["海野工業の人", "一度も記録なし"]], 1)] },
+    attendance: { key: 1, pages: [L("出勤簿 9月", [["職人A", "21日"], ["職人B", "22日"], ["職人C", "20日"]]), L("出勤簿 10月", [["職人A", "22日"], ["職人B", "21日"], ["職人C", "22日"]])] },
+    delivery: { key: 0, pages: [
+      L("納品書　浜辺建材 10月", [["10/19", "浴室パネル 一式", "届け先：山田様邸"], ["10/26", "屋根材", "届け先：鈴木様邸"]], 0),
+      L("納品書　浜辺建材 9月", [["9/12", "キッチン部材", "届け先：木村様邸"], ["9/20", "塗料", "届け先：中島様邸"]])] }
+  };
+  docs.forEach((d) => { if (PAGES[d.id]) Object.assign(d, PAGES[d.id]); else d.pages = [d.doc]; if (d.key == null) d.key = 0; d.doc = d.pages[d.key]; });
 
   const doc = (id) => docs.find((d) => d.id === id);
   const spot = (id) => spots.find((s) => s.id === id);
@@ -1280,7 +1349,7 @@ window.ASSETS = {
 <script>
 /* 臨場 v4 ― 司会主導の説明会向け。
  *  スクリーン：司会が「端緒」と「社長の言い分」を説明する（host.html）
- *  スマホ：①事務所の資料（約30点）から当たりをつけて1人6点まで見る → ②班で相談（班長が言い分ごとに資料を1つ選ぶ）
+ *  スマホ：①事務所の資料（約30点）から当たりをつけて1人6点まで見る → ②班で相談（代表が言い分ごとに資料を1つ選ぶ）
  *         → 社長に示す → 結果（答え合わせはスクリーンで）
  * 通信はしない。各自のスマホで遊び、見つけたことは口で伝え合う。
  * 保存は localStorage（"rinjo:v4"）。URL の末尾に #debug で window.__rinjo が使える。
@@ -1298,9 +1367,9 @@ window.ASSETS = {
   const claim = (id) => C.claims.find((c) => c.id === id);
 
   /* ---------- 状態 ---------- */
-  function fresh() { return { v: 5, screen: "title", seen: [], allowed: [], marks: [], tags: {}, at: null, spotAt: null, leader: false, picks: {}, outcome: null, hints: {}, started: false }; }
+  function fresh() { return { v: 5, screen: "title", seen: [], allowed: [], marks: [], tags: {}, at: null, spotAt: null, leader: false, picks: {}, outcome: null, hints: {}, started: false, pg: {}, found: {} }; }
   let st = load();
-  function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 5) return s; } catch (e) {} return fresh(); }
+  function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 5) { s.pg = s.pg || {}; s.found = s.found || {}; return s; } } catch (e) {} return fresh(); }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
   const left = () => Math.max(0, C.LIMIT - st.seen.length);
   const seen = (id) => st.seen.includes(id);
@@ -1539,6 +1608,26 @@ window.ASSETS = {
       <span class="t-foot">${s ? `<i class="ok">${ICON.check}見た</i>` : ""}${s && tag ? claimTag(tag) : ""}${marked(d.id) ? '<i class="star on">★</i>' : ""}</span></button>`;
   }
 
+  /* ---------- 何ページもある資料（めくる） ---------- */
+  let turn = "";
+  function book(d) {
+    const n = d.pages.length, i = Math.min(st.pg[d.id] || 0, n - 1);
+    if (n === 1) return `<div class="paper">${d.pages[0]}</div>`;
+    const t = turn; turn = "";
+    return `<div class="book" data-n="${n}">
+      <div class="paper page ${t}" data-page="${i}">${d.pages[i]}<span class="pg-no">${i + 1} / ${n}</span></div>
+      <div class="pg-bar"><button class="pg-btn" data-act="pg" data-dir="-1" ${i ? "" : "disabled"}>‹ 前のページ</button>
+        <span>${i + 1} / ${n} ページ</span>
+        <button class="pg-btn" data-act="pg" data-dir="1" ${i < n - 1 ? "" : "disabled"}>次のページ ›</button></div>
+      <p class="pg-help">左右にスワイプしても、めくれます</p></div>`;
+  }
+  function flip(dir) {
+    const d = C.doc(st.at); if (!d) return; const n = d.pages.length, i = st.pg[d.id] || 0, j = i + dir;
+    if (j < 0 || j >= n) return;
+    st.pg[d.id] = j; if (j === d.key) st.found[d.id] = true;
+    turn = dir > 0 ? "turn-next" : "turn-prev"; SND.play("paper"); save(); render();
+  }
+
   /* ---------- 1点を見る ---------- */
   function vPlace() {
     const d = C.doc(st.at); if (!d) return vMap();
@@ -1567,8 +1656,8 @@ window.ASSETS = {
     const tag = st.tags[d.id];
     return `<section class="screen"><div class="wrap">${back}
       ${mission(esc(d.name), esc(docWhere(d.id)))}
-      <div class="paper">${d.doc}</div>
-      <div class="noticed"><small>気づいたこと</small><p>${d.note}</p></div>
+      ${book(d)}
+      ${st.found[d.id] || d.key === 0 ? `<div class="noticed"><small>気づいたこと</small><p>${d.note}</p></div>` : `<div class="noticed wait"><small>気づいたこと</small><p>ページをめくって、気になるところを探そう。</p></div>`}
       <h2 class="q">この資料で、どの言い分をくずせそう？</h2>
       <div class="pickc">${C.claims.map((c) => `<button data-act="tag" data-t="${c.id}" aria-pressed="${tag === c.id}"><span class="cid">${c.id}</span><span>${esc(c.short)}</span></button>`).join("")}
         <button data-act="tag" data-t="none" aria-pressed="${tag === "none"}" class="none"><span class="cid">－</span><span>くずせなさそう</span></button></div>
@@ -1586,20 +1675,20 @@ window.ASSETS = {
         : `<p class="empty">まだ資料を見ていません。</p>`}
       ${left() ? `<button class="more" data-act="to-map">まだ ${left()} 点見られます →</button>` : ""}
       <div class="leader-box">
-        <h2>次に、<b>班長</b>を1人決めよう</h2>
-        <p>班長は、みんなの話を聞いて、言い分ごとに<b>決め手の資料</b>を選び、社長に示します。決まらなければ、スクリーンの指示に従ってください。</p>
-        <button class="btn btn-main" data-act="be-leader">私が班長（答えを入力する）</button>
-        <p class="after">班長でない人は、このまま班長のスマホをいっしょに見よう。</p>
+        <h2>次に、<b>代表</b>を1人決めよう</h2>
+        <p>代表は、みんなの話を聞いて、言い分ごとに<b>決め手の資料</b>を選び、社長に示します。決まらなければ、スクリーンの指示に従ってください。</p>
+        <button class="btn btn-main" data-act="be-leader">私が代表（答えを入力する）</button>
+        <p class="after">代表でない人は、このまま代表のスマホをいっしょに見よう。</p>
       </div>
     </div></section>`;
   }
 
-  /* ---------- 班長：言い分ごとに証拠を選ぶ ---------- */
+  /* ---------- 代表：言い分ごとに証拠を選ぶ ---------- */
   function vAnswer() {
     const all = C.claims.every((c) => st.picks[c.id]);
     return `<section class="screen"><div class="wrap">
       <button class="back" data-act="to-share">← 班で相談にもどる</button>
-      <div class="talk-badge lead">班長</div>
+      <div class="talk-badge lead">代表</div>
       ${mission("言い分ごとに、<em>決め手の証拠</em>を1つ選ぼう", "みんなの話を聞いて選ぼう。あなたが見ていない資料も選べます。")}
       <div class="answers">${C.claims.map((c) => {
         const p = st.picks[c.id] && C.doc(st.picks[c.id]);
@@ -1709,7 +1798,7 @@ window.ASSETS = {
       // 承諾ずみの場所なら、確認を挟まずにそのまま開く（見られる数が1つ減る）
       if (allowed(d.spot) && !seen(d.id)) {
         if (!left()) { toast("もう見られません。班の相談へ進もう"); return; }
-        st.seen.push(d.id); SND.play("paper");
+        st.seen.push(d.id); st.pg[d.id] = 0; if (d.key === 0) st.found[d.id] = true; SND.play("paper");
       } else SND.play("tap");
       st.at = d.id; st.spotAt = d.spot; go("place");
     },
@@ -1726,12 +1815,13 @@ window.ASSETS = {
       st.seen.push(d.id); SND.play("paper"); save(); render(); window.scrollTo(0, 0);
     },
     mark(el) { const id = (el && el.dataset.d) || st.at; st.marks = marked(id) ? st.marks.filter((x) => x !== id) : st.marks.concat(id); SND.play("click"); save(); render(); },
+    pg(el) { flip(+el.dataset.dir); },
     tag(el) { st.tags[st.at] = el.dataset.t; SND.play("click"); save(); render(); },
     "to-share"() {
       if (left() && st.screen === "map") { confirmSheet("班の相談へ進みますか", `まだ <b>${left()}点</b> 見られます。あとからもどって見ることもできます。`, "班の相談へ", () => go("share")); return; }
       go("share");
     },
-    "be-leader"() { st.leader = true; go("answer"); talk([{ who: "mori", text: "班長、たのむぞ。みんなの話を聞いて、言い分ごとに<b>決め手の資料</b>を1つずつ選ぼう。", v: "mori_leader" }]); },
+    "be-leader"() { st.leader = true; go("answer"); talk([{ who: "mori", text: "代表、たのむぞ。みんなの話を聞いて、言い分ごとに<b>決め手の資料</b>を1つずつ選ぼう。", v: "mori_leader" }]); },
     choose(el) { chooseSheet(el.dataset.c); },
     show() {
       if (!C.claims.every((c) => st.picks[c.id])) return;
@@ -1741,6 +1831,13 @@ window.ASSETS = {
     hint() { hintSheet(); }
   };
 
+  // 資料のページを左右のスワイプでめくる
+  let sw = null;
+  app.addEventListener("touchstart", (e) => { const pg = e.target.closest(".book .page"); sw = pg && e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null; }, { passive: true });
+  app.addEventListener("touchend", (e) => {
+    if (!sw) return; const t = e.changedTouches[0], dx = t.clientX - sw.x, dy = t.clientY - sw.y; sw = null;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) flip(dx < 0 ? 1 : -1);
+  }, { passive: true });
   app.addEventListener("click", (e) => {
     SND.unlock();
     const el = e.target.closest("[data-act]"); if (!el || el.disabled) return;

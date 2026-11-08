@@ -1,6 +1,6 @@
 /* 臨場 v4 ― 司会主導の説明会向け。
  *  スクリーン：司会が「端緒」と「社長の言い分」を説明する（host.html）
- *  スマホ：①事務所の資料（約30点）から当たりをつけて1人6点まで見る → ②班で相談（班長が言い分ごとに資料を1つ選ぶ）
+ *  スマホ：①事務所の資料（約30点）から当たりをつけて1人6点まで見る → ②班で相談（代表が言い分ごとに資料を1つ選ぶ）
  *         → 社長に示す → 結果（答え合わせはスクリーンで）
  * 通信はしない。各自のスマホで遊び、見つけたことは口で伝え合う。
  * 保存は localStorage（"rinjo:v4"）。URL の末尾に #debug で window.__rinjo が使える。
@@ -18,9 +18,9 @@
   const claim = (id) => C.claims.find((c) => c.id === id);
 
   /* ---------- 状態 ---------- */
-  function fresh() { return { v: 5, screen: "title", seen: [], allowed: [], marks: [], tags: {}, at: null, spotAt: null, leader: false, picks: {}, outcome: null, hints: {}, started: false }; }
+  function fresh() { return { v: 5, screen: "title", seen: [], allowed: [], marks: [], tags: {}, at: null, spotAt: null, leader: false, picks: {}, outcome: null, hints: {}, started: false, pg: {}, found: {} }; }
   let st = load();
-  function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 5) return s; } catch (e) {} return fresh(); }
+  function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 5) { s.pg = s.pg || {}; s.found = s.found || {}; return s; } } catch (e) {} return fresh(); }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
   const left = () => Math.max(0, C.LIMIT - st.seen.length);
   const seen = (id) => st.seen.includes(id);
@@ -259,6 +259,26 @@
       <span class="t-foot">${s ? `<i class="ok">${ICON.check}見た</i>` : ""}${s && tag ? claimTag(tag) : ""}${marked(d.id) ? '<i class="star on">★</i>' : ""}</span></button>`;
   }
 
+  /* ---------- 何ページもある資料（めくる） ---------- */
+  let turn = "";
+  function book(d) {
+    const n = d.pages.length, i = Math.min(st.pg[d.id] || 0, n - 1);
+    if (n === 1) return `<div class="paper">${d.pages[0]}</div>`;
+    const t = turn; turn = "";
+    return `<div class="book" data-n="${n}">
+      <div class="paper page ${t}" data-page="${i}">${d.pages[i]}<span class="pg-no">${i + 1} / ${n}</span></div>
+      <div class="pg-bar"><button class="pg-btn" data-act="pg" data-dir="-1" ${i ? "" : "disabled"}>‹ 前のページ</button>
+        <span>${i + 1} / ${n} ページ</span>
+        <button class="pg-btn" data-act="pg" data-dir="1" ${i < n - 1 ? "" : "disabled"}>次のページ ›</button></div>
+      <p class="pg-help">左右にスワイプしても、めくれます</p></div>`;
+  }
+  function flip(dir) {
+    const d = C.doc(st.at); if (!d) return; const n = d.pages.length, i = st.pg[d.id] || 0, j = i + dir;
+    if (j < 0 || j >= n) return;
+    st.pg[d.id] = j; if (j === d.key) st.found[d.id] = true;
+    turn = dir > 0 ? "turn-next" : "turn-prev"; SND.play("paper"); save(); render();
+  }
+
   /* ---------- 1点を見る ---------- */
   function vPlace() {
     const d = C.doc(st.at); if (!d) return vMap();
@@ -287,8 +307,8 @@
     const tag = st.tags[d.id];
     return `<section class="screen"><div class="wrap">${back}
       ${mission(esc(d.name), esc(docWhere(d.id)))}
-      <div class="paper">${d.doc}</div>
-      <div class="noticed"><small>気づいたこと</small><p>${d.note}</p></div>
+      ${book(d)}
+      ${st.found[d.id] || d.key === 0 ? `<div class="noticed"><small>気づいたこと</small><p>${d.note}</p></div>` : `<div class="noticed wait"><small>気づいたこと</small><p>ページをめくって、気になるところを探そう。</p></div>`}
       <h2 class="q">この資料で、どの言い分をくずせそう？</h2>
       <div class="pickc">${C.claims.map((c) => `<button data-act="tag" data-t="${c.id}" aria-pressed="${tag === c.id}"><span class="cid">${c.id}</span><span>${esc(c.short)}</span></button>`).join("")}
         <button data-act="tag" data-t="none" aria-pressed="${tag === "none"}" class="none"><span class="cid">－</span><span>くずせなさそう</span></button></div>
@@ -306,20 +326,20 @@
         : `<p class="empty">まだ資料を見ていません。</p>`}
       ${left() ? `<button class="more" data-act="to-map">まだ ${left()} 点見られます →</button>` : ""}
       <div class="leader-box">
-        <h2>次に、<b>班長</b>を1人決めよう</h2>
-        <p>班長は、みんなの話を聞いて、言い分ごとに<b>決め手の資料</b>を選び、社長に示します。決まらなければ、スクリーンの指示に従ってください。</p>
-        <button class="btn btn-main" data-act="be-leader">私が班長（答えを入力する）</button>
-        <p class="after">班長でない人は、このまま班長のスマホをいっしょに見よう。</p>
+        <h2>次に、<b>代表</b>を1人決めよう</h2>
+        <p>代表は、みんなの話を聞いて、言い分ごとに<b>決め手の資料</b>を選び、社長に示します。決まらなければ、スクリーンの指示に従ってください。</p>
+        <button class="btn btn-main" data-act="be-leader">私が代表（答えを入力する）</button>
+        <p class="after">代表でない人は、このまま代表のスマホをいっしょに見よう。</p>
       </div>
     </div></section>`;
   }
 
-  /* ---------- 班長：言い分ごとに証拠を選ぶ ---------- */
+  /* ---------- 代表：言い分ごとに証拠を選ぶ ---------- */
   function vAnswer() {
     const all = C.claims.every((c) => st.picks[c.id]);
     return `<section class="screen"><div class="wrap">
       <button class="back" data-act="to-share">← 班で相談にもどる</button>
-      <div class="talk-badge lead">班長</div>
+      <div class="talk-badge lead">代表</div>
       ${mission("言い分ごとに、<em>決め手の証拠</em>を1つ選ぼう", "みんなの話を聞いて選ぼう。あなたが見ていない資料も選べます。")}
       <div class="answers">${C.claims.map((c) => {
         const p = st.picks[c.id] && C.doc(st.picks[c.id]);
@@ -429,7 +449,7 @@
       // 承諾ずみの場所なら、確認を挟まずにそのまま開く（見られる数が1つ減る）
       if (allowed(d.spot) && !seen(d.id)) {
         if (!left()) { toast("もう見られません。班の相談へ進もう"); return; }
-        st.seen.push(d.id); SND.play("paper");
+        st.seen.push(d.id); st.pg[d.id] = 0; if (d.key === 0) st.found[d.id] = true; SND.play("paper");
       } else SND.play("tap");
       st.at = d.id; st.spotAt = d.spot; go("place");
     },
@@ -446,12 +466,13 @@
       st.seen.push(d.id); SND.play("paper"); save(); render(); window.scrollTo(0, 0);
     },
     mark(el) { const id = (el && el.dataset.d) || st.at; st.marks = marked(id) ? st.marks.filter((x) => x !== id) : st.marks.concat(id); SND.play("click"); save(); render(); },
+    pg(el) { flip(+el.dataset.dir); },
     tag(el) { st.tags[st.at] = el.dataset.t; SND.play("click"); save(); render(); },
     "to-share"() {
       if (left() && st.screen === "map") { confirmSheet("班の相談へ進みますか", `まだ <b>${left()}点</b> 見られます。あとからもどって見ることもできます。`, "班の相談へ", () => go("share")); return; }
       go("share");
     },
-    "be-leader"() { st.leader = true; go("answer"); talk([{ who: "mori", text: "班長、たのむぞ。みんなの話を聞いて、言い分ごとに<b>決め手の資料</b>を1つずつ選ぼう。", v: "mori_leader" }]); },
+    "be-leader"() { st.leader = true; go("answer"); talk([{ who: "mori", text: "代表、たのむぞ。みんなの話を聞いて、言い分ごとに<b>決め手の資料</b>を1つずつ選ぼう。", v: "mori_leader" }]); },
     choose(el) { chooseSheet(el.dataset.c); },
     show() {
       if (!C.claims.every((c) => st.picks[c.id])) return;
@@ -461,6 +482,13 @@
     hint() { hintSheet(); }
   };
 
+  // 資料のページを左右のスワイプでめくる
+  let sw = null;
+  app.addEventListener("touchstart", (e) => { const pg = e.target.closest(".book .page"); sw = pg && e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null; }, { passive: true });
+  app.addEventListener("touchend", (e) => {
+    if (!sw) return; const t = e.changedTouches[0], dx = t.clientX - sw.x, dy = t.clientY - sw.y; sw = null;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) flip(dx < 0 ? 1 : -1);
+  }, { passive: true });
   app.addEventListener("click", (e) => {
     SND.unlock();
     const el = e.target.closest("[data-act]"); if (!el || el.disabled) return;
