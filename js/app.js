@@ -147,6 +147,7 @@
     if (window.SCENE3D) SCENE3D.hide();
     app.innerHTML = f();
     if (st.screen === "spot") mount3d();
+    if (st.screen === "map") mountOffice();
     const key = st.screen + st.at + st.spotAt + st.stage;
     const scr = app.querySelector(".screen,#title");
     if (scr && lastKey === key) scr.style.animation = "none";
@@ -191,6 +192,8 @@
     return `<section class="screen"><div class="wrap">
       ${mission(n ? "どの資料を見る？ <em>当たり</em>をつけよう" : "見られる数を使い切りました", n ? `事務所には${C.docs.length}点の資料。どれを見れば言い分を確かめられるか、班で相談しながら選ぼう。` : "下のボタンで、班の相談へ進もう。")}
       <div class="left ${n ? "" : "zero"}"><div class="dots4">${dots}</div><p>見られるのは あと <b>${n}</b> 点</p></div>
+      <div id="s3d-host"></div>
+      <p class="s3d-hint">見たい場所の名札をタップ。左右になぞると少し見回せます</p>
       <p class="mark-help"><span class="star on">★</span>＝当たりの印（見なくてもつけられます）。相談のメモにどうぞ。</p>
       ${C.areas.map((a) => `<div class="area">
         <div class="area-head" style="background-image:url('${bg(a.bg)}')"><span>${esc(a.name)}</span></div>
@@ -218,6 +221,11 @@
       return { id: d.id, name: d.name, kind: k[0], style: k[1], seen: seen(d.id), marked: marked(d.id), lock: !seen(d.id) && !left() };
     });
     try { if (SCENE3D.show(host, LAYOUT3D[sp.id] || "desk", items, (id) => ACT.doc({ dataset: { d: id } }))) host.classList.add("on"); } catch (e) { console.warn(e); }
+  }
+  function mountOffice() {
+    const host = app.querySelector("#s3d-host"); if (!host || !window.SCENE3D || !SCENE3D.ok) return;
+    const items = C.spots.map((sp) => { const ds = C.docs.filter((d) => d.spot === sp.id); return { id: sp.id, name: sp.name, seen: ds.some((d) => seen(d.id)), marked: ds.some((d) => marked(d.id)) }; });
+    try { if (SCENE3D.show(host, "office", items, (id) => ACT.spot({ dataset: { s: id } }))) host.classList.add("on"); } catch (e) { console.warn(e); }
   }
   function vSpot() {
     const sp = C.spot(st.spotAt); if (!sp) return vMap();

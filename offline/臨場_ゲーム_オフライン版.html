@@ -461,7 +461,7 @@ h2.q{font-size:17px;margin:22px 0 10px}
 .s3d{position:relative;width:100%;overflow:hidden;background:#1c1a17}
 .s3d canvas{display:block;width:100%!important;height:100%!important}
 .s3d-labels{position:absolute;inset:0;pointer-events:none}
-.s3d-label{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;display:inline-flex;align-items:center;gap:3px;max-width:min(46%,10em);padding:5px 9px;border-radius:14px;text-align:center;border:0;background:rgba(20,18,15,.82);color:#f7f2e6;font:600 12.5px/1.25 var(--f-ui);box-shadow:0 2px 8px rgba(0,0,0,.45);cursor:pointer}
+.s3d-label{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;display:inline-flex;align-items:center;gap:3px;width:max-content;max-width:min(46%,10em);padding:5px 9px;border-radius:14px;text-align:center;border:0;background:rgba(20,18,15,.82);color:#f7f2e6;font:600 12.5px/1.25 var(--f-ui);box-shadow:0 2px 8px rgba(0,0,0,.45);cursor:pointer}
 .s3d-label span{overflow:hidden;text-overflow:ellipsis}
 .s3d-label i{font-style:normal;color:#7fd39a}
 .s3d-label em{font-style:normal;color:#f2c14e}
@@ -471,6 +471,12 @@ h2.q{font-size:17px;margin:22px 0 10px}
 .s3d{touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .s3d-hint{margin:6px 0 0;font-size:12px;color:var(--dim);text-align:center}
 #s3d-host:not(.on) + .s3d-hint{display:none}
+.tilew{position:relative;display:grid}
+.tilew .tile{padding-right:40px}
+.tstar{position:absolute;top:4px;right:4px;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:var(--paper-dim);font-size:20px;line-height:1;cursor:pointer}
+.tstar.on{color:#d99a12}
+.tap-note{margin:8px 0 0;font-size:12.5px;color:var(--dim)}
+#s3d-host.on ~ .mark-help{margin-top:8px}
 
 </style>
 </head>
@@ -1017,7 +1023,72 @@ window.ASSETS = {
     });
   }
 
+  /* ---------- 事務所全体（場所えらび用） ---------- */
+  function officeRoom(scene, items) {
+    const pl = plaster();
+    const floorT = wood("floor", "#6b4f36", "40,25,10"); floorT.wrapS = floorT.wrapT = T.RepeatWrapping; floorT.repeat.set(4, 3);
+    const floor = new T.Mesh(new T.PlaneGeometry(6.8, 6.4), M({ map: floorT })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+    const back = box(6.8, 2.6, 0.1, M({ map: pl, color: "#d8cfbd" })); back.position.set(0, 1.3, -3.2); scene.add(back);
+    const left = box(0.1, 2.6, 6.4, M({ map: pl, color: "#cfc6b4" })); left.position.set(-3.4, 1.3, 0); scene.add(left);
+    const right = box(0.1, 2.6, 6.4, M({ map: pl, color: "#cfc6b4" })); right.position.set(3.4, 1.3, 0); scene.add(right);
+    const wt = wood("desk#8a5f3a", "#8a5f3a", "50,30,10"), wt2 = wood("acct", "#9a7048", "50,30,10"), dark = wood("table", "#3b2a1e", "20,10,5");
+    const paper = M({ color: "#f6f1e4" });
+    const G = {};
+    const grp = (id, x, z) => { const g = new T.Group(); g.position.set(x, 0, z); g.userData.id = id; scene.add(g); G[id] = g; return g; };
+    const deskAt = (g, w, d, mat) => { const t = box(w, 0.08, d, M({ map: mat, roughness: 0.55 })); t.position.y = 0.76; g.add(t); [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b]) => { const l = box(0.07, 0.72, 0.07, M({ map: mat })); l.position.set(a * (w / 2 - 0.08), 0.36, b * (d / 2 - 0.08)); g.add(l); }); };
+    // 社長の机の上
+    let g = grp("top", -1.25, -1.9); deskAt(g, 2.0, 1.0, wt);
+    [[-0.5, 0.1, "#2f5d8a"], [0.1, -0.05, null], [0.55, 0.15, null]].forEach(([x, z, c]) => { const p = box(0.34, 0.03, 0.44, c ? M({ color: c }) : paper); p.position.set(x, 0.82, z); p.rotation.y = x * 0.4; g.add(p); });
+    const chair = box(0.5, 0.9, 0.5, M({ color: "#2a2a2a", roughness: 0.6 })); chair.position.set(0, 0.45, -0.85); g.add(chair);
+    // 社長の机の引き出し（机の右下を少し引き出した形）
+    g = grp("drawer", -0.75, -1.32);
+    const dr = box(0.7, 0.2, 0.5, M({ map: wood("drawer", "#7a5232", "40,25,10") })); dr.position.set(0, 0.55, 0.1); g.add(dr);
+    const kn = box(0.18, 0.03, 0.03, M({ color: "#c8b08a", metalness: 0.6, roughness: 0.3 })); kn.position.set(0, 0.57, 0.37); g.add(kn);
+    // 経理の机
+    g = grp("acct", 1.45, -1.9); deskAt(g, 1.6, 0.9, wt2);
+    ["#2f5d8a", "#7a2f2f", "#2f6a4f"].forEach((c, i) => { const b = box(0.3, 0.05, 0.42, M({ color: c })); b.position.set(-0.45 + i * 0.42, 0.83, 0.05); g.add(b); });
+    const mon = box(0.5, 0.36, 0.05, M({ color: "#222", roughness: 0.4 })); mon.position.set(0.1, 1.05, -0.3); g.add(mon);
+    const ch2 = box(0.45, 0.85, 0.45, M({ color: "#3a3a3a" })); ch2.position.set(0, 0.42, 0.75); g.add(ch2);
+    // 事務所の壁（ホワイトボードと掲示物）
+    g = grp("wall", 0, -3.12);
+    const wb = box(1.6, 0.9, 0.04, M({ color: "#f3f4f2", roughness: 0.2 })); wb.position.set(0, 1.65, 0); g.add(wb);
+    const wf = box(1.68, 0.98, 0.03, M({ color: "#b8b8b8", metalness: 0.5 })); wf.position.set(0, 1.65, -0.01); g.add(wf);
+    [[-0.3, 1.85, "#2b4a7a"], [-0.2, 1.7, "#2b4a7a"], [-0.1, 1.55, "#c0392b"]].forEach(([x, y, c]) => { const l = box(0.9, 0.025, 0.01, M({ color: c })); l.position.set(x, y, 0.025); g.add(l); });
+    const ps = box(0.4, 0.55, 0.02, M({ color: "#f8f4ea", map: paperTex("form") })); ps.position.set(1.15, 1.6, 0.01); g.add(ps);
+    // 書類棚
+    g = grp("cabinet", -3.1, 0.5); g.rotation.y = Math.PI / 2;
+    const sw = wood("shelf", "#6e4a2c", "40,25,10");
+    const sb = box(1.8, 2.0, 0.05, M({ map: sw })); sb.position.set(0, 1.0, -0.2); g.add(sb);
+    [0.02, 0.68, 1.34, 2.0].forEach((y) => { const sh = box(1.8, 0.04, 0.4, M({ map: sw })); sh.position.set(0, y, 0); g.add(sh); });
+    [-0.9, 0.9].forEach((x) => { const sd = box(0.04, 2.0, 0.4, M({ map: sw })); sd.position.set(x, 1.0, 0); g.add(sd); });
+    [0.06, 0.72, 1.38].forEach((y, r) => { for (let k = 0; k < 7; k++) { const f = box(0.16, 0.5, 0.3, M({ color: COVER[(k + r) % COVER.length], roughness: 0.6 })); f.position.set(-0.7 + k * 0.22, y + 0.27, 0); g.add(f); } });
+    // 金庫
+    g = grp("safe", -2.85, -2.65);
+    const sf = box(0.8, 0.95, 0.7, M({ color: "#3a3f45", metalness: 0.6, roughness: 0.45 })); sf.position.y = 0.475; g.add(sf);
+    const dial = new T.Mesh(new T.CylinderGeometry(0.09, 0.09, 0.04, 20), M({ color: "#bbb", metalness: 0.8, roughness: 0.2 })); dial.rotation.x = Math.PI / 2; dial.position.set(0.1, 0.55, 0.37); g.add(dial);
+    // 応接コーナー
+    g = grp("guest", 1.6, 1.4);
+    const tb = box(1.3, 0.06, 0.8, M({ map: dark, roughness: 0.35 })); tb.position.y = 0.42; g.add(tb);
+    const tl = box(1.1, 0.38, 0.6, M({ color: "#222" })); tl.position.y = 0.2; g.add(tl);
+    [-1, 1].forEach((sgn) => { const so = box(1.5, 0.45, 0.6, M({ color: "#5a2f2a", roughness: 0.9 })); so.position.set(0, 0.23, sgn * 0.95); g.add(so); const sbk = box(1.5, 0.4, 0.18, M({ color: "#4e2925", roughness: 0.9 })); sbk.position.set(0, 0.6, sgn * 1.2); g.add(sbk); });
+    const fl = box(0.3, 0.004, 0.4, M({ color: "#fff1c9" })); fl.position.set(-0.3, 0.455, 0); g.add(fl);
+    // 資材置き場（右奥：材木と段ボール）
+    g = grp("store", 2.85, -0.55);
+    for (let k = 0; k < 5; k++) { const lm = box(0.12, 0.1, 1.6, M({ map: wood("lumber", "#c79a62", "90,60,30") })); lm.position.set(-0.3 + (k % 3) * 0.14, 0.05 + Math.floor(k / 3) * 0.1, 0); g.add(lm); }
+    [[0.35, 0.25, 0.3], [0.35, 0.7, 0.2], [0.3, 0.25, -0.45]].forEach(([x, y, z]) => { const cb = box(0.45, 0.45, 0.45, M({ color: "#b08a5a" })); cb.position.set(x, y - 0.02, z); g.add(cb); });
+    // 職人の休憩室（右の壁のドア）
+    g = grp("rest", 3.32, 1.9);
+    const door = box(0.06, 2.0, 0.95, M({ map: wood("door", "#7b5a3c", "40,25,10") })); door.position.set(0, 1.0, 0); g.add(door);
+    const nob = box(0.06, 0.06, 0.06, M({ color: "#c8b08a", metalness: 0.7 })); nob.position.set(-0.06, 1.0, 0.35); g.add(nob);
+    const sign = box(0.03, 0.18, 0.5, M({ color: "#f3eddc" })); sign.position.set(-0.04, 1.75, 0); g.add(sign);
+    return items.map((it) => G[it.id]).filter(Boolean);
+  }
+
   const LAYOUT = {
+    office(scene, items) {
+      const groups = officeRoom(scene, items);
+      return { cam: [0, 7.0, 6.0], look: [0, 0.1, -0.35], groups, fov: 50 };
+    },
     desk(scene, items, opt) {
       room(scene, -1.4); const y = desk(scene, opt.wood || "#8a5f3a");
       // 卓上ライトの代わりに、マグカップとペン立てで雰囲気を出す
@@ -1096,7 +1167,7 @@ window.ASSETS = {
     if (!ok) return false;
     const wrap = document.createElement("div"); wrap.className = "s3d";
     el.appendChild(wrap);
-    const w = Math.max(280, el.clientWidth || 340), h = Math.round(w * 0.78);
+    const w = Math.max(280, el.clientWidth || 340), h = Math.round(w * (type === "office" ? 0.95 : 0.78));
     wrap.style.height = h + "px";
     const renderer = new T.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -1105,16 +1176,17 @@ window.ASSETS = {
     const scene = new T.Scene(); scene.background = new T.Color("#1c1a17"); scene.fog = new T.Fog("#1c1a17", 6, 12);
     const L = LAYOUT[type] || LAYOUT.desk;
     const lay = L(scene, items, {});
-    const cam = new T.PerspectiveCamera(42, w / h, 0.1, 30); cam.position.set(...lay.cam); cam.lookAt(...lay.look); cam.updateMatrixWorld(); cam.updateProjectionMatrix();
+    const cam = new T.PerspectiveCamera(lay.fov || 42, w / h, 0.1, 30); cam.position.set(...lay.cam); cam.lookAt(...lay.look); cam.updateMatrixWorld(); cam.updateProjectionMatrix();
     // 光：あたたかい部屋の明かり＋影を落とす主光
-    scene.add(new T.HemisphereLight("#fff3dd", "#3a2a1c", 0.75));
+    scene.add(new T.HemisphereLight("#fff3dd", "#3a2a1c", lay.groups ? 0.95 : 0.75));
     const key = new T.DirectionalLight("#fff0d6", 0.95); key.position.set(-2.5, 4.5, 2.5); key.castShadow = true;
-    key.shadow.mapSize.set(1024, 1024); key.shadow.camera.left = -3; key.shadow.camera.right = 3; key.shadow.camera.top = 3; key.shadow.camera.bottom = -3; key.shadow.bias = -0.0008; key.shadow.radius = 4;
+    key.shadow.mapSize.set(1024, 1024); const sc = lay.groups ? 6 : 3; key.shadow.camera.left = -sc; key.shadow.camera.right = sc; key.shadow.camera.top = sc; key.shadow.camera.bottom = -sc; key.shadow.bias = -0.0008; key.shadow.radius = 4;
     scene.add(key);
     const warm = new T.PointLight("#ffb46b", 0.4, 6); warm.position.set(1.5, 2.2, 1); scene.add(warm);
 
-    const meshes = [];
-    items.forEach((it, i) => {
+    const meshes = lay.groups ? lay.groups.slice() : [];
+    if (lay.groups) meshes.forEach((g) => { g.userData.base = g.position.clone(); g.traverse((m) => { if (m.isMesh) { m.userData.id = g.userData.id; m.castShadow = m.receiveShadow = true; } }); });
+    else items.forEach((it, i) => {
       const g = makeItem(it, i);
       const p = lay.pos[i];
       g.position.set(p.x, p.y, p.z);
@@ -1135,7 +1207,7 @@ window.ASSETS = {
       b.dataset.d = it.id; b.innerHTML = `${it.seen ? "<i>✓</i>" : ""}${it.marked ? "<em>★</em>" : ""}<span></span>`;
       b.querySelector("span").textContent = it.name;
       const g = meshes[i]; const bb = new T.Box3().setFromObject(g); bb.getCenter(v);
-      if (["board", "poster", "clip", "frame"].includes(it.kind) || lay.pos[i].upright) v.y = bb.min.y - 0.02; else if (it.kind === "binder") v.y = bb.max.y + 0.05; else v.z = bb.max.z + 0.02;
+      if (lay.groups) v.y = bb.max.y + 0.15; else if (["board", "poster", "clip", "frame"].includes(it.kind) || lay.pos[i].upright) v.y = bb.min.y - 0.02; else if (it.kind === "binder") v.y = bb.max.y + 0.05; else v.z = bb.max.z + 0.02;
       anchors.push(v.clone()); btns.push(b);
       b.onclick = (e) => { e.stopPropagation(); pick(it.id); };
       labels.appendChild(b);
@@ -1143,7 +1215,12 @@ window.ASSETS = {
 
     let busy = false;
     function placeLabels() {
-      anchors.forEach((a, i) => { v.copy(a).project(cam); btns[i].style.left = ((v.x + 1) / 2 * 100).toFixed(2) + "%"; btns[i].style.top = ((1 - v.y) / 2 * 100).toFixed(2) + "%"; });
+      const W = wrap.clientWidth || w, H = wrap.clientHeight || h;
+      anchors.forEach((a, i) => {
+        v.copy(a).project(cam); const bw = btns[i].offsetWidth || 80, bh = btns[i].offsetHeight || 24;
+        const x = Math.max(bw / 2 + 4, Math.min(W - bw / 2 - 4, (v.x + 1) / 2 * W)), y = Math.max(bh / 2 + 4, Math.min(H - bh / 2 - 4, (1 - v.y) / 2 * H));
+        btns[i].style.left = x.toFixed(1) + "px"; btns[i].style.top = y.toFixed(1) + "px";
+      });
     }
     function render() { renderer.render(scene, cam); }
     // 指で左右になぞると、少しだけ見回せる（ゆっくり。手を離すとそこで止まる）
@@ -1164,7 +1241,7 @@ window.ASSETS = {
     function pick(id) {
       if (busy) return; busy = true;
       const g = meshes.find((m) => m.userData.id === id);
-      if (!g || reduce()) { onPick(id); busy = false; return; }
+      if (!g || reduce() || lay.groups) { onPick(id); busy = false; return; }
       const from = g.position.clone(), to = from.clone().lerp(cam.position, 0.25);
       const t0 = performance.now();
       const step = (t) => {
@@ -1350,6 +1427,7 @@ window.ASSETS = {
     if (window.SCENE3D) SCENE3D.hide();
     app.innerHTML = f();
     if (st.screen === "spot") mount3d();
+    if (st.screen === "map") mountOffice();
     const key = st.screen + st.at + st.spotAt + st.stage;
     const scr = app.querySelector(".screen,#title");
     if (scr && lastKey === key) scr.style.animation = "none";
@@ -1394,6 +1472,8 @@ window.ASSETS = {
     return `<section class="screen"><div class="wrap">
       ${mission(n ? "どの資料を見る？ <em>当たり</em>をつけよう" : "見られる数を使い切りました", n ? `事務所には${C.docs.length}点の資料。どれを見れば言い分を確かめられるか、班で相談しながら選ぼう。` : "下のボタンで、班の相談へ進もう。")}
       <div class="left ${n ? "" : "zero"}"><div class="dots4">${dots}</div><p>見られるのは あと <b>${n}</b> 点</p></div>
+      <div id="s3d-host"></div>
+      <p class="s3d-hint">見たい場所の名札をタップ。左右になぞると少し見回せます</p>
       <p class="mark-help"><span class="star on">★</span>＝当たりの印（見なくてもつけられます）。相談のメモにどうぞ。</p>
       ${C.areas.map((a) => `<div class="area">
         <div class="area-head" style="background-image:url('${bg(a.bg)}')"><span>${esc(a.name)}</span></div>
@@ -1422,6 +1502,11 @@ window.ASSETS = {
     });
     try { if (SCENE3D.show(host, LAYOUT3D[sp.id] || "desk", items, (id) => ACT.doc({ dataset: { d: id } }))) host.classList.add("on"); } catch (e) { console.warn(e); }
   }
+  function mountOffice() {
+    const host = app.querySelector("#s3d-host"); if (!host || !window.SCENE3D || !SCENE3D.ok) return;
+    const items = C.spots.map((sp) => { const ds = C.docs.filter((d) => d.spot === sp.id); return { id: sp.id, name: sp.name, seen: ds.some((d) => seen(d.id)), marked: ds.some((d) => marked(d.id)) }; });
+    try { if (SCENE3D.show(host, "office", items, (id) => ACT.spot({ dataset: { s: id } }))) host.classList.add("on"); } catch (e) { console.warn(e); }
+  }
   function vSpot() {
     const sp = C.spot(st.spotAt); if (!sp) return vMap();
     const a = C.areas.find((x) => x.id === sp.area), ds = C.docs.filter((d) => d.spot === sp.id);
@@ -1438,11 +1523,12 @@ window.ASSETS = {
     }
     const n = left();
     return `<section class="screen"><div class="wrap">${back}
-      ${mission(esc(sp.name), `気になる資料を<b>タップ</b>しよう。見られるのは あと <b>${n}</b> 点。`)}
+      ${mission(esc(sp.name), `気になる資料を<b>タップ</b>すると、すぐ開きます。見られるのは あと <b>${n}</b> 点。`)}
       <div id="s3d-host"></div>
       <p class="s3d-hint">左右になぞると、少し見回せます</p>
       <p class="grp">${esc(sp.name)}にある資料（${ds.length}点）</p>
-      <div class="tiles">${ds.map(tile).join("")}</div>
+      <div class="tiles">${ds.map((d) => `<div class="tilew">${tile(d)}${seen(d.id) ? "" : `<button class="tstar ${marked(d.id) ? "on" : ""}" data-act="mark" data-d="${d.id}" aria-label="当たりの印">${marked(d.id) ? "★" : "☆"}</button>`}</div>`).join("")}</div>
+      <p class="tap-note">資料をタップすると、すぐに開きます（見られる数が1つ減ります）。☆で当たりの印だけつけることもできます。</p>
       <p class="disclaim">${sp.open ? "<b>ゲームの表現です。</b>実際は社長の明示の承諾を得て、開けて見せてもらいます。" : "社長の承諾を得て見せてもらっています。"}</p>
     </div></section>${cta(`<button class="btn btn-ghost" data-act="to-map">ほかの場所を見る</button>`)}`;
   }
@@ -1618,7 +1704,15 @@ window.ASSETS = {
       go("map");
       if (first) { SND.play("door"); await talk([{ who: "boss", text: "税務署の方？ うちは赤字ですよ。どうぞ、何でも見てください。", face: "boss_grin", v: "boss_hello" }]); }
     },
-    doc(el) { const d = C.doc(el.dataset.d); if (!d) return; st.at = d.id; st.spotAt = d.spot; SND.play("tap"); go("place"); },
+    doc(el) {
+      const d = C.doc(el.dataset.d); if (!d) return;
+      // 承諾ずみの場所なら、確認を挟まずにそのまま開く（見られる数が1つ減る）
+      if (allowed(d.spot) && !seen(d.id)) {
+        if (!left()) { toast("もう見られません。班の相談へ進もう"); return; }
+        st.seen.push(d.id); SND.play("paper");
+      } else SND.play("tap");
+      st.at = d.id; st.spotAt = d.spot; go("place");
+    },
     spot(el) { st.spotAt = el.dataset.s; SND.play("tap"); go("spot"); },
     "to-spot"() { const d = C.doc(st.at); if (d) st.spotAt = d.spot; go(st.spotAt ? "spot" : "map"); },
     async ask() {
@@ -1631,7 +1725,7 @@ window.ASSETS = {
       if (!left()) { toast("もう見られません。班の相談へ進もう"); return; }
       st.seen.push(d.id); SND.play("paper"); save(); render(); window.scrollTo(0, 0);
     },
-    mark() { const id = st.at; st.marks = marked(id) ? st.marks.filter((x) => x !== id) : st.marks.concat(id); SND.play("click"); save(); render(); },
+    mark(el) { const id = (el && el.dataset.d) || st.at; st.marks = marked(id) ? st.marks.filter((x) => x !== id) : st.marks.concat(id); SND.play("click"); save(); render(); },
     tag(el) { st.tags[st.at] = el.dataset.t; SND.play("click"); save(); render(); },
     "to-share"() {
       if (left() && st.screen === "map") { confirmSheet("班の相談へ進みますか", `まだ <b>${left()}点</b> 見られます。あとからもどって見ることもできます。`, "班の相談へ", () => go("share")); return; }

@@ -449,7 +449,7 @@ h2.q{font-size:17px;margin:22px 0 10px}
 .s3d{position:relative;width:100%;overflow:hidden;background:#1c1a17}
 .s3d canvas{display:block;width:100%!important;height:100%!important}
 .s3d-labels{position:absolute;inset:0;pointer-events:none}
-.s3d-label{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;display:inline-flex;align-items:center;gap:3px;max-width:min(46%,10em);padding:5px 9px;border-radius:14px;text-align:center;border:0;background:rgba(20,18,15,.82);color:#f7f2e6;font:600 12.5px/1.25 var(--f-ui);box-shadow:0 2px 8px rgba(0,0,0,.45);cursor:pointer}
+.s3d-label{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;display:inline-flex;align-items:center;gap:3px;width:max-content;max-width:min(46%,10em);padding:5px 9px;border-radius:14px;text-align:center;border:0;background:rgba(20,18,15,.82);color:#f7f2e6;font:600 12.5px/1.25 var(--f-ui);box-shadow:0 2px 8px rgba(0,0,0,.45);cursor:pointer}
 .s3d-label span{overflow:hidden;text-overflow:ellipsis}
 .s3d-label i{font-style:normal;color:#7fd39a}
 .s3d-label em{font-style:normal;color:#f2c14e}
@@ -464,3 +464,4 @@ h2.q{font-size:17px;margin:22px 0 10px}
 .tstar{position:absolute;top:4px;right:4px;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:var(--paper-dim);font-size:20px;line-height:1;cursor:pointer}
 .tstar.on{color:#d99a12}
 .tap-note{margin:8px 0 0;font-size:12.5px;color:var(--dim)}
+#s3d-host.on ~ .mark-help{margin-top:8px}
