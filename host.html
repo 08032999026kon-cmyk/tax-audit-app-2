@@ -24,6 +24,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 button:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
 .slide{display:none;flex:1;min-height:0;padding:4.5vh max(5vw,16px) 3vh;overflow:auto;flex-direction:column;gap:2.6vh;position:relative}
 .slide.on{display:flex}
+.slide>*{flex-shrink:0}
 .kicker{font-size:clamp(12px,1.4vw,20px);letter-spacing:.28em;color:var(--amber);font-weight:700;margin:0}
 h1{font-family:var(--f-display);font-weight:400;font-size:clamp(64px,13vw,200px);line-height:.95;margin:0;letter-spacing:.02em;text-shadow:0 8px 60px rgba(242,165,58,.25)}
 h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.4vw,68px);line-height:1.15;margin:0;letter-spacing:.02em}
@@ -125,7 +126,7 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
 <section class="slide center" data-title="タイトル">
   <p class="kicker">税務調査 体験ゲーム</p>
   <h1>臨場</h1>
-  <p class="lead">喫茶店「浜風珈琲」の社長の言い分を、<b>証拠</b>で確かめよう。</p>
+  <p class="lead">白洲リフォーム株式会社の社長の言い分を、<b>証拠</b>で確かめよう。</p>
   <p class="note">臨場（りんじょう）＝調査官が、お店や会社に出向いて調べること。</p>
 </section>
 
@@ -133,7 +134,7 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
 <section class="slide" data-title="今日の仕事">
   <p class="kicker">MISSION</p>
   <h2>あなたは税務署の<em>調査官</em>です</h2>
-  <p class="lead">お店のもうけ（<b>所得</b>）は「売上 − 経費」。もうけが大きいほど、税金も多くなります。<br>だから、こんなごまかしが起きることがあります。</p>
+  <p class="lead">会社のもうけ（<b>所得</b>）は「売上 − 経費」。もうけが大きいほど、税金も多くなります。<br>だから、こんなごまかしが起きることがあります。</p>
   <div class="fraud">
     <div class="card"><strong>売上除外</strong><p class="lead">売上を帳簿に書かずに隠す</p></div>
     <div class="card"><strong>架空経費</strong><p class="lead">ありもしない経費を足す</p></div>
@@ -142,13 +143,13 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
 </section>
 
 <!-- 3 -->
-<section class="slide" data-title="今日のお店">
-  <div class="stage" data-bg="ext"></div>
+<section class="slide" data-title="今日の会社">
+  <div class="stage" data-bg="office"></div>
   <div class="over">
-    <p class="kicker">THE SHOP</p>
+    <p class="kicker">THE COMPANY</p>
     <div class="person"><img data-ch="boss_grin" alt="白洲社長">
-      <div class="card"><h3>喫茶店「浜風珈琲」　白洲 守 社長</h3>
-        <p class="lead">海沿いの小さな喫茶店。帳簿は<b>全部、社長が1人で</b>つけています。<br>今期の申告は「赤字」でした。</p></div></div>
+      <div class="card"><h3>白洲リフォーム株式会社　白洲 守 社長</h3>
+        <p class="lead">家の修理やリフォームをする小さな会社。お客さんには<b>現金で払う人</b>も多く、帳簿は<b>全部、社長が1人で</b>つけています。<br>今期の申告は「赤字」でした。</p></div></div>
   </div>
 </section>
 
@@ -179,7 +180,7 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
   <p class="kicker">HOW TO PLAY</p>
   <h2>この順で進めます</h2>
   <ol class="steps">
-    <li><span><b>作戦を立てる</b><small>お店には資料が<b>約30点</b>。見られるのは1人<b>6点</b>まで。どの資料を見れば確かめられるか、<b>当たり</b>（見当）の付け方を班で相談する。</small></span><span class="min">3分</span></li>
+    <li><span><b>作戦を立てる</b><small>事務所には資料が<b>約30点</b>。見られるのは1人<b>6点</b>まで。どの資料を見れば確かめられるか、<b>当たり</b>（見当）の付け方を班で相談する。</small></span><span class="min">3分</span></li>
     <li><span><b>調べる</b><small>相談しながら、各自のスマホで資料を見る。見つけたことはすぐ班に伝える。</small></span><span class="min">10分</span></li>
     <li><span><b>班長が示す</b><small>見つけたことを持ち寄り、<b>班長</b>が言い分ごとに決め手の資料を1つ選んで、社長に示す。</small></span><span class="min">5分</span></li>
     <li><span><b>答え合わせ</b><small>この画面で、決め手になった証拠を確かめます。</small></span><span class="min">5分</span></li>
@@ -194,7 +195,7 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
   <div class="qrwrap">
     <div class="qr" id="qr"></div>
     <div style="display:flex;flex-direction:column;gap:2vh;min-width:0">
-      <p class="lead">開いたら<b>「はじめる」</b>を押し、「お店に入る」まで進みます。</p>
+      <p class="lead">開いたら<b>「はじめる」</b>を押し、「事務所に入る」まで進みます。</p>
       <p class="lead">音が出ます。消したいときは、画面右上の<b>音のボタン</b>を押してください。</p>
       <div class="url" id="url"></div>
     </div>
@@ -250,10 +251,10 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
   <p class="kicker">RESULT</p>
   <h2>白洲社長が隠していたもの</h2>
   <div class="sum">
-    <div class="card"><small>売上除外（土曜夜の貸切 18回）</small><strong>153万円</strong></div>
-    <div class="card"><small>架空経費（山海物産の白紙の領収書）</small><strong>180万円</strong></div>
-    <div class="card"><small>申告した所得</small><strong style="color:var(--ink)">−57万円</strong></div>
-    <div class="card"><small>正しい所得</small><strong>276万円</strong></div>
+    <div class="card"><small>売上除外（現金でもらった工事 6件）</small><strong>180万円</strong></div>
+    <div class="card"><small>架空経費（海野工業への外注費 8回）</small><strong>240万円</strong></div>
+    <div class="card"><small>申告した所得</small><strong style="color:var(--ink)">−40万円</strong></div>
+    <div class="card"><small>正しい所得</small><strong>380万円</strong></div>
   </div>
   <p class="note">実際には、このあと正しい所得と税額を計算し直す手続きに進みます。</p>
 </section>

@@ -24,6 +24,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 button:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
 .slide{display:none;flex:1;min-height:0;padding:4.5vh max(5vw,16px) 3vh;overflow:auto;flex-direction:column;gap:2.6vh;position:relative}
 .slide.on{display:flex}
+.slide>*{flex-shrink:0}
 .kicker{font-size:clamp(12px,1.4vw,20px);letter-spacing:.28em;color:var(--amber);font-weight:700;margin:0}
 h1{font-family:var(--f-display);font-weight:400;font-size:clamp(64px,13vw,200px);line-height:.95;margin:0;letter-spacing:.02em;text-shadow:0 8px 60px rgba(242,165,58,.25)}
 h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.4vw,68px);line-height:1.15;margin:0;letter-spacing:.02em}
@@ -125,7 +126,7 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
 <section class="slide center" data-title="タイトル">
   <p class="kicker">税務調査 体験ゲーム</p>
   <h1>臨場</h1>
-  <p class="lead">喫茶店「浜風珈琲」の社長の言い分を、<b>証拠</b>で確かめよう。</p>
+  <p class="lead">白洲リフォーム株式会社の社長の言い分を、<b>証拠</b>で確かめよう。</p>
   <p class="note">臨場（りんじょう）＝調査官が、お店や会社に出向いて調べること。</p>
 </section>
 
@@ -133,7 +134,7 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
 <section class="slide" data-title="今日の仕事">
   <p class="kicker">MISSION</p>
   <h2>あなたは税務署の<em>調査官</em>です</h2>
-  <p class="lead">お店のもうけ（<b>所得</b>）は「売上 − 経費」。もうけが大きいほど、税金も多くなります。<br>だから、こんなごまかしが起きることがあります。</p>
+  <p class="lead">会社のもうけ（<b>所得</b>）は「売上 − 経費」。もうけが大きいほど、税金も多くなります。<br>だから、こんなごまかしが起きることがあります。</p>
   <div class="fraud">
     <div class="card"><strong>売上除外</strong><p class="lead">売上を帳簿に書かずに隠す</p></div>
     <div class="card"><strong>架空経費</strong><p class="lead">ありもしない経費を足す</p></div>
@@ -142,13 +143,13 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
 </section>
 
 <!-- 3 -->
-<section class="slide" data-title="今日のお店">
-  <div class="stage" data-bg="ext"></div>
+<section class="slide" data-title="今日の会社">
+  <div class="stage" data-bg="office"></div>
   <div class="over">
-    <p class="kicker">THE SHOP</p>
+    <p class="kicker">THE COMPANY</p>
     <div class="person"><img data-ch="boss_grin" alt="白洲社長">
-      <div class="card"><h3>喫茶店「浜風珈琲」　白洲 守 社長</h3>
-        <p class="lead">海沿いの小さな喫茶店。帳簿は<b>全部、社長が1人で</b>つけています。<br>今期の申告は「赤字」でした。</p></div></div>
+      <div class="card"><h3>白洲リフォーム株式会社　白洲 守 社長</h3>
+        <p class="lead">家の修理やリフォームをする小さな会社。お客さんには<b>現金で払う人</b>も多く、帳簿は<b>全部、社長が1人で</b>つけています。<br>今期の申告は「赤字」でした。</p></div></div>
   </div>
 </section>
 
@@ -179,7 +180,7 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
   <p class="kicker">HOW TO PLAY</p>
   <h2>この順で進めます</h2>
   <ol class="steps">
-    <li><span><b>作戦を立てる</b><small>お店には資料が<b>約30点</b>。見られるのは1人<b>6点</b>まで。どの資料を見れば確かめられるか、<b>当たり</b>（見当）の付け方を班で相談する。</small></span><span class="min">3分</span></li>
+    <li><span><b>作戦を立てる</b><small>事務所には資料が<b>約30点</b>。見られるのは1人<b>6点</b>まで。どの資料を見れば確かめられるか、<b>当たり</b>（見当）の付け方を班で相談する。</small></span><span class="min">3分</span></li>
     <li><span><b>調べる</b><small>相談しながら、各自のスマホで資料を見る。見つけたことはすぐ班に伝える。</small></span><span class="min">10分</span></li>
     <li><span><b>班長が示す</b><small>見つけたことを持ち寄り、<b>班長</b>が言い分ごとに決め手の資料を1つ選んで、社長に示す。</small></span><span class="min">5分</span></li>
     <li><span><b>答え合わせ</b><small>この画面で、決め手になった証拠を確かめます。</small></span><span class="min">5分</span></li>
@@ -194,7 +195,7 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
   <div class="qrwrap">
     <div class="qr" id="qr"></div>
     <div style="display:flex;flex-direction:column;gap:2vh;min-width:0">
-      <p class="lead">開いたら<b>「はじめる」</b>を押し、「お店に入る」まで進みます。</p>
+      <p class="lead">開いたら<b>「はじめる」</b>を押し、「事務所に入る」まで進みます。</p>
       <p class="lead">音が出ます。消したいときは、画面右上の<b>音のボタン</b>を押してください。</p>
       <div class="url" id="url"></div>
     </div>
@@ -250,10 +251,10 @@ table.fs td.mark{color:#b2321f;font-weight:700;background:rgba(226,85,63,.12)}
   <p class="kicker">RESULT</p>
   <h2>白洲社長が隠していたもの</h2>
   <div class="sum">
-    <div class="card"><small>売上除外（土曜夜の貸切 18回）</small><strong>153万円</strong></div>
-    <div class="card"><small>架空経費（山海物産の白紙の領収書）</small><strong>180万円</strong></div>
-    <div class="card"><small>申告した所得</small><strong style="color:var(--ink)">−57万円</strong></div>
-    <div class="card"><small>正しい所得</small><strong>276万円</strong></div>
+    <div class="card"><small>売上除外（現金でもらった工事 6件）</small><strong>180万円</strong></div>
+    <div class="card"><small>架空経費（海野工業への外注費 8回）</small><strong>240万円</strong></div>
+    <div class="card"><small>申告した所得</small><strong style="color:var(--ink)">−40万円</strong></div>
+    <div class="card"><small>正しい所得</small><strong>380万円</strong></div>
   </div>
   <p class="note">実際には、このあと正しい所得と税額を計算し直す手続きに進みます。</p>
 </section>
@@ -2593,202 +2594,197 @@ var qrcode = function() {
 
 </script>
 <script>
-/* 事件データ（すべて架空）　喫茶店「浜風珈琲」（株式会社浜風珈琲・社長 白洲 守）
- * 答え：①土曜夜の貸切パーティーの売上をレジに通さず金庫に隠した（売上除外 153万円＝18回）
- *       ②山海物産の白紙の領収書で、豆の仕入れ30万円×6回をでっち上げた（架空経費 180万円）
- * v5：お店の机・壁・棚に資料が33点。班で「どの資料を見れば確かめられるか」当たりの付け方を相談し、
+/* 事件データ（すべて架空）　リフォーム会社「白洲リフォーム株式会社」（社長 白洲 守）
+ * 答え：①現金でもらった工事代（6件・180万円）を帳簿に載せず、金庫に隠した（売上除外）
+ *       ②「海野工業」への外注費 30万円×8回＝240万円をでっち上げ、家族名義の口座に振り込んだ（架空経費）
+ * v6：事務所の机・棚・壁などに資料31点。班で「どの資料を見れば確かめられるか」当たりの付け方を相談し、
  *     各自が1人6点まで見る → 班で持ち寄り、班長が言い分ごとに決め手の資料を1つ選んで社長に示す。
  */
 window.CASE = (function () {
   /* 1人が見られる資料の数 */
   const LIMIT = 6;
 
+  const company = { name: "白洲リフォーム株式会社", short: "白洲リフォーム", boss: "白洲 守", kind: "家の修理やリフォームをする小さな会社" };
+
   /* ---------- 端緒（たんちょ）：決算書などから気づく不審な点 ---------- */
   const tancho = [
-    { big: "今期だけ赤字", text: "お客さんの数は毎月ほぼ同じなのに、もうけが −57万円。" },
-    { big: "原価率 31% → 42%", text: "値段も席数も同じなのに、仕入れの割合だけが急に上がった。" },
-    { big: "山海物産に現金で180万円", text: "今期からの新しい仕入れ先。ほかの仕入れ先は全部銀行振込。" },
-    { big: "夜の売上が0円", text: "ホームページでは「4月から土曜の夜は貸切OK」と宣伝している。" }
+    { big: "今期だけ赤字", text: "工事の数は去年とほぼ同じなのに、もうけが −40万円。" },
+    { big: "外注費が 240万円 増えた", text: "外注費＝ほかの会社に工事を頼んだ代金。仕事の量は同じなのに、急に増えている。" },
+    { big: "新しい外注先「海野工業」", text: "今期から取引が始まり、ちょうど240万円を支払っている。" },
+    { big: "「現金払いなら5%引き」", text: "会社のチラシで、現金で払うお客さんを集めている。" }
   ];
 
   /* 決算書（スクリーンとスマホで同じものを見せる） */
   const statement = `<table class="fs"><thead><tr><th>（万円）</th><th>前々期</th><th>前期</th><th>今期</th></tr></thead><tbody>
-    <tr><th>売上</th><td>1,820</td><td>1,850</td><td>1,790</td></tr>
-    <tr><th>仕入れ</th><td>564</td><td>574</td><td class="mark">752</td></tr>
-    <tr class="sub"><th>原価率</th><td>31.0%</td><td>31.0%</td><td class="mark">42.0%</td></tr>
-    <tr><th>人件費</th><td>610</td><td>620</td><td>625</td></tr>
-    <tr><th>家賃・その他</th><td>456</td><td>460</td><td>470</td></tr>
-    <tr class="total"><th>所得（もうけ）</th><td>190</td><td>196</td><td class="mark">−57</td></tr></tbody></table>
-    <p class="cap">原価率＝売上に対する仕入れの割合。喫茶店ではふつう30%前後。</p>`;
+    <tr><th>売上</th><td>5,240</td><td>5,310</td><td>5,130</td></tr>
+    <tr><th>材料費</th><td>1,830</td><td>1,850</td><td>1,800</td></tr>
+    <tr><th>外注費</th><td>920</td><td>930</td><td class="mark">1,170</td></tr>
+    <tr><th>人件費</th><td>1,420</td><td>1,440</td><td>1,450</td></tr>
+    <tr><th>家賃・その他</th><td>710</td><td>720</td><td>750</td></tr>
+    <tr class="total"><th>所得（もうけ）</th><td>360</td><td>370</td><td class="mark">−40</td></tr></tbody></table>
+    <p class="cap">外注費＝ほかの会社に工事の一部を頼んだ代金。</p>`;
 
   /* ---------- 社長の言い分（これを証拠でくずす） ---------- */
   // ok：決め手になる資料。trap：社長の言い分と食い違わない資料への特別な返事
   const claims = [
-    { id: "A", short: "夜は営業していない", text: "夜は営業していません。お店は夕方7時までです。",
-      ok: ["trash", "calendar", "poster", "memo", "shift", "payroll", "clean"],
-      win: "……夜のことまで。わ、分かりました。土曜の夜は、貸切パーティーをやっていました。",
-      miss: "それが夜の営業と何の関係があるんです？",
-      trap: { register: "レジに夜の売上がないのは、夜は営業していないからですよ。", permit: "許可証のどこに、夜やっているなんて書いてあります？", wine: "ワインは料理に使うんですよ。夜の営業とは関係ありません。" },
-      why: "夜の動きが残る資料ならどれでもくずせる：捨てられた注文票・予約カレンダー・求人の貼り紙・電話メモ・シフト表・給与台帳・清掃チェック表。",
-      hint: ["夜に人やお客さんが動いた跡が残っていそうな資料は？", "予定（カレンダー・メモ）や、人の働いた記録（シフト・給与）を探そう。"] },
-    { id: "B", short: "売上は全部銀行へ", text: "売上は毎日、全部銀行に入れています。",
+    { id: "A", short: "工事は帳簿にあるだけ", text: "工事は、帳簿に載っているもので全部です。",
+      ok: ["receiptbook", "board", "estimate", "album", "letter", "delivery", "memo"],
+      win: "……山田さんの浴室まで。わ、分かりました。現金でもらった工事は、帳簿に載せていませんでした。",
+      miss: "それが帳簿と何の関係があるんです？",
+      trap: { ledger: "ほら、工事台帳にきちんと全部書いてあるでしょう。", license: "許可証があるから何だと言うんです？", flyer: "現金で払うお客さんが多いだけですよ。" },
+      why: "帳簿に載っていない「山田様の浴室工事」の跡が残る資料ならどれでもくずせる：領収書の控え・ホワイトボードの予定・見積書の控え・工事写真・お礼の手紙・材料の納品書・電話メモ。",
+      hint: ["帳簿に載っていない工事の跡が、どこかに残っていない？", "予定・見積もり・写真・材料の届け先など、工事をすると必ず残るものを探そう。"] },
+    { id: "B", short: "現金も全部銀行へ", text: "現金でいただいた工事代も、全部銀行に入れています。",
       ok: ["safe"],
-      win: "……その封筒まで。はい、貸切の売上は銀行に入れずに、金庫にしまっていました。",
-      miss: "ふふ、それで何が分かるんです？ 売上は全部銀行ですよ。",
-      trap: { bank: "通帳を見てください。毎日ちゃんと入金しているでしょう？", trash: "その注文票のお金も、ちゃんと銀行に入れましたよ。", change: "両替は釣り銭のためです。売上とは関係ありません。" },
-      why: "金庫の「別」の封筒とノート。銀行に入れずに隠していた現金が、そのまま残っていた。",
-      hint: ["銀行に入れなかったお金は、どこに置いておく？", "お金をしまっておけそうな場所を、社長に開けてもらおう。"] },
-    { id: "C", short: "豆が値上がりした", text: "仕入れが増えたのは、豆が値上がりしたからです。",
-      ok: ["stock", "beans", "desk", "bank"],
-      win: "……そこまで。豆は値上がりしていません。山海物産の領収書は、私が書きました。",
-      miss: "豆の値段なんて、いろいろですからね。",
-      trap: { ledger: "ほら、領収書は全部そろっていますよ。ちゃんと払っています。", bizcard: "山海物産さんの名刺ですよ。それが何か？" },
-      why: "豆の入荷記録（値段は去年と同じ）・倉庫の豆の袋（山海物産の豆が1つもない）・机の白紙の領収書・通帳（山海物産へ払った跡がない）のどれでもくずせる。",
-      hint: ["豆が本当に値上がりしたのか、山海物産から本当に買ったのか、確かめられる資料は？", "倉庫の豆や入荷の記録、お金の出入り、机の中を見てみよう。"] }
+      win: "……その封筒まで。はい、現金の工事代は銀行に入れずに、金庫にしまっていました。",
+      miss: "ふふ、それで何が分かるんです？ お金は全部銀行ですよ。",
+      trap: { bank: "通帳を見てください。ちゃんと入金しているでしょう？", receiptbook: "その領収書のお金も、ちゃんと銀行に入れましたよ。" },
+      why: "金庫の「現金工事」の封筒とノート。銀行に入れずに隠していた現金が、そのまま残っていた。",
+      hint: ["銀行に入れなかった現金は、どこに置いておく？", "お金をしまっておけそうな場所を、社長に開けてもらおう。"] },
+    { id: "C", short: "外注費は本物", text: "外注費は、海野工業さんに実際に工事をお願いした代金です。",
+      ok: ["bank", "blank", "nippou"],
+      win: "……そこまで。海野工業には何も頼んでいません。請求書は、私が書きました。",
+      miss: "外注なんて、どこの会社でもやっていることですよ。",
+      trap: { invoices: "ほら、請求書は全部そろっていますよ。", bizcard: "海野工業さんの名刺ですよ。それが何か？", lastyear: "去年は頼まなかっただけです。" },
+      why: "通帳（外注費の振込先が社長の家族名義）・机の白紙の請求書とハンコ・作業日報（海野工業の人は一度も現場に来ていない）のどれでもくずせる。",
+      hint: ["海野工業が本当に工事をしたのか、お金が本当に海野工業に行ったのか、確かめられる資料は？", "お金の出入り、現場の人の記録、机の中を見てみよう。"] }
   ];
 
-  /* ---------- お店の中：場所（社長に承諾をもらう単位）と、そこにある資料 ---------- */
+  /* ---------- 事務所の中：場所（社長に承諾をもらう単位）と、そこにある資料 ---------- */
   const areas = [
-    { id: "shop", name: "店内", bg: "shop" },
-    { id: "office", name: "事務室", bg: "office" },
-    { id: "back", name: "倉庫・厨房", bg: "shop" }
+    { id: "office", name: "事務所", bg: "office" },
+    { id: "guest", name: "応接コーナー", bg: "office" },
+    { id: "back", name: "資材置き場・休憩室", bg: "office" }
   ];
   // open:true は社長に開けてもらう場所
   const spots = [
-    { id: "reg", area: "shop", name: "レジまわり", ask: "レジまわりの書類を見せていただけますか。", ok: "どうぞ。毎日きちんと締めていますよ。" },
-    { id: "wall", area: "shop", name: "店内の壁", ask: "壁に貼ってあるものを拝見してもよろしいですか。", ok: "どうぞどうぞ。" },
-    { id: "under", area: "shop", name: "カウンターの下", ask: "カウンターの下と、ゴミ箱の中を確認させていただいてもよろしいですか。", ok: "ゴ、ゴミ箱？ ……まあ、どうぞ。" },
-    { id: "top", area: "office", name: "机の上", ask: "机の上の書類を見せていただけますか。", ok: "どうぞ。散らかっていますがね。" },
-    { id: "drawer", area: "office", name: "机の引き出し", open: true, ask: "机の引き出しを開けて、中を見せていただけますか。", ok: "……か、構いませんよ。（社長が鍵で引き出しを開ける）" },
-    { id: "owall", area: "office", name: "事務室の壁", ask: "事務室の壁のものを拝見してもよろしいですか。", ok: "……どうぞ。" },
-    { id: "shelf", area: "office", name: "本棚", ask: "本棚のファイルを見せていただけますか。", ok: "古いものばかりですよ。どうぞ。" },
+    { id: "top", area: "office", name: "社長の机の上", ask: "机の上の書類を見せていただけますか。", ok: "どうぞ。散らかっていますがね。" },
+    { id: "drawer", area: "office", name: "社長の机の引き出し", open: true, ask: "机の引き出しを開けて、中を見せていただけますか。", ok: "……か、構いませんよ。（社長が鍵で引き出しを開ける）" },
+    { id: "acct", area: "office", name: "経理の机", ask: "経理の机の帳簿を見せていただけますか。", ok: "帳簿は全部、私がつけています。どうぞ。" },
+    { id: "wall", area: "office", name: "事務所の壁", ask: "壁のホワイトボードや掲示物を拝見してもよろしいですか。", ok: "……どうぞ。" },
+    { id: "cabinet", area: "office", name: "書類棚", ask: "書類棚のファイルを見せていただけますか。", ok: "古いものばかりですよ。どうぞ。" },
     { id: "safe", area: "office", name: "金庫", open: true, ask: "金庫を開けて、中を見せていただけますか。", ok: "……釣り銭と私物だけですよ。（社長がしぶしぶ金庫を開ける）" },
-    { id: "store", area: "back", name: "倉庫の棚", ask: "倉庫の棚を見せていただけますか。", ok: "豆と備品ですよ。どうぞ。" },
-    { id: "kitchen", area: "back", name: "厨房", ask: "厨房の記録を拝見してもよろしいですか。", ok: "どうぞ。衛生管理はきちんとしています。" }
+    { id: "guest", area: "guest", name: "応接テーブル", ask: "応接テーブルのものを拝見してもよろしいですか。", ok: "お客さん用のものですよ。どうぞ。" },
+    { id: "store", area: "back", name: "資材置き場", ask: "資材置き場の書類を見せていただけますか。", ok: "材料しかありませんよ。どうぞ。" },
+    { id: "rest", area: "back", name: "職人の休憩室", ask: "休憩室の記録を拝見してもよろしいですか。", ok: "職人たちの部屋ですよ。どうぞ。" }
   ];
 
   const L = (cap, rows, hl) => `<table class="ledger"><caption>${cap}</caption>${rows.map((r, i) => `<tr class="${hl === i ? "hl" : ""}">${r.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>`;
   const docs = [
-    /* 店内：レジまわり */
-    { id: "register", spot: "reg", name: "レジの日計表",
-      doc: `<div class="receipt-roll"><b>日計表 11/2（土）</b><span>ブレンド ×64</span><span>ランチ ×21</span><span>ケーキセット ×18</span><span>…</span><b>合計 ¥68,400</b><em>レジ締め 18:58</em></div>`,
-      note: "レジは毎日<b>夕方6時58分</b>に締めている。夜の売上は入っていない。" },
-    { id: "pointcard", spot: "reg", name: "ポイントカードの控え",
-      doc: L("ポイントカード発行数", [["9月", "41枚"], ["10月", "38枚"], ["11月", "12枚（途中）"]]),
-      note: "常連さんは毎月同じくらい。特に気になる点はない。" },
-    { id: "change", spot: "reg", name: "両替の記録",
-      doc: L("両替メモ", [["11/1", "千円札 20枚"], ["11/2", "千円札 20枚"], ["11/5", "百円玉 50枚"]]),
-      note: "釣り銭用の両替。特に気になる点はない。" },
-    /* 店内の壁 */
-    { id: "calendar", spot: "wall", name: "予約カレンダー",
-      doc: `<div class="calendar"><b>11月</b><div class="cal">${Array.from({ length: 30 }, (_, i) => { const d = i + 1, sat = (d + 4) % 7 === 6; return `<span class="${sat ? "sat" : ""}">${d}${sat && d !== 30 ? "<i>貸切</i>" : ""}</span>`; }).join("")}</div><p class="hand">4月から 貸切 計18回</p></div>`,
-      note: "土曜日ごとに<b>「貸切」</b>の書き込み。<b>4月から18回</b>と手書きのメモもある。" },
-    { id: "menu", spot: "wall", name: "メニュー表",
-      doc: L("メニュー", [["ブレンド", "¥480"], ["ランチセット", "¥1,200"], ["ケーキセット", "¥950"]]),
-      note: "値段は去年と同じ。特に気になる点はない。" },
-    { id: "permit", spot: "wall", name: "営業許可証",
-      doc: `<div class="cert"><b>飲食店営業許可証</b><span>株式会社浜風珈琲</span><span>許可の期限 2029年3月31日</span><small>（保健所）</small></div>`,
-      note: "ふつうの営業許可証。営業時間は書かれていない。" },
-    { id: "poster", spot: "wall", name: "求人の貼り紙",
-      doc: `<div class="poster"><b>スタッフ募集！</b><span>ホール・キッチン</span><span class="big">土曜 19時〜23時</span><span>時給 1,300円</span><small>くわしくは店長まで</small></div>`,
-      note: "<b>土曜の夜7時〜11時</b>のスタッフを募集している。" },
-    /* カウンターの下 */
-    { id: "trash", spot: "under", name: "ゴミ箱の中の紙",
-      doc: `<div class="order-slip hand"><div>11/2（土）19:30〜</div><div>貸切パーティー　山田様 20名</div><div>コース 4,250円 × 20名</div><div class="big">合計 ¥85,000</div><div>現金にて受領 <span class="hanko">済</span></div></div>`,
-      note: "11月2日（土）の<b>夜7時半から</b>、20名の貸切で<b>85,000円</b>。現金で受け取り済み。" },
-    { id: "flyer", spot: "under", name: "業者のチラシ",
-      doc: `<div class="poster plain"><b>業務用コーヒーマシン</b><span>リース月々 9,800円〜</span><small>浜辺厨房機器</small></div>`,
-      note: "売り込みのチラシ。特に気になる点はない。" },
-    { id: "news", spot: "under", name: "古新聞",
-      doc: `<div class="poster plain"><b>浜辺新聞</b><span>商店街の夏祭り、来場者が過去最多</span></div>`,
-      note: "ただの古新聞。特に気になる点はない。" },
-    /* 事務室：机の上 */
+    /* 社長の机の上 */
     { id: "bank", spot: "top", name: "預金通帳",
-      doc: `<table class="ledger bank"><caption>普通預金　浜風珈琲</caption><tr><th>日付</th><th>摘要</th><th>出金</th><th>入金</th></tr>
-        <tr><td>11/1</td><td>入金</td><td></td><td>61,200</td></tr><tr><td>11/2</td><td>入金</td><td></td><td>68,400</td></tr>
-        <tr><td>11/5</td><td>振込 丸浜食品</td><td>264,000</td><td></td></tr><tr><td>11/5</td><td>振込 前川コーヒー</td><td>98,000</td><td></td></tr>
-        <tr class="hl"><td colspan="4">1年分を見ても、山海物産への支払いも、30万円の引き出しも一度もない</td></tr></table>`,
-      note: "入金はレジの合計と同じ額。<b>山海物産に払ったはずの30万円</b>は、通帳のどこからも出ていない。" },
-    { id: "ledger", spot: "top", name: "仕入帳と領収書",
-      doc: L("仕入帳（山海物産）", [["5/10", "豆", "300,000", "現金"], ["6/14", "豆", "300,000", "現金"], ["…", "", "", ""], ["6回", "計", "1,800,000", ""]], 3) + `<div class="receipt-mini hand">領収書　¥300,000-　山海物産<span class="hanko">山海</span></div>`,
-      note: "山海物産から豆を<b>30万円ずつ6回</b>。領収書は全部そろっている。" },
+      doc: `<table class="ledger bank"><caption>普通預金　白洲リフォーム</caption><tr><th>日付</th><th>摘要</th><th>出金</th><th>入金</th></tr>
+        <tr><td>10/31</td><td>振込入金 佐藤様</td><td></td><td>860,000</td></tr>
+        <tr class="hl"><td>11/5</td><td>振込 シラス ミチコ</td><td>300,000</td><td></td></tr>
+        <tr><td>11/5</td><td>振込 浜辺建材</td><td>412,000</td><td></td></tr>
+        <tr class="hl"><td colspan="4">海野工業への外注費8回は、すべて「シラス ミチコ」名義の口座へ振り込まれている</td></tr></table>`,
+      note: "海野工業に払ったはずの外注費が、<b>社長と同じ名字「シラス ミチコ」名義の口座</b>に振り込まれている。" },
+    { id: "invoices", spot: "top", name: "外注費の請求書つづり",
+      doc: L("海野工業からの請求書", [["5月", "外注工事", "300,000"], ["6月", "外注工事", "300,000"], ["…", "", ""], ["8回", "計", "2,400,000"]], 3) + `<div class="receipt-mini">請求書　¥300,000-　海野工業<span class="hanko">海野</span></div>`,
+      note: "海野工業から<b>30万円ずつ8回</b>の請求書。全部そろっている。" },
     { id: "memo", spot: "top", name: "電話のメモ",
-      doc: `<div class="memo-note hand"><b>TEL</b><span>山田様　11/2（土）夜7時半〜</span><span>20名　コース</span><span>→ OK！</span></div>`,
-      note: "<b>11月2日の夜7時半から20名</b>の予約を受けたメモ。" },
-    { id: "utility", spot: "top", name: "電気代の請求書",
-      doc: L("電気料金のお知らせ", [["10月分", "48,200円"], ["前年同月", "47,900円"]]),
-      note: "去年とほぼ同じ。特に気になる点はない。" },
+      doc: `<div class="memo-note hand"><b>TEL</b><span>山田様　浴室の改修</span><span>10/20〜10/24</span><span>現金で → 5%引き</span></div>`,
+      note: "<b>山田様の浴室工事</b>を、10月20日から<b>現金払い</b>で受けたメモ。" },
     { id: "bizcard", spot: "top", name: "名刺の束",
-      doc: `<div class="biz"><small>山海物産株式会社</small><b>代表 海野 一郎</b><span>浜辺市潮見町3-4-5 潮見ハイツ201</span></div>`,
-      note: "山海物産の名刺。住所はアパートの一室だ。" },
-    /* 机の引き出し */
-    { id: "desk", spot: "drawer", name: "領収書の束",
-      doc: `<div class="receipt-blank"><b>領 収 書</b><span>　　　　様</span><span>¥　　　　　-</span><span>但</span><em>山海物産株式会社<span class="hanko">山海</span></em><small>× 14枚（使った跡あり）</small></div>`,
-      note: "山海物産のハンコが押された<b>白紙の領収書の束</b>。金額を好きに書けてしまう。" },
+      doc: `<div class="biz"><small>海野工業</small><b>代表 海野 一郎</b><span>浜辺市潮見町3-4-5 潮見ハイツ201</span></div>`,
+      note: "海野工業の名刺。住所はアパートの一室だ。" },
+    { id: "news", spot: "top", name: "業界新聞",
+      doc: `<div class="poster plain"><b>住まいの新聞</b><span>浴室リフォームの需要、今年も好調</span></div>`,
+      note: "ただの新聞。特に気になる点はない。" },
+    /* 社長の机の引き出し */
+    { id: "blank", spot: "drawer", name: "請求書の束とハンコ",
+      doc: `<div class="receipt-blank"><b>請 求 書</b><span>白洲リフォーム 様</span><span>¥　　　　　-</span><span>但　外注工事</span><em>海野工業<span class="hanko">海野</span></em><small>× 12枚（白紙）＋「海野」のハンコ</small></div>`,
+      note: "海野工業の<b>白紙の請求書</b>と、<b>「海野」のハンコ</b>が社長の引き出しに。" },
     { id: "photo", spot: "drawer", name: "古い写真",
-      doc: `<div class="photo-print"><div class="ph"></div><p>祝 開店 2019.10.15</p></div>`,
-      note: "開店の日の記念写真。特に気になる点はない。" },
-    /* 事務室の壁 */
-    { id: "shift", spot: "owall", name: "アルバイトのシフト表",
-      doc: `<table class="ledger shift"><caption>11月 シフト表</caption><tr><th>日</th><th>佐藤</th><th>田中</th></tr>
-        <tr><td>11/1（金）</td><td>8–15</td><td>12–19</td></tr><tr class="hl"><td>11/2（土）</td><td>8–15</td><td><b>19–23</b></td></tr>
-        <tr><td>11/3（日）</td><td>8–15</td><td>12–19</td></tr><tr><td>…</td><td></td><td></td></tr>
-        <tr class="hl"><td>11/9（土）</td><td>12–19</td><td><b>19–23</b></td></tr></table>`,
-      note: "土曜日だけ、<b>夜7時〜11時</b>にアルバイトが入っている。" },
-    { id: "insure", spot: "owall", name: "火災保険の証書",
-      doc: `<div class="cert"><b>火災保険 証券</b><span>浜風珈琲 店舗一式</span><span>保険期間 1年</span></div>`,
-      note: "ふつうの保険の証書。特に気になる点はない。" },
-    { id: "contacts", spot: "owall", name: "業者の連絡先一覧",
-      doc: L("連絡先", [["丸浜食品", "0X-XXXX-1111"], ["前川コーヒー", "0X-XXXX-2222"], ["設備の修理", "0X-XXXX-3333"]]),
-      note: "取引先の電話番号。山海物産の番号は書かれていない。" },
-    /* 本棚 */
-    { id: "payroll", spot: "shelf", name: "給与の台帳",
-      doc: L("給与台帳 11月（田中）", [["ふつうの時間", "64時間"], ["夜10時以降（深夜）", "8時間"], ["支給額", "98,600円"]], 1),
-      note: "アルバイトの田中さんに、<b>夜10時以降の深夜手当</b>が出ている。" },
-    { id: "lease", spot: "shelf", name: "店舗の賃貸借契約書",
-      doc: L("賃貸借契約書（抜き書き）", [["家賃", "月 22万円"], ["契約期間", "2年ごとに更新"]]),
-      note: "店の借り方の契約。特に気になる点はない。" },
-    { id: "lastyear", spot: "shelf", name: "前期の帳簿",
-      doc: L("前期 仕入帳（豆）", [["前川コーヒー", "月 3袋", "1袋 15,000円"], ["山海物産", "取引なし", ""]]),
-      note: "前期は前川コーヒーだけ。山海物産とは取引がなかった。" },
-    { id: "manual", spot: "shelf", name: "機械の説明書",
-      doc: `<div class="poster plain"><b>エスプレッソマシン 取扱説明書</b><span>お手入れは毎日行ってください</span></div>`,
-      note: "ただの説明書。特に気になる点はない。" },
+      doc: `<div class="photo-print"><div class="ph"></div><p>創業記念 2012.4.1</p></div>`,
+      note: "会社を始めたときの記念写真。特に気になる点はない。" },
+    /* 経理の机 */
+    { id: "ledger", spot: "acct", name: "工事台帳（売上の帳簿）",
+      doc: L("工事台帳 10月", [["佐藤様", "外壁塗装", "860,000"], ["田村様", "キッチン", "1,240,000"], ["鈴木様", "屋根修理", "380,000"]]),
+      note: "10月の工事は3件。<b>山田様の名前はない</b>。" },
+    { id: "receiptbook", spot: "acct", name: "領収書の控え帳",
+      doc: `<div class="receipt-blank"><b>領収書（控え）</b><span>山田 様</span><span>¥320,000-</span><span>但　浴室改修工事代　現金にて</span><em>白洲リフォーム<span class="hanko">白洲</span></em><small>10/24</small></div>`,
+      note: "<b>山田様から浴室工事代32万円を現金で</b>受け取った控え。" },
+    { id: "payroll", spot: "acct", name: "給与の台帳",
+      doc: L("給与台帳 10月", [["職人 3名", "計 1,050,000"], ["事務 1名", "210,000"]]),
+      note: "毎月ほぼ同じ。特に気になる点はない。" },
+    { id: "utility", spot: "acct", name: "電気代の請求書",
+      doc: L("電気料金のお知らせ", [["10月分", "28,400円"], ["前年同月", "28,100円"]]),
+      note: "去年とほぼ同じ。特に気になる点はない。" },
+    /* 事務所の壁 */
+    { id: "board", spot: "wall", name: "ホワイトボードの予定表",
+      doc: L("10月の現場", [["10/1〜", "佐藤様 外壁"], ["10/9〜", "田村様 キッチン"], ["10/20〜", "山田様 浴室"], ["10/27〜", "鈴木様 屋根"]], 2),
+      note: "10月の現場に<b>「山田様 浴室」</b>。工事台帳には載っていない現場だ。" },
+    { id: "license", spot: "wall", name: "建設業の許可証",
+      doc: `<div class="cert"><b>建設業許可証</b><span>白洲リフォーム株式会社</span><span>内装仕上工事業</span></div>`,
+      note: "ふつうの許可証。特に気になる点はない。" },
+    { id: "calendar", spot: "wall", name: "カレンダー",
+      doc: `<div class="poster plain"><b>10月</b><span>定休日：日曜</span></div>`,
+      note: "定休日が書いてあるだけ。特に気になる点はない。" },
+    { id: "safety", spot: "wall", name: "安全標語のポスター",
+      doc: `<div class="poster"><b>安全第一</b><span>声かけ・指さし・確認よし！</span></div>`,
+      note: "ただの標語。特に気になる点はない。" },
+    /* 書類棚 */
+    { id: "estimate", spot: "cabinet", name: "見積書の控え",
+      doc: L("見積書（控え）山田様", [["浴室改修一式", "336,000"], ["現金払い 5%引き", "−16,000"], ["合計", "320,000"]], 2),
+      note: "<b>山田様の浴室工事 32万円</b>（現金払いで値引き）の見積書。" },
+    { id: "album", spot: "cabinet", name: "工事写真のアルバム",
+      doc: `<div class="photo-print"><div class="ph"></div><p>10/24 山田様邸 浴室 完成</p></div>`,
+      note: "<b>山田様の家の浴室が完成した</b>写真。" },
+    { id: "contracts", spot: "cabinet", name: "契約書のファイル",
+      doc: L("工事請負契約書（一覧）", [["佐藤様", "外壁塗装"], ["田村様", "キッチン"], ["鈴木様", "屋根修理"]]),
+      note: "契約書は台帳と同じ3件。特に気になる点はない。" },
+    { id: "lastyear", spot: "cabinet", name: "前期の帳簿",
+      doc: L("前期 外注費", [["浜辺設備", "520,000"], ["潮見電工", "410,000"], ["海野工業", "取引なし"]]),
+      note: "前期は海野工業との取引がなかった。" },
+    { id: "car", spot: "cabinet", name: "車検証",
+      doc: `<div class="cert"><b>自動車検査証</b><span>軽トラック 1台</span></div>`,
+      note: "社用車の書類。特に気になる点はない。" },
     /* 金庫 */
-    { id: "safe", spot: "safe", name: "「別」と書いた封筒とノート",
-      doc: `<div class="envelope"><span>別</span><small>裏に鉛筆で「11/2」</small><b>¥85,000</b></div>
-        <table class="ledger hand small"><caption>小さなノート</caption><tr><td>4/6 貸切</td><td>78,000</td></tr><tr><td>4/20 貸切</td><td>91,000</td></tr><tr><td>…</td><td>…</td></tr><tr><td>11/2 貸切</td><td>85,000</td></tr><tr class="hl"><td>18回 計</td><td>1,530,000</td></tr></table>`,
-      note: "「別」と書かれた封筒に<b>現金85,000円</b>（裏に11/2）。ノートには<b>貸切18回・計153万円</b>。" },
+    { id: "safe", spot: "safe", name: "「現金工事」の封筒とノート",
+      doc: `<div class="envelope"><span>現金</span><small>「現金工事」　裏に鉛筆で「山田」</small><b>¥320,000</b></div>
+        <table class="ledger hand small"><caption>小さなノート</caption><tr><td>4月 小林様</td><td>280,000</td></tr><tr><td>6月 森田様</td><td>350,000</td></tr><tr><td>…</td><td>…</td></tr><tr><td>10月 山田様</td><td>320,000</td></tr><tr class="hl"><td>6件 計</td><td>1,800,000</td></tr></table>`,
+      note: "「現金工事」の封筒に<b>現金32万円</b>（裏に「山田」）。ノートには<b>6件・計180万円</b>。" },
     { id: "deed", spot: "safe", name: "登記の書類",
-      doc: `<div class="cert"><b>履歴事項全部証明書</b><span>株式会社浜風珈琲</span><span>代表取締役 白洲 守</span></div>`,
+      doc: `<div class="cert"><b>履歴事項全部証明書</b><span>白洲リフォーム株式会社</span><span>代表取締役 白洲 守</span></div>`,
       note: "会社の登記の書類。特に気になる点はない。" },
-    /* 倉庫の棚 */
-    { id: "stock", spot: "store", name: "豆の入荷記録",
-      doc: L("豆の入荷記録", [["", "前期", "今期"], ["入荷量", "月 3袋", "月 3袋"], ["1袋の値段", "15,000円", "15,000円"], ["届いた豆", "前川コーヒー", "前川コーヒーのみ"]], 2),
-      note: "豆の量も<b>値段も去年と同じ</b>。届いているのは前川コーヒーの豆だけ。" },
-    { id: "beans", spot: "store", name: "豆の袋",
-      doc: `<div class="bags"><span>前川コーヒー<br>ブレンド用</span><span>前川コーヒー<br>ブレンド用</span><span>前川コーヒー<br>深煎り</span></div><p class="cap">山海物産の袋は1つもない</p>`,
-      note: "棚の豆は<b>全部 前川コーヒー</b>。山海物産の豆は1袋もない。" },
-    { id: "wine", spot: "store", name: "酒屋の納品書",
-      doc: L("納品書　潮見酒店", [["10/31", "白ワイン", "12本"], ["10/31", "赤ワイン", "12本"], ["", "合計", "43,200円"]]),
-      note: "ワインを24本。昼の喫茶店で、こんなに使うだろうか。" },
-    /* 厨房 */
-    { id: "clean", spot: "kitchen", name: "清掃チェック表",
-      doc: L("清掃チェック 11月", [["11/1（金）", "19:10 済"], ["11/2（土）", "23:20 済"], ["11/3（日）", "19:05 済"]], 1),
-      note: "土曜日だけ、片づけが<b>夜11時20分</b>。" },
-    { id: "fridge", spot: "kitchen", name: "冷蔵庫の温度記録",
-      doc: L("冷蔵庫 温度", [["朝", "3℃"], ["夕方", "4℃"]]),
-      note: "毎日きちんと記録している。特に気になる点はない。" },
-    { id: "recipe", spot: "kitchen", name: "レシピノート",
-      doc: `<div class="memo-note hand"><b>ナポリタン</b><span>ケチャップ多め、最後にバター</span></div>`,
-      note: "料理のメモ。特に気になる点はない。" }
+    /* 応接テーブル */
+    { id: "flyer", spot: "guest", name: "会社のチラシ",
+      doc: `<div class="poster"><b>白洲リフォーム</b><span>浴室・キッチン・外壁</span><span class="big">現金払いなら 5%引き！</span></div>`,
+      note: "「<b>現金払いなら5%引き</b>」と書いてある。" },
+    { id: "letter", spot: "guest", name: "お客さんからの手紙",
+      doc: `<div class="memo-note hand"><b>白洲リフォームさまへ</b><span>浴室がとてもきれいになりました。</span><span>ありがとうございました。　山田</span></div>`,
+      note: "<b>山田様から浴室工事のお礼</b>の手紙。" },
+    { id: "magazine", spot: "guest", name: "住宅雑誌",
+      doc: `<div class="poster plain"><b>月刊 すまいと暮らし</b><span>特集：収納のアイデア</span></div>`,
+      note: "ただの雑誌。特に気になる点はない。" },
+    /* 資材置き場 */
+    { id: "delivery", spot: "store", name: "材料の納品書",
+      doc: L("納品書　浜辺建材", [["10/19", "浴室パネル 一式", "届け先：山田様邸"], ["10/26", "屋根材", "届け先：鈴木様邸"]], 0),
+      note: "<b>山田様の家に浴室の材料を届けた</b>納品書。" },
+    { id: "tools", spot: "store", name: "工具の貸出表",
+      doc: L("工具の貸出", [["電動ドリル", "職人A"], ["脚立", "職人B"]]),
+      note: "工具の管理表。特に気になる点はない。" },
+    { id: "scrap", spot: "store", name: "端材のリスト",
+      doc: L("端材", [["合板", "4枚"], ["タイル", "1箱"]]),
+      note: "余った材料のメモ。特に気になる点はない。" },
+    /* 職人の休憩室 */
+    { id: "nippou", spot: "rest", name: "職人の作業日報",
+      doc: L("作業日報（今期・抜き書き）", [["現場に来た人", "白洲リフォームの職人 3名のみ"], ["海野工業の人", "一度も記録なし"]], 1),
+      note: "どの現場にも、<b>海野工業の人が来た記録は一度もない</b>。" },
+    { id: "attendance", spot: "rest", name: "出勤簿",
+      doc: L("出勤簿 10月", [["職人A", "22日"], ["職人B", "21日"], ["職人C", "22日"]]),
+      note: "ふつうの出勤簿。特に気になる点はない。" },
+    { id: "bento", spot: "rest", name: "弁当の注文表",
+      doc: L("弁当の注文", [["月", "3個"], ["火", "3個"], ["水", "4個"]]),
+      note: "ただの注文表。特に気になる点はない。" }
   ];
 
   const doc = (id) => docs.find((d) => d.id === id);
   const spot = (id) => spots.find((s) => s.id === id);
-  const result = { sales: 153, cost: 180, before: -57, after: 276 };
+  const result = { sales: 180, cost: 240, before: -40, after: 380 };
 
-  return { LIMIT, tancho, statement, claims, areas, spots, docs, doc, spot, result };
+  return { LIMIT, company, tancho, statement, claims, areas, spots, docs, doc, spot, result };
 })();
 
 </script>

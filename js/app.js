@@ -1,6 +1,6 @@
 /* 臨場 v4 ― 司会主導の説明会向け。
  *  スクリーン：司会が「端緒」と「社長の言い分」を説明する（host.html）
- *  スマホ：①お店の資料（約30点）から当たりをつけて1人6点まで見る → ②班で相談（班長が言い分ごとに資料を1つ選ぶ）
+ *  スマホ：①事務所の資料（約30点）から当たりをつけて1人6点まで見る → ②班で相談（班長が言い分ごとに資料を1つ選ぶ）
  *         → 社長に示す → 結果（答え合わせはスクリーンで）
  * 通信はしない。各自のスマホで遊び、見つけたことは口で伝え合う。
  * 保存は localStorage（"rinjo:v4"）。URL の末尾に #debug で window.__rinjo が使える。
@@ -155,10 +155,10 @@
 
   /* ---------- タイトル ---------- */
   function vTitle() {
-    return `<section id="title"><div class="bg" style="background-image:url('${bg("ext")}')"></div>
+    return `<section id="title"><div class="bg" style="background-image:url('${bg("office")}')"></div>
       <div class="wrap">
-        <div class="file"><span class="stamp">調査中</span><p class="kick">税務調査 体験ゲーム</p><h1>臨場</h1><div class="case">喫茶店「浜風珈琲」の調査</div></div>
-        <p class="lead">あなたは税務署の調査官。<br>社長の言い分が本当か、お店で<b>証拠</b>を探して確かめよう。</p>
+        <div class="file"><span class="stamp">調査中</span><p class="kick">税務調査 体験ゲーム</p><h1>臨場</h1><div class="case">白洲リフォーム株式会社の調査</div></div>
+        <p class="lead">あなたは税務署の調査官。<br>社長の言い分が本当か、事務所で<b>証拠</b>を探して確かめよう。</p>
         <div class="wait-note">${ICON.talk}<span><b>スクリーンの説明を聞いてから</b>、はじめてください。</span></div>
         ${st.started ? `<button class="btn btn-main" data-act="resume">続きから</button><button class="btn btn-ghost" data-act="reset">最初からやり直す</button>` : `<button class="btn btn-main" data-act="start">はじめる</button>`}
         <div class="t-foot"><span>登場する会社・人物・資料は、すべて架空です。<br>音は右の ${ICON.snd.replace("<svg", '<svg class="inl"')} でいつでも消せます。</span>${sndBtn()}</div>
@@ -168,26 +168,26 @@
   /* ---------- 言い分の確認 ---------- */
   function vBrief() {
     return `<section class="screen"><div class="wrap">
-      ${mission("社長の<em>言い分</em>を、証拠でくずそう", "スクリーンで見た3つの言い分です。お店で証拠を探して、本当かどうか確かめます。")}
+      ${mission("社長の<em>言い分</em>を、証拠でくずそう", "スクリーンで見た3つの言い分です。事務所で証拠を探して、本当かどうか確かめます。")}
       <div class="claims">${C.claims.map((c) => quote(c)).join("")}</div>
       <details class="words"><summary>スクリーンで見た「不審な点」（端緒）</summary>
         <p class="words-lede"><b>端緒（たんちょ）</b>＝調べるきっかけになる、不審な点のこと。</p>
         <ul class="tancho">${C.tancho.map((t) => `<li><b>${esc(t.big)}</b><span>${esc(t.text)}</span></li>`).join("")}</ul>
       </details>
       <div class="rules">
-        <div><span class="n">1</span><p>お店には<b>${C.docs.length}点</b>の資料がある。でも、見られるのは<b>1人${C.LIMIT}点まで</b>。</p></div>
+        <div><span class="n">1</span><p>事務所には<b>${C.docs.length}点</b>の資料がある。でも、見られるのは<b>1人${C.LIMIT}点まで</b>。</p></div>
         <div><span class="n">2</span><p>どの資料を見れば言い分を確かめられるか、<b>当たり</b>（見当）をつけよう。その付け方を<b>班で相談</b>して、手分けしよう。</p></div>
         <div><span class="n">3</span><p>見るときは、まず社長に<b>お願いして承諾をもらう</b>。</p></div>
       </div>
-    </div></section>${cta(`<button class="btn btn-main" data-act="to-map">お店に入る</button>`)}`;
+    </div></section>${cta(`<button class="btn btn-main" data-act="to-map">事務所に入る</button>`)}`;
   }
 
-  /* ---------- お店の中：どの資料を見る？ ---------- */
+  /* ---------- 事務所の中：どの資料を見る？ ---------- */
   function vMap() {
     const n = left();
     const dots = Array.from({ length: C.LIMIT }, (_, i) => `<i class="${i < st.seen.length ? "used" : ""}"></i>`).join("");
     return `<section class="screen"><div class="wrap">
-      ${mission(n ? "どの資料を見る？ <em>当たり</em>をつけよう" : "見られる数を使い切りました", n ? `お店には${C.docs.length}点の資料。どれを見れば言い分を確かめられるか、班で相談しながら選ぼう。` : "下のボタンで、班の相談へ進もう。")}
+      ${mission(n ? "どの資料を見る？ <em>当たり</em>をつけよう" : "見られる数を使い切りました", n ? `事務所には${C.docs.length}点の資料。どれを見れば言い分を確かめられるか、班で相談しながら選ぼう。` : "下のボタンで、班の相談へ進もう。")}
       <div class="left ${n ? "" : "zero"}"><div class="dots4">${dots}</div><p>見られるのは あと <b>${n}</b> 点</p></div>
       <p class="mark-help"><span class="star on">★</span>＝当たりの印（見なくてもつけられます）。相談のメモにどうぞ。</p>
       ${C.areas.map((a) => `<div class="area">
@@ -362,8 +362,8 @@
     sound() { SND.unlock(); SND.toggle(); if (!SND.on) voice(null); render(); },
     async start() {
       st = fresh(); st.started = true; go("brief"); SND.play("paper");
-      await talk([{ who: "mori", text: "指導役の森だ。スクリーンで見たとおり、相手は喫茶店「<b>浜風珈琲</b>」の白洲社長。", v: "mori_start_1" },
-        { who: "mori", text: "社長の<b>3つの言い分</b>が本当か、お店で証拠を探して確かめよう。迷ったら上の<b>「ヒント」</b>を押してくれ。", v: "mori_start_2" }]);
+      await talk([{ who: "mori", text: "指導役の森だ。スクリーンで見たとおり、相手は「<b>白洲リフォーム</b>」の白洲社長。", v: "mori_start_1" },
+        { who: "mori", text: "社長の<b>3つの言い分</b>が本当か、事務所で証拠を探して確かめよう。迷ったら上の<b>「ヒント」</b>を押してくれ。", v: "mori_start_2" }]);
     },
     resume() { go(resumeTo && resumeTo !== "title" ? resumeTo : "brief"); },
     reset() { confirmSheet("最初からやり直しますか", "この端末の進み具合が消えます。", "やり直す", () => { st = fresh(); save(); go("title"); }); },
